@@ -1,0 +1,8 @@
+RegionPoint r_from
+RegionPoint r_to
+string name_from
+string name_to
+int32 op
+Map map
+---
+mavros_msgs/WaypointList waypoints

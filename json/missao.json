@@ -1,0 +1,60 @@
+[
+   {
+      "name" : "take_picture_0",
+      "id" : 0,
+      "mission_execution" : [
+         {"instructions" : {"area" : "region_1"},"command" : "take_picture"},
+         {"instructions" : { "area" : "base_3"},"command" : "end"}
+      ]
+   },
+   {
+      "name" : "take_picture_1",
+      "id" : 1,
+      "mission_execution" : [
+         {"instructions" : {"area" : "region_1"},"command" : "take_picture"},
+         {"instructions" : {"area" : "region_2"},"command" : "take_picture"},
+         {"instructions" : { "area" : "base_1"},"command" : "end"}
+      ]
+   },
+   {
+      "name" : "take_picture_1",
+      "id" : 2,
+      "mission_execution" : [
+         {"instructions" : {"area" : "region_1"},"command" : "take_picture"},
+         {"instructions" : {"area" : "region_2"},"command" : "take_picture"},
+         {"instructions" : {"area" : "region_3"},"command" : "take_picture"},
+         {"instructions" : { "area" : "base_3"},"command" : "end"}
+      ]
+   },
+   {"id": 3, "name": "take_picture_7928", "mission_execution": 
+      [{"command": "take_picture", "instructions": {"area": "region_1"}}, 
+       {"command": "take_picture", "instructions": {"area": "region_2"}}, 
+       {"command": "take_picture", "instructions": {"area": "region_3"}}, 
+       {"command": "take_picture", "instructions": {"area": "region_4"}}, 
+       {"command": "take_picture", "instructions": {"area": "region_5"}}, 
+       {"command": "take_picture", "instructions": {"area": "region_6"}}, 
+       {"command": "end", "instructions": {"area": "base_3"}}]},
+   {"id": 4, "name": "take_picture_pulverize_7928", "mission_execution": [{"command": "take_picture", "instructions": {"area": "region_1"}}, {"command": "take_picture", "instructions": {"area": "region_2"}}, {"command": "take_picture", "instructions": {"area": "region_3"}}, {"command": "take_picture", "instructions": {"area": "region_4"}}, {"command": "take_picture", "instructions": {"area": "region_5"}}, {"command": "take_picture", "instructions": {"area": "region_6"}},{"command": "pulverize", "instructions": {"area": "region_1"}}, {"command": "pulverize", "instructions": {"area": "region_2"}}, {"command": "pulverize", "instructions": {"area": "region_3"}}, {"command": "pulverize", "instructions": {"area": "region_4"}}, {"command": "pulverize", "instructions": {"area": "region_5"}}, {"command": "pulverize", "instructions": {"area": "region_6"}}, {"command": "end", "instructions": {"area": "base_3"}}]},
+   {"id": 5, "name": "take_picture_7928", "mission_execution": [{"command": "take_picture", "instructions": {"area": "region_1"}}, {"command": "take_picture", "instructions": {"area": "region_3"}}, {"command": "take_picture", "instructions": {"area": "region_5"}}, {"command": "end", "instructions": {"area": "base_3"}}]},
+   {"id": 6, "name": "take_picture_7928", "mission_execution": 
+      [{"command": "take_picture", "instructions": {"area": "region_2"}}, 
+       {"command": "take_picture", "instructions": {"area": "region_4"}}, 
+       {"command": "take_picture", "instructions": {"area": "region_6"}}]},
+   {"id": 7, "name": "take_picture_7928", "mission_execution": 
+      [ 
+       {"command": "take_picture", "instructions": {"area": "region_1"}}, 
+       {"command": "take_picture", "instructions": {"area": "region_3"}}, 
+       {"command": "take_picture", "instructions": {"area": "region_5"}}, 
+       {"command": "take_picture", "instructions": {"area": "region_6"}}, 
+       {"command": "end", "instructions": {"area": "base_3"}}]},
+   {"id": 8, "name": "take_picture_7928", "mission_execution": 
+      [  
+       {"command": "take_picture", "instructions": {"area": "region_5"}}, 
+       {"command": "take_picture", "instructions": {"area": "region_6"}}]
+   },
+   {"id": 9, "name": "take_picture_7928", "mission_execution": 
+      [ 
+       {"command": "take_picture", "instructions": {"area": "region_4"}}
+     ]
+   }
+]

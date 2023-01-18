@@ -1,0 +1,8 @@
+#goal
+int32 op
+Mission mission
+---
+#result
+---
+#feedback
+int32 status

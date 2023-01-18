@@ -1,0 +1,10 @@
+string name
+Tuple2D open_angle
+Tuple2D sensor
+Tuple2D resolution
+int32 max_zoom
+float32 mega_pixel
+float32 focus_distance
+float32 shutter_time
+float32 trigger
+float32 weight
