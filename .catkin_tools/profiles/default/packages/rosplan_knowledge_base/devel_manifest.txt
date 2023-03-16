@@ -1,0 +1,6 @@
+rosplan/rosplan_knowledge_base
+/home/vannini/harpia/devel/.private/rosplan_knowledge_base/cmake.lock /home/vannini/harpia/devel/./cmake.lock
+/home/vannini/harpia/devel/.private/rosplan_knowledge_base/lib/pkgconfig/rosplan_knowledge_base.pc /home/vannini/harpia/devel/lib/pkgconfig/rosplan_knowledge_base.pc
+/home/vannini/harpia/devel/.private/rosplan_knowledge_base/lib/rosplan_knowledge_base/knowledgeBase /home/vannini/harpia/devel/lib/rosplan_knowledge_base/knowledgeBase
+/home/vannini/harpia/devel/.private/rosplan_knowledge_base/share/rosplan_knowledge_base/cmake/rosplan_knowledge_baseConfig.cmake /home/vannini/harpia/devel/share/rosplan_knowledge_base/cmake/rosplan_knowledge_baseConfig.cmake
+/home/vannini/harpia/devel/.private/rosplan_knowledge_base/share/rosplan_knowledge_base/cmake/rosplan_knowledge_baseConfig-version.cmake /home/vannini/harpia/devel/share/rosplan_knowledge_base/cmake/rosplan_knowledge_baseConfig-version.cmake
