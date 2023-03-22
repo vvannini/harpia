@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import rospy
 from std_msgs.msg import String
@@ -8,8 +8,35 @@ from geometry_msgs.msg import *
 from sensor_msgs.msg import NavSatFix, Imu, BatteryState
 
 
-def callback(data):
-    rospy.loginfo(rospy.get_caller_id() + 'I heard %s', data.pose)
+# --- 
+from libs.anomalyDetection import findAnomaly, clusters, checkValues
+from libs import anomalyDetection,clustering,loadData, NoiseGenerator
+#S,NoiseGenerator #user libraries
+# import numpy as np
+# import pandas as pd
+# import colorama;colorama.init(autoreset=True)
+# import termcolor
+# from colorama import Fore, Back, Style
+# import progressbar
+import time
+
+
+def sequential_noise(data):
+    sequential = {'roll':[],
+                          'pitch':[],
+                          'heading':[], #yaw
+                          'rollRate':[],
+                          'pitchRate':[],
+                          'yawRate':[],
+                          'groundSpeed':[],
+                          'climbRate':0, # ?
+                          'altitudeRelative':[],
+                          'throttlePct':[]}
+    for key in sequential:
+        sequential[key] = NoiseGenerator.noisyData(data,key, 1., 50000.)
+
+    return sequential
+
 
 # Classes
 
@@ -26,7 +53,7 @@ class UAV(object):
                           'pitchRate':[],
                           'yawRate':[],
                           'groundSpeed':[],
-                          'climbRate':[], # ?
+                          'climbRate':0, # ?
                           'altitudeRelative':[],
                           'throttlePct':[]}
         # self.weightedCluster = []
@@ -54,18 +81,43 @@ class UAV(object):
 
 def listener():
 
-    # In ROS, nodes are uniquely named. If two nodes with the same
-    # name are launched, the previous one is kicked off. The
-    # anonymous=True flag means that rospy will choose a unique
-    # name for our 'listener' node so that multiple listeners can
-    # run simultaneously.
     rospy.init_node('listener', anonymous=True)
-
     kenny = UAV()
 
-    for i in range(30):
-        print(kenny.sequential)
-        rospy.sleep(1)
+
+    startMain = time.time()
+
+    _,statistics = loadData.loadData(printColumnNames=True) #loading previous flights statistics
+
+    # anomaly classifier (static):
+    start_1 = time.time()
+    module1 = anomalyDetection.findAnomaly()
+    end_1 = time.time()
+    print("\n>> Loaded Anomaly Detection Module in {} seconds.\n".format(round((end_1-start_1),3)))
+
+
+    # clustering method (static):
+    start_2 = time.time()
+    module2 = clustering.clusters()
+    end_2 = time.time()
+    print("\n>> Loaded Clustering Module in {} seconds.\n".format(round((end_2-start_2),3)))
+
+    # while not rospy.is_shutdown():
+    _, flag = anomalyDetection.checkValues(kenny.sequential, statistics, module1, module2)
+
+    while flag:
+        if(time.time()-startMain > 30) and (time.time()-startMain < 120):
+            print('noisyData')
+            error_data = sequential_noise(kenny.sequential)
+            # print(error_data)
+            _, flag = anomalyDetection.checkValues(error_data, statistics, module1, module2)
+        elif(time.time()-startMain > 140):
+            break
+        else:
+            _, flag = anomalyDetection.checkValues(kenny.sequential, statistics, module1, module2)
+        # print(kenny.sequential)
+        rospy.Rate(1)
+        
 
 
     # spin() simply keeps python from exiting until this node is stopped
