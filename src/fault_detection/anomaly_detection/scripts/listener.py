@@ -106,9 +106,23 @@ def listener():
     _, flag = anomalyDetection.checkValues(kenny.sequential, statistics, module1, module2)
 
     while flag:
-        if(time.time()-startMain > 30) and (time.time()-startMain < 120):
+        if(time.time()-startMain > 1) and (time.time()-startMain < 120):
             print('noisyData')
+            
             error_data = sequential_noise(kenny.sequential)
+
+
+            error_data['rollRate'] = error_data['rollRate'] * 1000
+            # error_data['yawRate'] = error_data['yawRate'] * 1000
+            # error_data['pitchRate'] = error_data['pitchRate'] * 1000
+
+            print(error_data['rollRate'], kenny.sequential['rollRate'])
+            print(error_data['yawRate'], kenny.sequential['yawRate'])
+            print(error_data['pitchRate'], kenny.sequential['pitchRate'])
+
+            # print(error_data['yawRate'], kenny.sequential['yawRate'])
+            # print(error_data['pitchRate'], kenny.sequential['pitchRate'])
+
             # print(error_data)
             _, flag = anomalyDetection.checkValues(error_data, statistics, module1, module2)
         elif(time.time()-startMain > 140):

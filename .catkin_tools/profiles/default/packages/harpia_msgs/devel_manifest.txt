@@ -23,8 +23,10 @@ harpia_msgs
 /home/vannini/harpia/devel/.private/harpia_msgs/lib/python2.7/dist-packages/harpia_msgs/msg/_Frame.py /home/vannini/harpia/devel/lib/python2.7/dist-packages/harpia_msgs/msg/_Frame.py
 /home/vannini/harpia/devel/.private/harpia_msgs/lib/python2.7/dist-packages/harpia_msgs/srv/_MissionGoalManager.py /home/vannini/harpia/devel/lib/python2.7/dist-packages/harpia_msgs/srv/_MissionGoalManager.py
 /home/vannini/harpia/devel/.private/harpia_msgs/lib/python2.7/dist-packages/harpia_msgs/srv/__init__.py /home/vannini/harpia/devel/lib/python2.7/dist-packages/harpia_msgs/srv/__init__.py
+/home/vannini/harpia/devel/.private/harpia_msgs/lib/python2.7/dist-packages/harpia_msgs/srv/_WeatherCheck.py /home/vannini/harpia/devel/lib/python2.7/dist-packages/harpia_msgs/srv/_WeatherCheck.py
 /home/vannini/harpia/devel/.private/harpia_msgs/lib/python2.7/dist-packages/harpia_msgs/srv/_FaultDetection.py /home/vannini/harpia/devel/lib/python2.7/dist-packages/harpia_msgs/srv/_FaultDetection.py
 /home/vannini/harpia/devel/.private/harpia_msgs/lib/python2.7/dist-packages/harpia_msgs/srv/_PathPlanning.py /home/vannini/harpia/devel/lib/python2.7/dist-packages/harpia_msgs/srv/_PathPlanning.py
+/home/vannini/harpia/devel/.private/harpia_msgs/include/harpia_msgs/WeatherCheckResponse.h /home/vannini/harpia/devel/include/harpia_msgs/WeatherCheckResponse.h
 /home/vannini/harpia/devel/.private/harpia_msgs/include/harpia_msgs/PathPlanningRequest.h /home/vannini/harpia/devel/include/harpia_msgs/PathPlanningRequest.h
 /home/vannini/harpia/devel/.private/harpia_msgs/include/harpia_msgs/Region.h /home/vannini/harpia/devel/include/harpia_msgs/Region.h
 /home/vannini/harpia/devel/.private/harpia_msgs/include/harpia_msgs/Goal.h /home/vannini/harpia/devel/include/harpia_msgs/Goal.h
@@ -43,8 +45,10 @@ harpia_msgs
 /home/vannini/harpia/devel/.private/harpia_msgs/include/harpia_msgs/MissionPlannerGoal.h /home/vannini/harpia/devel/include/harpia_msgs/MissionPlannerGoal.h
 /home/vannini/harpia/devel/.private/harpia_msgs/include/harpia_msgs/MissionGoalManager.h /home/vannini/harpia/devel/include/harpia_msgs/MissionGoalManager.h
 /home/vannini/harpia/devel/.private/harpia_msgs/include/harpia_msgs/Mission.h /home/vannini/harpia/devel/include/harpia_msgs/Mission.h
+/home/vannini/harpia/devel/.private/harpia_msgs/include/harpia_msgs/WeatherCheckRequest.h /home/vannini/harpia/devel/include/harpia_msgs/WeatherCheckRequest.h
 /home/vannini/harpia/devel/.private/harpia_msgs/include/harpia_msgs/MissionGoalManagerRequest.h /home/vannini/harpia/devel/include/harpia_msgs/MissionGoalManagerRequest.h
 /home/vannini/harpia/devel/.private/harpia_msgs/include/harpia_msgs/MissionGoalManagerResponse.h /home/vannini/harpia/devel/include/harpia_msgs/MissionGoalManagerResponse.h
+/home/vannini/harpia/devel/.private/harpia_msgs/include/harpia_msgs/WeatherCheck.h /home/vannini/harpia/devel/include/harpia_msgs/WeatherCheck.h
 /home/vannini/harpia/devel/.private/harpia_msgs/include/harpia_msgs/Map.h /home/vannini/harpia/devel/include/harpia_msgs/Map.h
 /home/vannini/harpia/devel/.private/harpia_msgs/include/harpia_msgs/UAV.h /home/vannini/harpia/devel/include/harpia_msgs/UAV.h
 /home/vannini/harpia/devel/.private/harpia_msgs/include/harpia_msgs/PathPlanningResponse.h /home/vannini/harpia/devel/include/harpia_msgs/PathPlanningResponse.h
@@ -109,6 +113,8 @@ harpia_msgs
 /home/vannini/harpia/devel/.private/harpia_msgs/share/common-lisp/ros/harpia_msgs/srv/_package_MissionGoalManager.lisp /home/vannini/harpia/devel/share/common-lisp/ros/harpia_msgs/srv/_package_MissionGoalManager.lisp
 /home/vannini/harpia/devel/.private/harpia_msgs/share/common-lisp/ros/harpia_msgs/srv/harpia_msgs-srv.asd /home/vannini/harpia/devel/share/common-lisp/ros/harpia_msgs/srv/harpia_msgs-srv.asd
 /home/vannini/harpia/devel/.private/harpia_msgs/share/common-lisp/ros/harpia_msgs/srv/MissionGoalManager.lisp /home/vannini/harpia/devel/share/common-lisp/ros/harpia_msgs/srv/MissionGoalManager.lisp
+/home/vannini/harpia/devel/.private/harpia_msgs/share/common-lisp/ros/harpia_msgs/srv/_package_WeatherCheck.lisp /home/vannini/harpia/devel/share/common-lisp/ros/harpia_msgs/srv/_package_WeatherCheck.lisp
+/home/vannini/harpia/devel/.private/harpia_msgs/share/common-lisp/ros/harpia_msgs/srv/WeatherCheck.lisp /home/vannini/harpia/devel/share/common-lisp/ros/harpia_msgs/srv/WeatherCheck.lisp
 /home/vannini/harpia/devel/.private/harpia_msgs/share/roseus/ros/harpia_msgs/manifest.l /home/vannini/harpia/devel/share/roseus/ros/harpia_msgs/manifest.l
 /home/vannini/harpia/devel/.private/harpia_msgs/share/roseus/ros/harpia_msgs/msg/Map.l /home/vannini/harpia/devel/share/roseus/ros/harpia_msgs/msg/Map.l
 /home/vannini/harpia/devel/.private/harpia_msgs/share/roseus/ros/harpia_msgs/msg/MissionPlannerFeedback.l /home/vannini/harpia/devel/share/roseus/ros/harpia_msgs/msg/MissionPlannerFeedback.l
@@ -130,6 +136,7 @@ harpia_msgs
 /home/vannini/harpia/devel/.private/harpia_msgs/share/roseus/ros/harpia_msgs/msg/MissionPlannerGoal.l /home/vannini/harpia/devel/share/roseus/ros/harpia_msgs/msg/MissionPlannerGoal.l
 /home/vannini/harpia/devel/.private/harpia_msgs/share/roseus/ros/harpia_msgs/srv/PathPlanning.l /home/vannini/harpia/devel/share/roseus/ros/harpia_msgs/srv/PathPlanning.l
 /home/vannini/harpia/devel/.private/harpia_msgs/share/roseus/ros/harpia_msgs/srv/FaultDetection.l /home/vannini/harpia/devel/share/roseus/ros/harpia_msgs/srv/FaultDetection.l
+/home/vannini/harpia/devel/.private/harpia_msgs/share/roseus/ros/harpia_msgs/srv/WeatherCheck.l /home/vannini/harpia/devel/share/roseus/ros/harpia_msgs/srv/WeatherCheck.l
 /home/vannini/harpia/devel/.private/harpia_msgs/share/roseus/ros/harpia_msgs/srv/MissionGoalManager.l /home/vannini/harpia/devel/share/roseus/ros/harpia_msgs/srv/MissionGoalManager.l
 /home/vannini/harpia/devel/.private/harpia_msgs/share/gennodejs/ros/harpia_msgs/_index.js /home/vannini/harpia/devel/share/gennodejs/ros/harpia_msgs/_index.js
 /home/vannini/harpia/devel/.private/harpia_msgs/share/gennodejs/ros/harpia_msgs/msg/MissionPlannerAction.js /home/vannini/harpia/devel/share/gennodejs/ros/harpia_msgs/msg/MissionPlannerAction.js
@@ -153,5 +160,6 @@ harpia_msgs
 /home/vannini/harpia/devel/.private/harpia_msgs/share/gennodejs/ros/harpia_msgs/msg/Map.js /home/vannini/harpia/devel/share/gennodejs/ros/harpia_msgs/msg/Map.js
 /home/vannini/harpia/devel/.private/harpia_msgs/share/gennodejs/ros/harpia_msgs/srv/MissionGoalManager.js /home/vannini/harpia/devel/share/gennodejs/ros/harpia_msgs/srv/MissionGoalManager.js
 /home/vannini/harpia/devel/.private/harpia_msgs/share/gennodejs/ros/harpia_msgs/srv/_index.js /home/vannini/harpia/devel/share/gennodejs/ros/harpia_msgs/srv/_index.js
+/home/vannini/harpia/devel/.private/harpia_msgs/share/gennodejs/ros/harpia_msgs/srv/WeatherCheck.js /home/vannini/harpia/devel/share/gennodejs/ros/harpia_msgs/srv/WeatherCheck.js
 /home/vannini/harpia/devel/.private/harpia_msgs/share/gennodejs/ros/harpia_msgs/srv/PathPlanning.js /home/vannini/harpia/devel/share/gennodejs/ros/harpia_msgs/srv/PathPlanning.js
 /home/vannini/harpia/devel/.private/harpia_msgs/share/gennodejs/ros/harpia_msgs/srv/FaultDetection.js /home/vannini/harpia/devel/share/gennodejs/ros/harpia_msgs/srv/FaultDetection.js

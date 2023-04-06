@@ -15,6 +15,7 @@ add_service_files(
   FaultDetection.srv
   PathPlanning.srv
   MissionGoalManager.srv
+  WeatherCheck.srv
 )
   
 add_action_files(
