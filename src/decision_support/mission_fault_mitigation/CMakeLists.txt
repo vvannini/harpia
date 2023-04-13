@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(fault_detection)
+project(mission_fault_mitigation)
 
 find_package(catkin REQUIRED COMPONENTS
   actionlib_msgs
@@ -22,7 +22,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES fault_detection
+#  LIBRARIES MissionFaultMitigation
   CATKIN_DEPENDS actionlib_msgs geographic_msgs geometry_msgs harpia_msgs roscpp rosplan_dispatch_msgs rosplan_knowledge_msgs rospy std_msgs
 #  DEPENDS system_lib
 )

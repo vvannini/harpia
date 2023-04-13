@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#@authors Pedro Natali and Veronica Vannini
+#@authors Veronica Vannini
 
 # Import libraries
 import pyAgrum as gum
@@ -187,7 +187,7 @@ def log(replan, bn):
         json.dump(log_file, outfile, indent=4)
     outfile.close()
 
-def fault_detection(req):
+def mission_fault_mitigation(req):
     p = Plan()
     uav = Drone()
     while p.plan.plan ==  []:
@@ -280,7 +280,7 @@ def fault_detection(req):
                 print("\n------------------------- REPLANNING -----------------------------\n")
                 FLAG = 1
                 log(1, bn)
-                return FaultDetectionResponse(FLAG)
+                return MissionFaultMitigationResponse(FLAG)
         else:
             ie.eraseAllEvidence()
 
@@ -293,16 +293,16 @@ def fault_detection(req):
     # with open("WaterSprinkler.net","r") as out:
     #   print(out.read())
     #log(0, bn) #erro em salvar
-    return FaultDetectionResponse(FLAG)
+    return MissionFaultMitigationResponse(FLAG)
 
-def fault_detection_server():
-    rospy.init_node('fault_detection_server')
-    s = rospy.Service('harpia/fault_detection', FaultDetection, fault_detection)
-    print("Fault Detecion Ready")
+def mission_fault_mitigation_server():
+    rospy.init_node('mission_fault_mitigation_server')
+    s = rospy.Service('harpia/mission_fault_mitigation', MissionFaultMitigation, mission_fault_mitigation)
+    rospy.loginfo("Mission Fault Mitigation Ready")
     # rospy.spin()
     while not rospy.is_shutdown():
         continue
 
 if __name__ == '__main__':
-    fault_detection_server()
+    mission_fault_mitigation_server()
     

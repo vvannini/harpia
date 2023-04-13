@@ -12,7 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 add_service_files(
   FILES
-  FaultDetection.srv
+  MissionFaultMitigation.srv
   PathPlanning.srv
   MissionGoalManager.srv
   WeatherCheck.srv
@@ -35,6 +35,7 @@ add_message_files(
   Goal.msg
   Mission.msg
   ChangeMission.msg
+  DronePose.msg
 )
 
 generate_messages(

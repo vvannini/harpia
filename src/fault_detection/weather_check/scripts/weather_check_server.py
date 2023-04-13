@@ -126,7 +126,7 @@ def weather_check(data):
             print("Waiting for UAV info...")
             rospy.sleep(1)
 
-    apikey = 'd0c5edc79f876e0aceae75bf06376b5f' # api key for the openwheater api 
+    apikey = '' # api key for the openwheater api 
 
     address="https://api.openweathermap.org/data/2.5/weather?lat={}&lon={}&appid={}&units=metric".format(uav.latitude,uav.longitude,apikey)
 

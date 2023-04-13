@@ -19,6 +19,7 @@ from libs import anomalyDetection,clustering,loadData, NoiseGenerator
 # from colorama import Fore, Back, Style
 # import progressbar
 import time
+import tf
 
 
 def sequential_noise(data):
@@ -60,9 +61,21 @@ class UAV(object):
 
     
     def pose_callback(self, data): 
-        self.sequential['roll'] = data.pose.position.x
-        self.sequential['pitch'] = data.pose.position.y
-        self.sequential['heading'] = data.pose.position.z
+        lx = data.pose.position.x
+        ly = data.pose.position.y
+        lz = data.pose.position.z
+
+        qx = data.pose.orientation.x
+        qy = data.pose.orientation.y
+        qz = data.pose.orientation.z
+        qw = data.pose.orientation.w
+
+        q = tf.transformQuaternion("kenny", data.pose.orientation)
+        m = tf.
+
+        self.sequential['roll'] = 
+        self.sequential['pitch'] = 
+        self.sequential['heading'] = 
 
     def imu_callback(self, data): 
         self.sequential['rollRate'] = data.angular_velocity.x

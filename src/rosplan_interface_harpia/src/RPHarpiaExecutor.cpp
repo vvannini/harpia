@@ -26,7 +26,7 @@
 #include <harpia_msgs/Goal.h>
 #include <harpia_msgs/RegionPoint.h>
 #include <harpia_msgs/MissionPlannerAction.h>
-#include <harpia_msgs/FaultDetection.h>
+#include <harpia_msgs/MissionFaultMitigation.h>
 #include <harpia_msgs/RegionPoint.h>
 #include <harpia_msgs/PathPlanning.h>
 #include <actionlib/client/simple_action_client.h>
@@ -489,8 +489,8 @@ namespace KCL_rosplan {
 	bool RPHarpiaExecutor::concreteCallback(const rosplan_dispatch_msgs::ActionDispatch::ConstPtr& msg) {
 
 		ros::NodeHandle n;
-	 	ros::ServiceClient client = n.serviceClient<harpia_msgs::FaultDetection>("harpia/fault_detection");
-	  	harpia_msgs::FaultDetection srv;
+	 	ros::ServiceClient client = n.serviceClient<harpia_msgs::MissionFaultMitigation>("harpia/mission_fault_mitigation");
+	  	harpia_msgs::MissionFaultMitigation srv;
 	  	srv.request.uav = mission.hMission.uav;
 	  	srv.request.action_id = msg->action_id;
 

@@ -17,11 +17,12 @@
 	</include>
 
 	<!-- HARPIA -->
-    <node name="mission_planner_as"          pkg="mission_planning"     type="mission_planner_server.py"      respawn="false" output="screen" />
-    <node name="fault_detection_server"      pkg="fault_detection"      type="fault_detection_server.py"      respawn="false" output="screen" />
-    <node name="mission_goal_manager_server" pkg="mission_goal_manager" type="mission_goal_manager_server.py" respawn="true"  output="screen" />
-    <node name="path_planning_server"        pkg="path_planning"        type="path_planning_server.py"        respawn="false" output="screen" />
-    <node name="weather_check_server"        pkg="uav_fault_detection"  type="weather_check_server.py"        respawn="false" output="screen" />
+    <node name="mission_planner_as"          	 pkg="mission_planning"     	type="mission_planner_server.py"      		respawn="false" output="screen" />
+    <node name="mission_fault_mitigation_server" pkg="mission_fault_mitigation"	type="mission_fault_mitigation_server.py"   respawn="false" output="screen" />
+    <node name="mission_goal_manager_server"	 pkg="mission_goal_manager" 	type="mission_goal_manager_server.py" 		respawn="true"  output="screen" />
+    <node name="path_planning_server"        	 pkg="path_planning"        	type="path_planning_server.py"        		respawn="false" output="screen" />
+    <node name="weather_check_server"        	 pkg="fault_detection"  		type="weather_check_server.py"        		respawn="false" output="screen" />
+    <node name="drone_info"      		     	 pkg="fault_detection"  		type="DroneInfoCompiler"        			respawn="false" output="screen" />
 
 	<!-- ROSPlan -->
 	<include file="$(find rosplan_planning_system)/launch/interfaced_planning_system.launch" >
@@ -39,38 +40,13 @@
 		<param name="action_feedback_topic" value="/rosplan_plan_dispatcher/action_feedback" />
 	</node>
 
-	<!-- <node name="rosplan_interface_clean_camera" pkg="rosplan_interface_harpia" type="RPHarpiaExecutor" respawn="false" output="screen">
-		<param name="knowledge_base"		value="rosplan_knowledge_base"                   />
-		<param name="pddl_action_name"		value="clean_camera"                             />
-		<param name="action_dispatch_topic" value="/rosplan_plan_dispatcher/action_dispatch" />
-		<param name="action_feedback_topic" value="/rosplan_plan_dispatcher/action_feedback" />
-	</node> -->
+
 	<node name="rosplan_interface_go_to" pkg="rosplan_interface_harpia" type="RPHarpiaExecutor" respawn="false" output="screen">
 		<param name="knowledge_base"		value="rosplan_knowledge_base"                   />
 		<param name="pddl_action_name"		value="go_to"                          />
 		<param name="action_dispatch_topic" value="/rosplan_plan_dispatcher/action_dispatch" />
 		<param name="action_feedback_topic" value="/rosplan_plan_dispatcher/action_feedback" />
 	</node>
-	<!-- <node name="rosplan_interface_go_to_pulverize" pkg="rosplan_interface_harpia" type="RPHarpiaExecutor" respawn="false" output="screen">
-		<param name="knowledge_base"		value="rosplan_knowledge_base"                   />
-		<param name="pddl_action_name"		value="go_to_pulverize"                          />
-		<param name="action_dispatch_topic" value="/rosplan_plan_dispatcher/action_dispatch" />
-		<param name="action_feedback_topic" value="/rosplan_plan_dispatcher/action_feedback" />
-	</node>
-
-	<node name="rosplan_interface_go_to_base" pkg="rosplan_interface_harpia" type="RPHarpiaExecutor" respawn="false" output="screen">
-		<param name="knowledge_base"		value="rosplan_knowledge_base"                   />
-		<param name="pddl_action_name"		value="go_to_base"                               />
-		<param name="action_dispatch_topic" value="/rosplan_plan_dispatcher/action_dispatch" />
-		<param name="action_feedback_topic" value="/rosplan_plan_dispatcher/action_feedback" />
-	</node>
-
-	<node name="rosplan_interface_go_to_picture" pkg="rosplan_interface_harpia" type="RPHarpiaExecutor" respawn="false" output="screen">
-		<param name="knowledge_base"		value="rosplan_knowledge_base"                   />
-		<param name="pddl_action_name"		value="go_to_picture"                            />
-		<param name="action_dispatch_topic" value="/rosplan_plan_dispatcher/action_dispatch" />
-		<param name="action_feedback_topic" value="/rosplan_plan_dispatcher/action_feedback" />
-	</node> -->
 
 	<node name="rosplan_interface_pulverize_region" pkg="rosplan_interface_harpia" type="RPHarpiaExecutor" respawn="false" output="screen">
 		<param name="knowledge_base"		value="rosplan_knowledge_base"                   />
