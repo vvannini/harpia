@@ -19,8 +19,7 @@ from libs import anomalyDetection,clustering,loadData, NoiseGenerator
 # from colorama import Fore, Back, Style
 # import progressbar
 import time
-import tf
-
+import math
 
 def sequential_noise(data):
     sequential = {'roll':[],
@@ -43,54 +42,34 @@ def sequential_noise(data):
 
 class UAV(object):
     def __init__(self):
-        self.sub_pose     = rospy.Subscriber('/mavros/local_position/pose'  , PoseStamped              , self.pose_callback)
-        self.sub_imu      = rospy.Subscriber('/mavros/imu/data'             , Imu                      , self.imu_callback)
-        self.sub_vfr_hud  = rospy.Subscriber('/mavros/vfr_hud'              , VFR_HUD  , self.vfr_hud_callback)
-        self.sub_g_pos    = rospy.Subscriber('/mavros/global_position/local', Odometry , self.globalp_callback)
-        self.sequential = {'roll':[],
-                          'pitch':[],
-                          'heading':[], #yaw
-                          'rollRate':[],
-                          'pitchRate':[],
-                          'yawRate':[],
-                          'groundSpeed':[],
-                          'climbRate':0, # ?
-                          'altitudeRelative':[],
-                          'throttlePct':[]}
+        self.sub_pose   = rospy.Subscriber('/drone_info/pose'  , DronePose, self.pose_callback)
+        self.sequential = {'roll':-math.inf,
+                          'pitch':-math.inf,
+                          'yaw' : -math.inf,
+                          'heading':-math.inf, 
+                          'rollRate':-math.inf,
+                          'pitchRate':-math.inf,
+                          'yawRate':-math.inf,
+                          'groundSpeed':-math.inf,
+                          'climbRate':-math.inf, 
+                          'altitudeRelative':-math.inf,
+                          'throttlePct':-math.inf}
         # self.weightedCluster = []
 
     
     def pose_callback(self, data): 
-        lx = data.pose.position.x
-        ly = data.pose.position.y
-        lz = data.pose.position.z
-
-        qx = data.pose.orientation.x
-        qy = data.pose.orientation.y
-        qz = data.pose.orientation.z
-        qw = data.pose.orientation.w
-
-        q = tf.transformQuaternion("kenny", data.pose.orientation)
-        m = tf.
-
-        self.sequential['roll'] = 
-        self.sequential['pitch'] = 
-        self.sequential['heading'] = 
-
-    def imu_callback(self, data): 
-        self.sequential['rollRate'] = data.angular_velocity.x
-        self.sequential['pitchRate'] = data.angular_velocity.y
-        self.sequential['yawRate'] = data.angular_velocity.z
-
-    def vfr_hud_callback(self, data): 
+        self.sequential['roll'] = data.roll
+        self.sequential['pitch'] = data.pitch
+        self.sequential['yaw'] = data.yaw
+        self.sequential['heading'] = data.heading
+        self.sequential['rollRate'] = data.rollRate
+        self.sequential['pitchRate'] = data.pitchRate
+        self.sequential['yawRate'] = data.yawRate
         self.sequential['groundSpeed'] = data.groundspeed
         self.sequential['throttlePct'] = data.throttle
+        self.sequential['altitudeRelative'] = data.altRelative
 
-    def globalp_callback(self, data): 
-        self.sequential['altitudeRelative'] = data.pose.pose.position.z
 
-    # def unsubscribe(self):
-    #     self.sub.unregister()
 
 def listener():
 

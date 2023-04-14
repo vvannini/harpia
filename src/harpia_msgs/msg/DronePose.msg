@@ -8,4 +8,4 @@ float32 heading
 float32 groundSpeed
 float32 climbRate
 float32 altRelative
-float32 throttlePct
+float32 throttle
