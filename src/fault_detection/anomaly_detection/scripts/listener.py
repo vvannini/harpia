@@ -65,7 +65,7 @@ class UAV(object):
         self.sequential['rollRate'] = data.rollRate
         self.sequential['pitchRate'] = data.pitchRate
         self.sequential['yawRate'] = data.yawRate
-        self.sequential['groundSpeed'] = data.groundspeed
+        self.sequential['groundSpeed'] = data.groundSpeed
         self.sequential['throttlePct'] = data.throttle
         self.sequential['altitudeRelative'] = data.altRelative
 

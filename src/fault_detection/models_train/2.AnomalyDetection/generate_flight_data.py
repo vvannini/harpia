@@ -1,18 +1,31 @@
 #!/usr/bin/env python3
 
 import rospy
+import pyproj
+from shapely.geometry import mapping, Point as PointGeometry
+from shapely.ops import transform
+from functools import partial
 from std_msgs.msg import String
 from mavros_msgs.msg import *
 from nav_msgs.msg import *
 from geometry_msgs.msg import *
+from harpia_msgs.msg import *
 from sensor_msgs.msg import NavSatFix, Imu, BatteryState
 
+from mavros_msgs.srv import *
+
+import sys
+sys.path.append('../../anomaly_detection/scripts')
 
 # --- 
-from libs.anomalyDetection import findAnomaly, clusters, checkValues
+# from libs.anomalyDetection import findAnomaly, clusters, checkValues
 from libs import anomalyDetection,clustering,loadData, NoiseGenerator
 import time
 import math
+
+#---
+import numpy
+from VelocityController import VelocityController
 
 table = [
     {"Type": "Takeoff and landing", "Takeoff Alt": 5},
@@ -35,8 +48,8 @@ table = [
     {"Type": "Sideways flight", "Direction": "D", "Distance": 15, "Start Alt": 50, "End Alt": 30},
     {"Type": "Sideways flight", "Direction": "D", "Distance": 5, "Start Alt": 7, "End Alt": 5},
     {"Type": "Circular flight", "Radius": 5, "Wind speed": None},
-    {"Type": "Circular flight", "Radius": 15, "Wind speed": None},
-    {"Type": "Circular flight", "Radius": 20, "Wind speed": None},
+    {"Type": "Circular flight", "Radius": 25, "Wind speed": None},
+    {"Type": "Circular flight", "Radius": 50, "Wind speed": None},
     {"Type": "8", "Starting location (x,y,z)": None, "Obstacle position (x,y,z)": None, "Obstacle size": None, "Velocity": None},
 ]
 
@@ -47,114 +60,6 @@ def get_harpia_root_dir():
 '''
     behaivors 
 '''
-
-def circle(from_wp, raio, alt):
-    point = Point(from_wp.geo.longitude, from_wp.geo.latitude)
-    local_azimuthal_projection = f"+proj=aeqd +R=6371000 +units=m +lat_0={point.y} +lon_0={point.x}"
-
-    wgs84_to_aeqd = partial(
-        pyproj.transform,
-        pyproj.Proj('+proj=longlat +datum=WGS84 +no_defs'),
-        pyproj.Proj(local_azimuthal_projection),
-    )
-
-    aeqd_to_wgs84 = partial(
-        pyproj.transform,
-        pyproj.Proj(local_azimuthal_projection),
-        pyproj.Proj('+proj=longlat +datum=WGS84 +no_defs'),
-    )
-
-    point_transformed = transform(wgs84_to_aeqd, point)
-
-    buffer = point_transformed.buffer(raio)
-
-    buffer_wgs84 = transform(aeqd_to_wgs84, buffer)
-
-    # print(buffer_wgs84)
-    coord = mapping(buffer_wgs84)
-    # print(coord)
-
-    # Create polygon from lists of points
-    x = []
-    y = []
-
-    some_poly = buffer_wgs84
-    # Extract the point values that define the perimeter of the polygon
-    x, y = some_poly.exterior.coords.xy
-
-    route = WaypointList()
-    for i, j in zip(x, y):
-        geo_wp = Waypoint()
-        geo_wp.frame = 3
-        geo_wp.command = 16
-        if route.waypoints == []:
-            geo_wp.is_current = True
-        else:
-            geo_wp.is_current = False
-        geo_wp.autocontinue = True
-        geo_wp.param1 = 0
-        geo_wp.param2 = 0
-        geo_wp.param3 = 0
-        geo_wp.param4 = 0
-        geo_wp.x_lat = j
-        geo_wp.y_long = i
-        geo_wp.z_alt = 10
-        route.waypoints.append(geo_wp)
-
-    return route
-
-'''
-    Callers for MAVRos Services
-'''
-
-def mavros_cmd(topic, msg_ty, error_msg="MAVROS command failed: ", **kwargs):
-    rospy.wait_for_service(topic)
-    try:
-        service_proxy = rospy.ServiceProxy(topic, msg_ty)
-        response = service_proxy(**kwargs)
-        rospy.loginfo(response)
-    except rospy.ServiceException as e:
-        rospy.logerr(f"{error_msg} {e}")
-
-def land():
-    mavros_cmd(
-        '/mavros/cmd/land',
-        CommandTOL,
-        error_msg="Landing failed",
-        altitude=10, latitude=0, longitude=0, min_pitch=0, yaw=0
-    )
-
-def takeoff(alt):
-    mavros_cmd(
-        '/mavros/cmd/takeoff',
-        CommandTOL,
-        error_msg="Takeoff failed",
-        altitude=alt, latitude=0, longitude=0, min_pitch=0, yaw=0
-    )
-
-def set_mode(mode):
-    mavros_cmd(
-        '/mavros/set_mode',
-        SetMode,
-        error_msg="Set mode failed",
-        custom_mode=mode
-    )
-
-def clear_mission():
-    mavros_cmd(
-        '/mavros/mission/clear',
-        WaypointClear,
-        error_msg="Clear mission failed"
-    )
-
-def send_route(route):
-    mavros_cmd(
-        '/mavros/mission/push',
-        WaypointPush,
-        error_msg="Send route failed",
-        start_index=route.current_seq,
-        waypoints=route.waypoints
-    )
 
 def sequential_noise(data):
     sequential = {'roll':[],
@@ -209,29 +114,72 @@ def go_to_base(mission, uav):
     return base
 
 # Classes
+    
 
 class UAV(object):
     def __init__(self):
-        self.sub_pose   = rospy.Subscriber('/drone_info/pose'        , DronePose    , self.pose_callback)
-        self.sub_ex_state = rospy.Subscriber('/mavros/extended_state', ExtendedState, self.ex_state_callback)
-        self.sub_ex_state = rospy.Subscriber('/mavros/state'         , ExtendedState, self.state_callback)
-        self.sequential = {'roll':-math.inf,
-                          'pitch':-math.inf,
-                          'yaw' : -math.inf,
-                          'heading':-math.inf, 
-                          'rollRate':-math.inf,
-                          'pitchRate':-math.inf,
-                          'yawRate':-math.inf,
-                          'groundSpeed':-math.inf,
-                          'climbRate':-math.inf, 
-                          'altitudeRelative':-math.inf,
-                          'throttlePct':-math.inf}
+        self.sequential = {'roll':-float("inf"),
+                          'pitch':-float("inf"),
+                          'yaw' : -float("inf"),
+                          'heading':-float("inf"), 
+                          'rollRate':-float("inf"),
+                          'pitchRate':-float("inf"),
+                          'yawRate':-float("inf"),
+                          'groundSpeed':-float("inf"),
+                          'climbRate':-float("inf"), 
+                          'altitudeRelative':-float("inf"),
+                          'throttlePct':-float("inf")}
+        self.noise = {'roll':-float("inf"),
+                          'pitch':-float("inf"),
+                          'yaw' : -float("inf"),
+                          'heading':-float("inf"), 
+                          'rollRate':-float("inf"),
+                          'pitchRate':-float("inf"),
+                          'yawRate':-float("inf"),
+                          'groundSpeed':-float("inf"),
+                          'climbRate':-float("inf"), 
+                          'altitudeRelative':-float("inf"),
+                          'throttlePct':-float("inf")}
+        
+        # ----
         self.armed = None
-        self.land_ex = -math.inf
+        self.land_ex = -float("inf")
+        self.alt = -float("inf")
+        self.lat = -float("inf")
+        self.lon = -float("inf")
         self.mode =  None
-        # self.weightedCluster = []
+        self.guided = None
+        self.manual_input = None
+        self.system_status = None
+        self.vtol_state = None
+        self.landed_state = None
+        self.status = None
+        self.current = None
+        self.self_check = 0
+        self.qtd_sub = 4
 
-    
+        # ----
+        self.curr_vel = TwistStamped()
+        self.des_pose = PoseStamped()
+        self.cur_pose = PoseStamped()
+
+        # ----
+        self.sub_pose     = rospy.Subscriber('/drone_info/pose'      , DronePose    , self.pose_callback)
+        self.sub_state    = rospy.Subscriber('/mavros/state'         , State        , self.state_callback)
+        self.sub_ex_state = rospy.Subscriber('/mavros/extended_state', ExtendedState, self.state_ex_callback)
+        self.sub_gps      = rospy.Subscriber('/mavros/global_position/global', NavSatFix, self.gps_callback)
+        self.vel_pub      = rospy.Publisher('/mavros/setpoint_velocity/cmd_vel', TwistStamped, queue_size=10)
+        self.vel_sub      = rospy.Subscriber('/mavros/local_position/velocity', TwistStamped, self.vel_cb)
+        self.pos_sub      = rospy.Subscriber('/mavros/local_position/pose', PoseStamped, self.pos_cb)
+        self.sub_mission  = rospy.Subscriber('mavros/mission/reached', WaypointReached, self.reached_callback)
+
+
+    def vel_cb(self, msg):
+        self.curr_vel = msg
+
+    def pos_cb(self, msg):
+        self.cur_pose = msg
+
     def pose_callback(self, data): 
         self.sequential['roll'] = data.roll
         self.sequential['pitch'] = data.pitch
@@ -240,31 +188,324 @@ class UAV(object):
         self.sequential['rollRate'] = data.rollRate
         self.sequential['pitchRate'] = data.pitchRate
         self.sequential['yawRate'] = data.yawRate
-        self.sequential['groundSpeed'] = data.groundspeed
+        self.sequential['groundSpeed'] = data.groundSpeed
         self.sequential['throttlePct'] = data.throttle
         self.sequential['altitudeRelative'] = data.altRelative
+        self.sequential['climbRate'] = data.climbRate
 
+        self.noise = sequential_noise(self.sequential)
 
-# ------------ BEHAIVORS
+        self.self_check += 1
 
-def takeoff_land(kenny:UAV, alt:int, fight_time:int,flag_fault:bool) -> list:
+    def state_callback(self, data):
+        self.armed = data.armed
+        self.mode = data.mode
+        self.guided = data.guided
+        self.manual_input = data.manual_input
+        self.system_status = data.system_status
+
+        self.self_check += 1
+
+    def state_ex_callback(self, data):
+        self.vtol_state = data.vtol_state
+        self.landed_state = data.landed_state
+
+        self.self_check += 1
+
+    def gps_callback(self, data):
+        self.lat = data.latitude
+        self.lon = data.longitude
+        self.alt = data.altitude
+        self.status = data.status
+
+        self.self_check += 1
+        
+    def isReadyToTargetFly(self):
+        print(self.mode)
+        if(self.mode=='OFFBOARD'):
+            return True
+
+    def reached_callback(self, data):
+        self.current = data.wp_seq + 1
+# ------------   Callers for MAVRos Services
+
+def mavros_cmd(topic, msg_ty, error_msg="MAVROS command failed: ", **kwargs):
+    rospy.wait_for_service(topic)
+    try:
+        service_proxy = rospy.ServiceProxy(topic, msg_ty)
+        response = service_proxy(**kwargs)
+        rospy.loginfo(response)
+    except rospy.ServiceException as e:
+        rospy.logerr(f"{error_msg} {e}")
+
+def land():
+    mavros_cmd(
+        '/mavros/cmd/land',
+        CommandTOL,
+        error_msg="Landing failed",
+        altitude=10, latitude=0, longitude=0, min_pitch=0, yaw=0
+    )
+
+def takeoff(alt, uav):
+    mavros_cmd(
+        '/mavros/cmd/takeoff',
+        CommandTOL,
+        error_msg="Takeoff failed",
+        altitude=uav.alt+alt, latitude=uav.lat, longitude=uav.lon, min_pitch=0, yaw=0
+    )
+
+def arm():
+    mavros_cmd(
+        '/mavros/cmd/arming',
+        CommandBool,
+        value=True,
+        error_msg="Arming failed",
+    )
+
+def set_mode(mode):
+    mavros_cmd(
+        '/mavros/set_mode',
+        SetMode,
+        error_msg="Set mode failed",
+        custom_mode=mode,
+        base_mode=0
+    )
+
+def clear_mission():
+    mavros_cmd(
+        '/mavros/mission/clear',
+        WaypointClear,
+        error_msg="Clear mission failed"
+    )
+
+def send_route(route):
+    mavros_cmd(
+        '/mavros/mission/push',
+        WaypointPush,
+        error_msg="Send route failed",
+        start_index=route.current_seq,
+        waypoints=route.waypoints
+    )
+
+# ------------ BEHAVIORS
+
+def takeoff_land(kenny:UAV, alt:int, flight_time:int,flag_fault:bool) -> list:
     flight_list = []
     start = time.time()
 
     while(time.time()-start < flight_time):
-# while(!drone.current_state.armed && drone.ex_current_state.landed_state != 2)
-#                 {
-#                     set_loiter();
-#                     arm();
-#                     takeoff(drone);
-#                 }
+        set_mode("AUTO.LOITER")
 
+        while(not kenny.armed):
+            arm()
+            rospy.sleep(1)
+
+        
+        takeoff(10, kenny)
+        while(kenny.landed_state !=2):
+            flight_list.append(kenny.noise) if flag_fault else flight_list.append(kenny.sequential)
+            rospy.sleep(1)
+        i = 0
+        while(i < 10):
+            flight_list.append(kenny.noise) if flag_fault else flight_list.append(kenny.sequential)
+            #make flight straigh line
+            rospy.sleep(1) 
+            i += 1
+
+        land()
+        while(kenny.landed_state != 1):
+            flight_list.append(kenny.noise) if flag_fault else flight_list.append(kenny.sequential)
+            rospy.sleep(1)
+
+    return flight_list
+
+def hovering(kenny:UAV, alt:int, flight_time:int,flag_fault:bool) -> list:
+    flight_list = []
+
+    set_mode("AUTO.LOITER")
+
+    while(not kenny.armed):
+            arm()
+            rospy.sleep(1)
+
+    takeoff(10, kenny)
+    while(kenny.landed_state !=2):
         rospy.sleep(1)
-        flight_list.append(kenny.sequential)
+    
+    start = time.time()
+    while(time.time()-start < flight_time):
+        flight_list.append(kenny.noise) if flag_fault else flight_list.append(kenny.sequential)
+        rospy.sleep(1) 
+
+    land()
+    while(kenny.landed_state != 1):
+        rospy.sleep(1)
 
     return flight_list
 
 
+def add_step(direction, target, step):
+    if direction == 'R':
+        target.position.y -= step
+    elif direction == 'L':
+        target.position.y += step
+    elif direction == 'D':
+        target.position.x -= step
+    elif direction == 'F':
+        target.position.y += step
+
+
+def target_flight(uav, direction, flight_time):
+
+    target = Pose()
+    target.position.x = 0
+    target.position.y = 0
+    target.position.z = 5
+
+    vController = VelocityController()
+
+    flight_list = []
+
+    set_mode("AUTO.LOITER")
+
+    while(not uav.armed):
+            arm()
+            rospy.sleep(1)
+
+    takeoff(10, uav)
+    while(uav.landed_state !=2):
+        rospy.sleep(1)
+
+    
+    # while(uav.mode != "STABILIZED"):
+    #     print(uav.mode)
+    #     set_mode("STABILIZED")
+    #     rospy.sleep(5)
+
+    # while(not uav.isReadyToTargetFly()):
+    #     print(uav.status)
+    #     set_mode("OFFBOARD")
+
+    vController.setTarget(target)
+
+    # if uav.isReadyToTargetFly():
+    print(uav.curr_vel)
+    flag = True
+    while(flag or uav.curr_vel>0):
+        flag = False
+        uav.des_vel = vController.update(uav.cur_pose)
+        uav.vel_pub.publish(uav.des_vel)
+    flag = True
+    start = time.time()
+    while(time.time()-start < flight_time):
+
+        add_step(direction, target, 100)
+        vController.setTarget(target)
+
+        if uav.isReadyToTargetFly():
+            flag = True
+            while(flag or uav.curr_vel>0):
+                flag = False
+                uav.des_vel = vController.update(uav.cur_pose)
+                uav.vel_pub.publish(uav.des_vel)
+
+
+def circle(lat, lon, raio, alt):
+    point = PointGeometry(lon, lat)
+    local_azimuthal_projection = f"+proj=aeqd +R=6371000 +units=m +lat_0={point.y} +lon_0={point.x}"
+
+    wgs84_to_aeqd = partial(
+        pyproj.transform,
+        pyproj.Proj('+proj=longlat +datum=WGS84 +no_defs'),
+        pyproj.Proj(local_azimuthal_projection),
+    )
+
+    aeqd_to_wgs84 = partial(
+        pyproj.transform,
+        pyproj.Proj(local_azimuthal_projection),
+        pyproj.Proj('+proj=longlat +datum=WGS84 +no_defs'),
+    )
+
+    point_transformed = transform(wgs84_to_aeqd, point)
+
+    buffer = point_transformed.buffer(raio)
+
+    buffer_wgs84 = transform(aeqd_to_wgs84, buffer)
+
+    # print(buffer_wgs84)
+    coord = mapping(buffer_wgs84)
+    # print(coord)
+
+    # Create polygon from lists of points
+    x = []
+    y = []
+
+    some_poly = buffer_wgs84
+    # Extract the point values that define the perimeter of the polygon
+    x, y = some_poly.exterior.coords.xy
+
+    route = WaypointList()
+    for i, j in zip(x, y):
+        geo_wp = Waypoint()
+        geo_wp.frame = 3
+        geo_wp.command = 16
+        if route.waypoints == []:
+            geo_wp.is_current = True
+        else:
+            geo_wp.is_current = False
+        geo_wp.autocontinue = True
+        geo_wp.param1 = 0
+        geo_wp.param2 = 0
+        geo_wp.param3 = 0
+        geo_wp.param4 = 0
+        geo_wp.x_lat = j
+        geo_wp.y_long = i
+        geo_wp.z_alt = 10
+        route.waypoints.append(geo_wp)
+
+    return route
+
+def circular_flight(uav, raio, alt, flight_time, flag_fault):
+    flight_list = []
+    set_mode("AUTO.LOITER")
+
+    while(not uav.armed):
+            arm()
+            rospy.sleep(1)
+
+    takeoff(10, uav)
+    while(uav.landed_state !=2):
+        rospy.sleep(1)
+
+    ## do flight
+    route = WaypointList()
+    route.waypoints = circle(uav.lat, uav.lon, raio, alt)
+    route.current_seq = 0
+
+    # send route to uav
+    clear_mission()
+    rospy.loginfo("Send Route")
+    send_route(route.waypoints)
+
+    # set mode to mission
+    rospy.loginfo("Set Mode")
+    set_mode("AUTO.MISSION")
+
+    # wait to arrive.
+    uav.current = 0
+    start = time.time()
+    while( uav.current < len(route.waypoints.waypoints) and time.time()-start < flight_time):
+        flight_list.append(uav.noise) if flag_fault else flight_list.append(uav.sequential)
+        rospy.sleep(1)
+
+
+
+    land()
+    while(uav.landed_state != 1):
+        rospy.sleep(1)
+
+    return flight_list
+    
 
 # ------------ MAIN
 def listener():
@@ -274,23 +515,47 @@ def listener():
     flight_list = []
 
     ## quantity of each flight will be executed 
-    qtd_good_exe = 15
-    qtd_fault_exe = 5
+    qtd_good_exe = 1#15
+    qtd_fault_exe = 1 #5
 
-    fight_time = 180 #s
+    flight_time = 180 #s
 
     qtd_exe = qtd_fault_exe + qtd_good_exe
 
-    for flight in table:
-        for i in range(0, qtd_fault_exe):
+    while(kenny.self_check < kenny.qtd_sub):
+        print("Waiting for drone data...")
+        print(kenny.self_check)
+        rospy.sleep(1)
+
+   
+    target_flight(kenny, "F", flight_time)
+
+    
+
+
+    # print(kenny.sequential)
+    # print(kenny.armed)
+    # print(kenny.vtol_state)
+    # j = 1
+
+    # for flight in table:
+    #     for i in range(0, qtd_fault_exe):
             
-            flag_fault = i <= qtd_good_exe
+    #         flag_fault = i <= qtd_good_exe
 
-            if flight["Type"] == "Takeoff and landing":
-               flight_list.append(takeoff_land(kenny, flight["Takeoff Alt"], fight_time,flag_fault))
-        
+    #         if flight["Type"] == "Takeoff and landing":
+    #            # add test id?
+    #             flight_list.append({"Type": flight["Type"], "id":(i*j)+1,takeoff_land(kenny, flight["Takeoff Alt"], flight_time,flag_fault)})
+    #            # append to file to prevent data loss
+    #         elif flight["Type"] == "Hovering":
+    #             flight_list.append({"Type": flight["Type"], "id":(i*j)+1,hovering(kenny, flight["Hovering Alt"], flight_time,flag_fault)})
+    #         elif flight["Type"] == "Circular":
+    #             flight_list.append({"Type": flight["Type"], "id":(i*j)+1,circular_flight(kenny, flight["Radius"], 10, flight_time, flag_fault)})
+                
+    #     j+=1
 
 
+    print(flight_list)
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
 
