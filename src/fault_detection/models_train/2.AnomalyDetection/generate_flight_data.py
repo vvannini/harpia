@@ -25,7 +25,7 @@ import math
 
 #---
 import numpy
-from VelocityController import VelocityController
+import json
 
 table = [
     {"Type": "Takeoff and landing", "Takeoff Alt": 5},
@@ -34,24 +34,36 @@ table = [
     {"Type": "Hovering", "Hovering Alt": 5},
     {"Type": "Hovering", "Hovering Alt": 15},
     {"Type": "Hovering", "Hovering Alt": 30},
-    {"Type": "Forward flight", "Distance": 10, "Start Alt": 15, "End Alt": 15},
-    {"Type": "Forward flight", "Distance": 10, "Start Alt": 15, "End Alt": 10},
-    {"Type": "Forward flight", "Distance": 15, "Start Alt": 50, "End Alt": 30},
-    {"Type": "Forward flight", "Distance": 5, "Start Alt": 7, "End Alt": 5},
-    {"Type": "Backward flight", "Distance": 10, "Start Alt": 15, "End Alt": 10},
-    {"Type": "Backward flight", "Distance": 15, "Start Alt": 50, "End Alt": 30},
-    {"Type": "Backward flight", "Distance": 5, "Start Alt": 7, "End Alt": 5},
-    {"Type": "Sideways flight", "Direction": "L", "Distance": 10, "Start Alt": 15, "End Alt": 10},
-    {"Type": "Sideways flight", "Direction": "L", "Distance": 15, "Start Alt": 50, "End Alt": 30},
-    {"Type": "Sideways flight", "Direction": "L", "Distance": 5, "Start Alt": 7, "End Alt": 5},
-    {"Type": "Sideways flight", "Direction": "D", "Distance": 10, "Start Alt": 15, "End Alt": 10},
-    {"Type": "Sideways flight", "Direction": "D", "Distance": 15, "Start Alt": 50, "End Alt": 30},
-    {"Type": "Sideways flight", "Direction": "D", "Distance": 5, "Start Alt": 7, "End Alt": 5},
+    {"Type": "Line flight", "Direction": "F", "Distance": 10, "Start Alt": 15, "End Alt": 15},
+    {"Type": "Line flight", "Direction": "F", "Distance": 10, "Start Alt": 15, "End Alt": 10},
+    {"Type": "Line flight", "Direction": "F", "Distance": 15, "Start Alt": 50, "End Alt": 30},
+    {"Type": "Line flight", "Direction": "F", "Distance": 5, "Start Alt": 7, "End Alt": 5},
+    {"Type": "Line flight", "Direction": "B","Distance": 10, "Start Alt": 15, "End Alt": 10},
+    {"Type": "Line flight", "Direction": "B","Distance": 15, "Start Alt": 50, "End Alt": 30},
+    {"Type": "Line flight", "Direction": "B","Distance": 5, "Start Alt": 7, "End Alt": 5},
+    {"Type": "Line flight", "Direction": "L", "Distance": 10, "Start Alt": 15, "End Alt": 10},
+    {"Type": "Line flight", "Direction": "L", "Distance": 15, "Start Alt": 50, "End Alt": 30},
+    {"Type": "Line flight", "Direction": "L", "Distance": 5, "Start Alt": 7, "End Alt": 5},
+    {"Type": "Line flight", "Direction": "R", "Distance": 10, "Start Alt": 15, "End Alt": 10},
+    {"Type": "Line flight", "Direction": "R", "Distance": 15, "Start Alt": 50, "End Alt": 30},
+    {"Type": "Line flight", "Direction": "R", "Distance": 5, "Start Alt": 7, "End Alt": 5},
     {"Type": "Circular flight", "Radius": 5, "Wind speed": None},
     {"Type": "Circular flight", "Radius": 25, "Wind speed": None},
     {"Type": "Circular flight", "Radius": 50, "Wind speed": None},
-    {"Type": "8", "Starting location (x,y,z)": None, "Obstacle position (x,y,z)": None, "Obstacle size": None, "Velocity": None},
+    {"Type": "8", "Radius": 50, "Start Alt": 7, "End Alt": 5},
 ]
+
+
+# table = [
+#     {"Type": "Takeoff and landing", "Takeoff Alt": 5},
+#     {"Type": "Hovering", "Hovering Alt": 5},
+#     {"Type": "Line flight", "Direction": "F", "Distance": 10, "Start Alt": 15, "End Alt": 15},
+#     {"Type": "Line flight", "Direction": "B","Distance": 10, "Start Alt": 15, "End Alt": 10},
+#     {"Type": "Line flight", "Direction": "L", "Distance": 5, "Start Alt": 7, "End Alt": 5},
+#     {"Type": "Line flight", "Direction": "R", "Distance": 10, "Start Alt": 15, "End Alt": 10},
+#     {"Type": "Circular flight", "Radius": 25, "Wind speed": None},
+#     {"Type": "8", "Radius": 50, "Start Alt": 10, "End Alt": 20},
+# ]
 
 
 def get_harpia_root_dir():
@@ -343,26 +355,60 @@ def hovering(kenny:UAV, alt:int, flight_time:int,flag_fault:bool) -> list:
 
     return flight_list
 
+def line(lat, lon, distance, alt, direction):
+    longitude = lon
+    latitude = lat
+    alt = 10
+    # distance = 250
 
-def add_step(direction, target, step):
     if direction == 'R':
-        target.position.y -= step
+        theta = 180 # right
     elif direction == 'L':
-        target.position.y += step
-    elif direction == 'D':
-        target.position.x -= step
+        theta = 0 #left
+    elif direction == 'B':
+        theta = 270 #back
     elif direction == 'F':
-        target.position.y += step
+        theta = 90 # forward 
+
+    geo_route = WaypointList()
+
+    dx = distance* math.cos(math.radians(theta))  # theta measured clockwise from due east
+    dy = distance* math.sin(math.radians(theta))  # dx, dy same units as R
+
+    delta_longitude = dx / (111320 * math.cos(latitude))  # dx, dy in meters
+    delta_latitude = dy / 110540  # result in degrees long/lat
+
+    longitude = longitude + delta_longitude
+    latitude = latitude + delta_latitude
 
 
-def target_flight(uav, direction, flight_time):
+    geo_wp = Waypoint()
+    geo_wp.frame = 3
+    geo_wp.command = 16
+    if geo_route.waypoints == []:
+        geo_wp.is_current = True
+    else:
+        geo_wp.is_current = False
+    geo_wp.autocontinue = True
+    geo_wp.param1 = 0
+    geo_wp.param2 = 0
+    geo_wp.param3 = 0
+    geo_wp.param4 = 0
+    geo_wp.x_lat = latitude
+    geo_wp.y_long = longitude
+    geo_wp.z_alt = alt
+    geo_route.waypoints.append(geo_wp)
+
+    return geo_route
+
+def line_flight(uav, min_alt, max_alt, direction, flight_time, flag_fault):
 
     target = Pose()
     target.position.x = 0
     target.position.y = 0
     target.position.z = 5
 
-    vController = VelocityController()
+    # vController = VelocityController()
 
     flight_list = []
 
@@ -372,44 +418,41 @@ def target_flight(uav, direction, flight_time):
             arm()
             rospy.sleep(1)
 
-    takeoff(10, uav)
+    takeoff(min_alt, uav)
     while(uav.landed_state !=2):
         rospy.sleep(1)
 
-    
-    # while(uav.mode != "STABILIZED"):
-    #     print(uav.mode)
-    #     set_mode("STABILIZED")
-    #     rospy.sleep(5)
-
-    # while(not uav.isReadyToTargetFly()):
-    #     print(uav.status)
-    #     set_mode("OFFBOARD")
-
-    vController.setTarget(target)
-
-    # if uav.isReadyToTargetFly():
-    print(uav.curr_vel)
-    flag = True
-    while(flag or uav.curr_vel>0):
-        flag = False
-        uav.des_vel = vController.update(uav.cur_pose)
-        uav.vel_pub.publish(uav.des_vel)
-    flag = True
     start = time.time()
     while(time.time()-start < flight_time):
+        route = WaypointList()
 
-        add_step(direction, target, 100)
-        vController.setTarget(target)
+        route.waypoints = line(uav.lat, uav.lon, 50, max_alt, direction)
+        route.current_seq = 0
 
-        if uav.isReadyToTargetFly():
-            flag = True
-            while(flag or uav.curr_vel>0):
-                flag = False
-                uav.des_vel = vController.update(uav.cur_pose)
-                uav.vel_pub.publish(uav.des_vel)
+        # send route to uav
+        clear_mission()
+        uav.current = 0
+        rospy.loginfo("Send Route")
+        send_route(route.waypoints)
+
+        # set mode to mission
+        rospy.loginfo("Set Mode")
+        set_mode("AUTO.MISSION")
+        
+        rospy.sleep(1)
+        while(uav.current < len(route.waypoints.waypoints)):
+            flight_list.append(uav.noise) if flag_fault else flight_list.append(uav.sequential)
+            rospy.sleep(1)
 
 
+
+    land()
+    while(uav.landed_state != 1):
+        rospy.sleep(1)
+
+    return flight_list
+    # return None
+    
 def circle(lat, lon, raio, alt):
     point = PointGeometry(lon, lat)
     local_azimuthal_projection = f"+proj=aeqd +R=6371000 +units=m +lat_0={point.y} +lon_0={point.x}"
@@ -498,14 +541,99 @@ def circular_flight(uav, raio, alt, flight_time, flag_fault):
         flight_list.append(uav.noise) if flag_fault else flight_list.append(uav.sequential)
         rospy.sleep(1)
 
-
-
     land()
     while(uav.landed_state != 1):
         rospy.sleep(1)
 
     return flight_list
     
+def eight_waypoints(center_lat, center_lon, min_altitude, max_altitude, radius):
+    waypoints = []
+    # Calculate the coordinates for the eight-shaped flight pattern
+    num_points = 32  # Number of points in the pattern
+    angle_increment = 2 * math.pi / num_points  # Angle between each point
+
+    altitude_range = max_altitude - min_altitude
+    altitude_increment = altitude_range / (num_points - 1)  # Increment in altitude between each point
+
+    for i in range(num_points):
+        angle = i * angle_increment
+
+        # Calculate the coordinates for each waypoint
+        x = radius * math.cos(angle)
+        y = radius * math.sin(2 * angle) / 2  # Divide sin(2 * angle) by 2 to create the figure-eight shape
+
+        lat = center_lat + (y / 111111)  # Convert y-coordinate to latitude (assuming 1 degree is approximately 111111 meters)
+        lon = center_lon + (x / (111111 * math.cos(center_lat)))  # Convert x-coordinate to longitude (adjusting for latitude)
+
+        # Calculate the altitude for each waypoint based on the progressive increase and decrease
+        altitude = min_altitude + (i * altitude_increment)
+        if i >= num_points // 2:
+            altitude = max_altitude - ((i - num_points // 2) * altitude_increment)
+
+        waypoint = (lat, lon, altitude)
+        waypoints.append(waypoint)
+
+    route = WaypointList()
+    for wp in waypoints:
+        geo_wp = Waypoint()
+        geo_wp.frame = 3
+        geo_wp.command = 16
+        if route.waypoints == []:
+            geo_wp.is_current = True
+        else:
+            geo_wp.is_current = False
+        geo_wp.autocontinue = True
+        geo_wp.param1 = 0
+        geo_wp.param2 = 0
+        geo_wp.param3 = 0
+        geo_wp.param4 = 0
+        geo_wp.x_lat = wp[0]
+        geo_wp.y_long = wp[1]
+        geo_wp.z_alt = wp[2]
+        route.waypoints.append(geo_wp)
+
+    return route
+
+def eight_flight(uav, raio, min_alt, max_alt, flight_time, flag_fault):
+    flight_list = []
+    set_mode("AUTO.LOITER")
+
+    while(not uav.armed):
+            arm()
+            rospy.sleep(1)
+
+    takeoff(10, uav)
+    while(uav.landed_state !=2):
+        rospy.sleep(1)
+
+    ## do flight
+    route = WaypointList()
+    route.waypoints = eight_waypoints(uav.lat, uav.lon, min_alt, max_alt, raio)
+    route.current_seq = 0
+
+    # send route to uav
+    clear_mission()
+    rospy.loginfo("Send Route")
+    send_route(route.waypoints)
+
+    # set mode to mission
+    rospy.loginfo("Set Mode")
+    set_mode("AUTO.MISSION")
+
+    # wait to arrive.
+    uav.current = 0
+    start = time.time()
+    while( uav.current < len(route.waypoints.waypoints) and time.time()-start < flight_time):
+        flight_list.append(uav.noise) if flag_fault else flight_list.append(uav.sequential)
+        rospy.sleep(1)
+
+    land()
+    while(uav.landed_state != 1):
+        rospy.sleep(1)
+
+    return flight_list
+ 
 
 # ------------ MAIN
 def listener():
@@ -515,8 +643,8 @@ def listener():
     flight_list = []
 
     ## quantity of each flight will be executed 
-    qtd_good_exe = 1#15
-    qtd_fault_exe = 1 #5
+    qtd_good_exe = 15
+    qtd_fault_exe = 5
 
     flight_time = 180 #s
 
@@ -528,31 +656,75 @@ def listener():
         rospy.sleep(1)
 
    
-    target_flight(kenny, "F", flight_time)
+    # eight_flight(kenny, 5, 10, flight_time, False)
 
-    
+    file_path = "flight_data.json"
 
 
     # print(kenny.sequential)
     # print(kenny.armed)
     # print(kenny.vtol_state)
-    # j = 1
-
-    # for flight in table:
-    #     for i in range(0, qtd_fault_exe):
+    j = 0
+    for flight in table:
+        for i in range(0, qtd_fault_exe):
             
-    #         flag_fault = i <= qtd_good_exe
+            flag_fault = i <= qtd_fault_exe
 
-    #         if flight["Type"] == "Takeoff and landing":
-    #            # add test id?
-    #             flight_list.append({"Type": flight["Type"], "id":(i*j)+1,takeoff_land(kenny, flight["Takeoff Alt"], flight_time,flag_fault)})
-    #            # append to file to prevent data loss
-    #         elif flight["Type"] == "Hovering":
-    #             flight_list.append({"Type": flight["Type"], "id":(i*j)+1,hovering(kenny, flight["Hovering Alt"], flight_time,flag_fault)})
-    #         elif flight["Type"] == "Circular":
-    #             flight_list.append({"Type": flight["Type"], "id":(i*j)+1,circular_flight(kenny, flight["Radius"], 10, flight_time, flag_fault)})
-                
-    #     j+=1
+            if flight["Type"] == "Takeoff and landing":
+                print("*-------------------------------------*")
+                print((j))
+                print(flight["Type"])
+                data = takeoff_land(kenny, flight["Takeoff Alt"], flight_time,flag_fault)
+                flight_data = {"Type": flight["Type"],
+                                    "error": flag_fault, 
+                                    "id":(j),
+                                    "data": data
+                                    }
+            elif flight["Type"] == "Hovering":
+                print("*-------------------------------------*")
+                print((j))
+                print(flight["Type"])
+                data = hovering(kenny, flight["Hovering Alt"], flight_time,flag_fault)
+                flight_data ={"Type": flight["Type"],
+                                    "error": flag_fault, 
+                                    "id":(j),
+                                    "data": data
+                                    }
+            elif flight["Type"] == "Circular flight":
+                print("*-------------------------------------*")
+                print((j))
+                print(flight["Type"])
+                data = circular_flight(kenny, flight["Radius"], 10, flight_time, flag_fault)
+                flight_data ={"Type": flight["Type"],
+                                    "error": flag_fault, 
+                                    "id":(j),
+                                    "data": data
+                                    }
+            elif flight["Type"] == "Line flight":
+                print("*-------------------------------------*")
+                print((j))
+                print(flight["Type"]+" "+flight["Direction"])
+                data = line_flight(kenny, flight["Start Alt"], flight["End Alt"], flight["Direction"], flight_time, flag_fault)
+                flight_data ={"Type": flight["Type"]+" "+flight["Direction"],
+                                    "error": flag_fault, 
+                                    "id":(j),
+                                    "data": data
+                                    }
+            elif flight["Type"] == "8":
+                print("*-------------------------------------*")
+                print(j)
+                print(flight["Type"])
+                data = eight_flight(kenny,flight["Radius"], flight["Start Alt"], flight["End Alt"], flight_time, flag_fault)
+                flight_data ={"Type": flight["Type"],
+                                    "error": flag_fault, 
+                                    "id":(j),
+                                    "data": data
+                                    }
+
+            with open(file_path, "a") as json_file:
+                    json.dump(flight_data, json_file)
+                    json_file.write('\n')
+            j= j + 1
 
 
     print(flight_list)
