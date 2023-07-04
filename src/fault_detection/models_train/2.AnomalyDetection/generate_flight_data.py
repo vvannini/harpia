@@ -27,30 +27,37 @@ import math
 import numpy
 import json
 
+# table = [
+#     {"Type": "Takeoff and landing", "Takeoff Alt": 5},
+#     {"Type": "Takeoff and landing", "Takeoff Alt": 15},
+#     {"Type": "Takeoff and landing", "Takeoff Alt": 30},
+#     {"Type": "Hovering", "Hovering Alt": 5},
+#     {"Type": "Hovering", "Hovering Alt": 15},
+#     {"Type": "Hovering", "Hovering Alt": 30},
+#     {"Type": "Line flight", "Direction": "F", "Distance": 10, "Start Alt": 15, "End Alt": 15},
+#     {"Type": "Line flight", "Direction": "F", "Distance": 10, "Start Alt": 15, "End Alt": 10},
+#     {"Type": "Line flight", "Direction": "F", "Distance": 15, "Start Alt": 50, "End Alt": 30},
+#     {"Type": "Line flight", "Direction": "F", "Distance": 5, "Start Alt": 7, "End Alt": 5},
+#     {"Type": "Line flight", "Direction": "B","Distance": 10, "Start Alt": 15, "End Alt": 10},
+#     {"Type": "Line flight", "Direction": "B","Distance": 15, "Start Alt": 50, "End Alt": 30},
+#     {"Type": "Line flight", "Direction": "B","Distance": 5, "Start Alt": 7, "End Alt": 5},
+#     {"Type": "Line flight", "Direction": "L", "Distance": 10, "Start Alt": 15, "End Alt": 10},
+#     {"Type": "Line flight", "Direction": "L", "Distance": 15, "Start Alt": 50, "End Alt": 30},
+#     {"Type": "Line flight", "Direction": "L", "Distance": 5, "Start Alt": 7, "End Alt": 5},
+#     {"Type": "Line flight", "Direction": "R", "Distance": 10, "Start Alt": 15, "End Alt": 10},
+#     {"Type": "Line flight", "Direction": "R", "Distance": 15, "Start Alt": 50, "End Alt": 30},
+#     {"Type": "Line flight", "Direction": "R", "Distance": 5, "Start Alt": 7, "End Alt": 5},
+#     {"Type": "Circular flight", "Radius": 5, "Wind speed": None},
+#     {"Type": "Circular flight", "Radius": 25, "Wind speed": None},
+#     {"Type": "Circular flight", "Radius": 50, "Wind speed": None},
+#     {"Type": "8", "Radius": 50, "Start Alt": 7, "End Alt": 5},
+# ]
+
+
 table = [
-    {"Type": "Takeoff and landing", "Takeoff Alt": 5},
-    {"Type": "Takeoff and landing", "Takeoff Alt": 15},
-    {"Type": "Takeoff and landing", "Takeoff Alt": 30},
-    {"Type": "Hovering", "Hovering Alt": 5},
-    {"Type": "Hovering", "Hovering Alt": 15},
-    {"Type": "Hovering", "Hovering Alt": 30},
-    {"Type": "Line flight", "Direction": "F", "Distance": 10, "Start Alt": 15, "End Alt": 15},
-    {"Type": "Line flight", "Direction": "F", "Distance": 10, "Start Alt": 15, "End Alt": 10},
-    {"Type": "Line flight", "Direction": "F", "Distance": 15, "Start Alt": 50, "End Alt": 30},
-    {"Type": "Line flight", "Direction": "F", "Distance": 5, "Start Alt": 7, "End Alt": 5},
-    {"Type": "Line flight", "Direction": "B","Distance": 10, "Start Alt": 15, "End Alt": 10},
-    {"Type": "Line flight", "Direction": "B","Distance": 15, "Start Alt": 50, "End Alt": 30},
-    {"Type": "Line flight", "Direction": "B","Distance": 5, "Start Alt": 7, "End Alt": 5},
-    {"Type": "Line flight", "Direction": "L", "Distance": 10, "Start Alt": 15, "End Alt": 10},
-    {"Type": "Line flight", "Direction": "L", "Distance": 15, "Start Alt": 50, "End Alt": 30},
-    {"Type": "Line flight", "Direction": "L", "Distance": 5, "Start Alt": 7, "End Alt": 5},
-    {"Type": "Line flight", "Direction": "R", "Distance": 10, "Start Alt": 15, "End Alt": 10},
-    {"Type": "Line flight", "Direction": "R", "Distance": 15, "Start Alt": 50, "End Alt": 30},
-    {"Type": "Line flight", "Direction": "R", "Distance": 5, "Start Alt": 7, "End Alt": 5},
-    {"Type": "Circular flight", "Radius": 5, "Wind speed": None},
-    {"Type": "Circular flight", "Radius": 25, "Wind speed": None},
-    {"Type": "Circular flight", "Radius": 50, "Wind speed": None},
-    {"Type": "8", "Radius": 50, "Start Alt": 7, "End Alt": 5},
+    {"Type": "8", "Radius": 10, "Start Alt": 10, "End Alt": 15},
+    {"Type": "8", "Radius": 25, "Start Alt": 15, "End Alt": 30},
+    {"Type": "8", "Radius": 45, "Start Alt": 10, "End Alt": 30},
 ]
 
 
@@ -401,7 +408,7 @@ def line(lat, lon, distance, alt, direction):
 
     return geo_route
 
-def line_flight(uav, min_alt, max_alt, direction, flight_time, flag_fault):
+def line_flight(uav, min_alt, max_alt,distance, direction, flight_time, flag_fault):
 
     target = Pose()
     target.position.x = 0
@@ -426,7 +433,7 @@ def line_flight(uav, min_alt, max_alt, direction, flight_time, flag_fault):
     while(time.time()-start < flight_time):
         route = WaypointList()
 
-        route.waypoints = line(uav.lat, uav.lon, 50, max_alt, direction)
+        route.waypoints = line(uav.lat, uav.lon, distance, max_alt, direction)
         route.current_seq = 0
 
         # send route to uav
@@ -443,8 +450,9 @@ def line_flight(uav, min_alt, max_alt, direction, flight_time, flag_fault):
         while(uav.current < len(route.waypoints.waypoints)):
             flight_list.append(uav.noise) if flag_fault else flight_list.append(uav.sequential)
             rospy.sleep(1)
+        rospy.sleep(10)
 
-
+    set_mode("RTL")
 
     land()
     while(uav.landed_state != 1):
@@ -664,10 +672,9 @@ def listener():
     # print(kenny.sequential)
     # print(kenny.armed)
     # print(kenny.vtol_state)
-    j = 0
+    j = 455
     for flight in table:
-        for i in range(0, qtd_fault_exe):
-            
+        for i in range(0, qtd_exe):
             flag_fault = i <= qtd_fault_exe
 
             if flight["Type"] == "Takeoff and landing":
@@ -704,7 +711,7 @@ def listener():
                 print("*-------------------------------------*")
                 print((j))
                 print(flight["Type"]+" "+flight["Direction"])
-                data = line_flight(kenny, flight["Start Alt"], flight["End Alt"], flight["Direction"], flight_time, flag_fault)
+                data = line_flight(kenny, flight["Start Alt"], flight["End Alt"],flight["Distance"], flight["Direction"], flight_time, flag_fault)
                 flight_data ={"Type": flight["Type"]+" "+flight["Direction"],
                                     "error": flag_fault, 
                                     "id":(j),
