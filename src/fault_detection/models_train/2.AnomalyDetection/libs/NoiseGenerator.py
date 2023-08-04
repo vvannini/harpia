@@ -10,13 +10,28 @@ absPath = os.path.dirname(__file__)
 relPath = "dependencies"
 filesPath = os.path.join(absPath,relPath)
 
+# def noisyData(data,colName,xi,xf):
+#         # print(colName)
+#         # print(type(data[colName]))
+#         # print(data[colName])
+#         noiseModel = np.pi*np.arctan(random.uniform(xi,xf))
+        
+#         if colName in ['pitch', 'roll', 'yaw', 'heading']:
+#             response = noiseModel+float(data[colName])
+#         elif colName in ['rollRate', 'pitchRate', 'yawRate']:
+#             response = noiseModel/60+float
+#         return response
+
 def noisyData(data,colName,xi,xf):
-        # print(colName)
-        # print(type(data[colName]))
-        # print(data[colName])
-        noiseModel = np.pi*np.arctan(random.uniform(xi,xf))
-        response = noiseModel*float(data[colName])
-        return response
+
+    if colName in ['pitch', 'roll', 'yaw', 'heading','rollRate', 'pitchRate', 'yawRate', 'altitudeRelative']:
+        response = float(data[colName]) + random.gauss(-1.0, 1.0)
+    elif colName in ['throttlePct', 'climbRate']:
+        response = float(data[colName]) + random.gauss(0, 0.1)
+    else:
+        response = float(data[colName]) + random.gauss(-0.5, 0.5)
+    return response
+
 
 def oneCosineGust(filename='rawData.csv',path=filesPath,print=True):
     os.chdir(filesPath)

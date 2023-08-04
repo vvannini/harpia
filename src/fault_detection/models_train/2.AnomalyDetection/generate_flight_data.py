@@ -53,25 +53,25 @@ import json
 #     {"Type": "8", "Radius": 50, "Start Alt": 7, "End Alt": 5},
 # ]
 
-
 table = [
-    {"Type": "8", "Radius": 10, "Start Alt": 10, "End Alt": 15},
-    {"Type": "8", "Radius": 25, "Start Alt": 15, "End Alt": 30},
-    {"Type": "8", "Radius": 45, "Start Alt": 10, "End Alt": 30},
+    {"Type": "Line flight", "Direction": "F", "Distance": 10, "Start Alt": 15, "End Alt": 15},
+    {"Type": "Line flight", "Direction": "F", "Distance": 10, "Start Alt": 15, "End Alt": 10},
+    {"Type": "Line flight", "Direction": "F", "Distance": 15, "Start Alt": 50, "End Alt": 30},
+    {"Type": "Line flight", "Direction": "F", "Distance": 5, "Start Alt": 7, "End Alt": 5},
+    {"Type": "Line flight", "Direction": "B","Distance": 10, "Start Alt": 15, "End Alt": 10},
+    {"Type": "Line flight", "Direction": "B","Distance": 15, "Start Alt": 50, "End Alt": 30},
+    {"Type": "Line flight", "Direction": "B","Distance": 5, "Start Alt": 7, "End Alt": 5},
+    {"Type": "Line flight", "Direction": "L", "Distance": 10, "Start Alt": 15, "End Alt": 10},
+    {"Type": "Line flight", "Direction": "L", "Distance": 15, "Start Alt": 50, "End Alt": 30},
+    {"Type": "Line flight", "Direction": "L", "Distance": 5, "Start Alt": 7, "End Alt": 5},
+    {"Type": "Line flight", "Direction": "R", "Distance": 10, "Start Alt": 15, "End Alt": 10},
+    {"Type": "Line flight", "Direction": "R", "Distance": 15, "Start Alt": 50, "End Alt": 30},
+    {"Type": "Line flight", "Direction": "R", "Distance": 5, "Start Alt": 7, "End Alt": 5},
+    {"Type": "Circular flight", "Radius": 5, "Wind speed": None},
+    {"Type": "Circular flight", "Radius": 25, "Wind speed": None},
+    {"Type": "Circular flight", "Radius": 50, "Wind speed": None},
+    {"Type": "8", "Radius": 50, "Start Alt": 7, "End Alt": 5},
 ]
-
-
-# table = [
-#     {"Type": "Takeoff and landing", "Takeoff Alt": 5},
-#     {"Type": "Hovering", "Hovering Alt": 5},
-#     {"Type": "Line flight", "Direction": "F", "Distance": 10, "Start Alt": 15, "End Alt": 15},
-#     {"Type": "Line flight", "Direction": "B","Distance": 10, "Start Alt": 15, "End Alt": 10},
-#     {"Type": "Line flight", "Direction": "L", "Distance": 5, "Start Alt": 7, "End Alt": 5},
-#     {"Type": "Line flight", "Direction": "R", "Distance": 10, "Start Alt": 15, "End Alt": 10},
-#     {"Type": "Circular flight", "Radius": 25, "Wind speed": None},
-#     {"Type": "8", "Radius": 50, "Start Alt": 10, "End Alt": 20},
-# ]
-
 
 def get_harpia_root_dir():
     return rospy.get_param("/harpia_home", default=os.path.expanduser("~/harpia"))
@@ -83,6 +83,7 @@ def get_harpia_root_dir():
 def sequential_noise(data):
     sequential = {'roll':[],
                           'pitch':[],
+                          'yaw':[],
                           'heading':[], #yaw
                           'rollRate':[],
                           'pitchRate':[],
@@ -213,6 +214,7 @@ class UAV(object):
         self.sequential['climbRate'] = data.climbRate
 
         self.noise = sequential_noise(self.sequential)
+        # self.noise = self.sequential
 
         self.self_check += 1
 
@@ -305,6 +307,20 @@ def send_route(route):
         start_index=route.current_seq,
         waypoints=route.waypoints
     )
+def set_home_position(latitude, longitude, altitude):
+    rospy.wait_for_service('/mavros/cmd/set_home')
+    try:
+        set_home_service = rospy.ServiceProxy('/mavros/cmd/set_home', CommandHome)
+        response = set_home_service(0, 0, latitude, longitude, altitude)        
+        if response.success:
+            rospy.loginfo("Home position set successfully!")
+        else:
+            rospy.logerr("Failed to set home position.")
+    except rospy.ServiceException as e:
+        rospy.logerr("Service call failed: %s" % e)
+
+
+
 
 # ------------ BEHAVIORS
 
@@ -651,7 +667,8 @@ def listener():
     flight_list = []
 
     ## quantity of each flight will be executed 
-    qtd_good_exe = 15
+    # qtd_good_exe = 15
+    qtd_good_exe = 0
     qtd_fault_exe = 5
 
     flight_time = 180 #s
@@ -663,16 +680,20 @@ def listener():
         print(kenny.self_check)
         rospy.sleep(1)
 
-   
+    home_latitude = -22.001333
+    home_longitude = -47.934152
+    home_altitude = 847.142652
+
+    set_home_position(home_latitude, home_longitude, home_altitude)
     # eight_flight(kenny, 5, 10, flight_time, False)
 
-    file_path = "flight_data.json"
+    file_path = "flight_data_gauss.json"
 
 
     # print(kenny.sequential)
     # print(kenny.armed)
     # print(kenny.vtol_state)
-    j = 455
+    j = 30
     for flight in table:
         for i in range(0, qtd_exe):
             flag_fault = i <= qtd_fault_exe
@@ -680,7 +701,7 @@ def listener():
             if flight["Type"] == "Takeoff and landing":
                 print("*-------------------------------------*")
                 print((j))
-                print(flight["Type"])
+                print(flight["Type"] +"   "+ str(flag_fault))
                 data = takeoff_land(kenny, flight["Takeoff Alt"], flight_time,flag_fault)
                 flight_data = {"Type": flight["Type"],
                                     "error": flag_fault, 
