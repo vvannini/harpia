@@ -76486,5 +76486,50 @@
         "plans": [
             35124
         ]
+    },
+    {
+        "id": 382,
+        "map_id": 1,
+        "mission_id": 0,
+        "total_goals": 2,
+        "replan": 0,
+        "knn": [
+            0,
+            0,
+            0
+        ],
+        "cpu_time": [],
+        "bn_net": [],
+        "plans": []
+    },
+    {
+        "id": 383,
+        "map_id": 1,
+        "mission_id": 0,
+        "total_goals": 2,
+        "replan": 0,
+        "knn": [
+            0,
+            0,
+            0
+        ],
+        "cpu_time": [],
+        "bn_net": [],
+        "plans": []
+    },
+    {
+        "id": 384,
+        "map_id": 1,
+        "mission_id": 0,
+        "total_goals": 2,
+        "replan": 0,
+        "knn": [
+            0,
+            0,
+            0
+        ],
+        "cpu_time": [],
+        "bn_net": [],
+        "plans": []
     }
 ]

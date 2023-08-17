@@ -24,12 +24,14 @@ filesPath = os.path.join(absPath,relPath)
 
 def noisyData(data,colName,xi,xf):
 
-    if colName in ['pitch', 'roll', 'yaw', 'heading','rollRate', 'pitchRate', 'yawRate', 'altitudeRelative']:
-        response = float(data[colName]) + random.gauss(-1.0, 1.0)
+    if colName in ['pitch', 'roll', 'yaw', 'heading']:
+        response = float(data[colName]) + random.gauss(-10.0, 10.0)
+    elif colName in ['rollRate', 'pitchRate', 'yawRate', 'altitudeRelative']:
+        response = float(data[colName]) + random.gauss(-5.0, 5.0)
     elif colName in ['throttlePct', 'climbRate']:
-        response = float(data[colName]) + random.gauss(0, 0.1)
+        response = float(data[colName]) + random.gauss(0, 0.5)
     else:
-        response = float(data[colName]) + random.gauss(-0.5, 0.5)
+        response = float(data[colName]) + random.gauss(-1.5, 1.5)
     return response
 
 

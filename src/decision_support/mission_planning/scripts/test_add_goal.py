@@ -98,7 +98,7 @@ def test_client(hardware, map, mission):
 
     # Creates the SimpleActionClient, passing the type of the action
     client = actionlib.SimpleActionClient('harpia/mission_goal_manager', MissionPlannerAction)
-    #pub = rospy.Publisher("/harpia/mission", Mission, queue_size=100)
+    pub = rospy.Publisher("/harpia/mission", Mission, queue_size=100)
 
     create_log(map, mission)
 

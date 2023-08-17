@@ -54,24 +54,9 @@ import json
 # ]
 
 table = [
-    {"Type": "Line flight", "Direction": "F", "Distance": 10, "Start Alt": 15, "End Alt": 15},
-    {"Type": "Line flight", "Direction": "F", "Distance": 10, "Start Alt": 15, "End Alt": 10},
-    {"Type": "Line flight", "Direction": "F", "Distance": 15, "Start Alt": 50, "End Alt": 30},
-    {"Type": "Line flight", "Direction": "F", "Distance": 5, "Start Alt": 7, "End Alt": 5},
-    {"Type": "Line flight", "Direction": "B","Distance": 10, "Start Alt": 15, "End Alt": 10},
-    {"Type": "Line flight", "Direction": "B","Distance": 15, "Start Alt": 50, "End Alt": 30},
-    {"Type": "Line flight", "Direction": "B","Distance": 5, "Start Alt": 7, "End Alt": 5},
-    {"Type": "Line flight", "Direction": "L", "Distance": 10, "Start Alt": 15, "End Alt": 10},
-    {"Type": "Line flight", "Direction": "L", "Distance": 15, "Start Alt": 50, "End Alt": 30},
-    {"Type": "Line flight", "Direction": "L", "Distance": 5, "Start Alt": 7, "End Alt": 5},
-    {"Type": "Line flight", "Direction": "R", "Distance": 10, "Start Alt": 15, "End Alt": 10},
-    {"Type": "Line flight", "Direction": "R", "Distance": 15, "Start Alt": 50, "End Alt": 30},
-    {"Type": "Line flight", "Direction": "R", "Distance": 5, "Start Alt": 7, "End Alt": 5},
-    {"Type": "Circular flight", "Radius": 5, "Wind speed": None},
-    {"Type": "Circular flight", "Radius": 25, "Wind speed": None},
-    {"Type": "Circular flight", "Radius": 50, "Wind speed": None},
     {"Type": "8", "Radius": 50, "Start Alt": 7, "End Alt": 5},
 ]
+
 
 def get_harpia_root_dir():
     return rospy.get_param("/harpia_home", default=os.path.expanduser("~/harpia"))
@@ -307,6 +292,7 @@ def send_route(route):
         start_index=route.current_seq,
         waypoints=route.waypoints
     )
+
 def set_home_position(latitude, longitude, altitude):
     rospy.wait_for_service('/mavros/cmd/set_home')
     try:
@@ -318,9 +304,6 @@ def set_home_position(latitude, longitude, altitude):
             rospy.logerr("Failed to set home position.")
     except rospy.ServiceException as e:
         rospy.logerr("Service call failed: %s" % e)
-
-
-
 
 # ------------ BEHAVIORS
 
@@ -687,13 +670,13 @@ def listener():
     set_home_position(home_latitude, home_longitude, home_altitude)
     # eight_flight(kenny, 5, 10, flight_time, False)
 
-    file_path = "flight_data_gauss.json"
+    file_path = "flight_data_gauss_mild.json"
 
 
     # print(kenny.sequential)
     # print(kenny.armed)
     # print(kenny.vtol_state)
-    j = 30
+    j = 110
     for flight in table:
         for i in range(0, qtd_exe):
             flag_fault = i <= qtd_fault_exe

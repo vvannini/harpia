@@ -35,7 +35,7 @@ def loadData(filename='rawData.csv',path=filesPath,printColumnNames=False):
     df_s["climbRate"] = df_s["data"].apply(lambda x: x.get("climbRate"))
     df_s["altitudeRelative"] = df_s["data"].apply(lambda x: x.get("altitudeRelative"))
     df_s["throttlePct"] = df_s["data"].apply(lambda x: x.get("throttlePct"))
-
+    df_s = df_s[~df_s['error']]
     # Select the desired columns
     data = df_s[[
         "roll",

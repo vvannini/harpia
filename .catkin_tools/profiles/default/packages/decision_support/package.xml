@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package>
+	<name>decision_support</name>
+	<version>0.0.0</version>
+	<description>Decision Support metapackage</description>
+	<maintainer email="gab.dertoni@usp.br">gabriel</maintainer>
+	<license>BSD</license>
+	<url type="website">https://gitlab.com/mateus.jurioli/harpia</url>
+
+	<buildtool_depend>catkin</buildtool_depend>
+
+    <run_depend>fault_detection</run_depend>
+    <run_depend>mission_goal_manager</run_depend>
+    <run_depend>mission_planning</run_depend>
+
+	<export>
+		<metapackage/>
+	</export>
+
+</package>

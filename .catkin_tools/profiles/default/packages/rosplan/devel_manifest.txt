@@ -1,0 +1,2 @@
+rosplan/rosplan
+/home/vannini/harpia/devel/.private/rosplan/cmake.lock /home/vannini/harpia/devel/./cmake.lock

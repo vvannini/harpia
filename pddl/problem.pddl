@@ -16,11 +16,10 @@
 
 
 
-    (picture-goal region_5)
-    (picture-goal region_6)
+    (picture-goal region_1)
 
 
-    (= (battery-amount) 100)
+    (= (battery-amount) 50)
 
     (= (input-amount) 0)
 
@@ -32,26 +31,18 @@
     (= (input-capacity) 3)
 
 
-    (= (distance region_5 region_6) 91.9003)
-    (= (distance region_5 base_1) 292.575)
-    (= (distance region_5 base_2) 112.006)
-    (= (distance region_5 base_3) 151.901)
-    (= (distance region_6 region_5) 91.9003)
-    (= (distance region_6 base_1) 380.899)
-    (= (distance region_6 base_2) 47.4811)
-    (= (distance region_6 base_3) 243.646)
-    (= (distance base_1 region_5) 292.575)
-    (= (distance base_1 region_6) 380.899)
-    (= (distance base_1 base_2) 404.12)
-    (= (distance base_1 base_3) 149.93)
-    (= (distance base_2 region_5) 112.006)
-    (= (distance base_2 region_6) 47.4811)
-    (= (distance base_2 base_1) 404.12)
-    (= (distance base_2 base_3) 259.892)
-    (= (distance base_3 region_5) 151.901)
-    (= (distance base_3 region_6) 243.646)
-    (= (distance base_3 base_1) 149.93)
-    (= (distance base_3 base_2) 259.892)
+    (= (distance region_1 base_1) 316.645)
+    (= (distance region_1 base_2) 439.803)
+    (= (distance region_1 base_3) 1032.04)
+    (= (distance base_1 region_1) 316.645)
+    (= (distance base_1 base_2) 447.731)
+    (= (distance base_1 base_3) 769.595)
+    (= (distance base_2 region_1) 439.803)
+    (= (distance base_2 base_1) 447.731)
+    (= (distance base_2 base_3) 762.125)
+    (= (distance base_3 region_1) 1032.04)
+    (= (distance base_3 base_1) 769.595)
+    (= (distance base_3 base_2) 762.125)
 
     (= (velocity) 3.5)
 
@@ -63,8 +54,8 @@
 
 )
 (:goal (and
-    (taken-image region_5)
-    (taken-image region_6)
+    (taken-image region_1)
+    (at base_3)
 ))
 (:metric minimize (mission-length))
 )
