@@ -20,6 +20,8 @@ from std_msgs.msg import String
 from geometry_msgs.msg import Point
 from geographic_msgs.msg import GeoPoint
 
+from mavros_msgs.srv import CommandHome
+
 # Brings in the messages used by the fibonacci action, including the
 # goal message and the result message.
 from harpia_msgs.msg import *
@@ -62,7 +64,6 @@ def write_log(log, log_file):
         json.dump(log, outfile, indent=4)
     outfile.close()
 
-
 def total_goals(mission):
     total_goals = 0
     for step in mission["mission_execution"]:
@@ -104,10 +105,14 @@ def test_client(hardware, map, mission, mission_file):
     the action server state is < 2.
     """
 
+
+
     # Creates the SimpleActionClient, passing the type of the action
     client = actionlib.SimpleActionClient('harpia/mission_goal_manager', MissionPlannerAction)
     pub = rospy.Publisher("/harpia/mission", Mission, queue_size=100)
     pub2 = rospy.Publisher("/harpia/ChangeMission", ChangeMission, queue_size=100)
+    pub3 = rospy.Publisher("/harpia/uav", UAV, queue_size=100)
+    # pub3 = rospy.Publisher("/harpia/Uav", UAV, queue_size=100)
 
     create_log(map, mission)
 
@@ -124,12 +129,15 @@ def test_client(hardware, map, mission, mission_file):
     # Sends the goal to the action server.
     client.send_goal(goal, feedback_cb=feedback_callback)
 
+    set_home_position(goal.mission.uav.home.latitude, goal.mission.uav.home.longitude, goal.mission.uav.home.altitude)
+
     # Waits for the server to finish performing the action.
     # client.wait_for_result()
 
     rate = rospy.Rate(1)
     while client.get_state() in [GoalStatus.PENDING, GoalStatus.ACTIVE]:
         pub.publish(goal.mission)
+        pub3.publish(goal.mission.uav)
         i, o, e = select.select([sys.stdin], [], [], 1)
         if(i):
             mission_id, goal_op = sys.stdin.readline().strip().split()
@@ -267,6 +275,14 @@ def get_uav(hardware):
 
     uav.input_capacity = hardware['input_capacity']
 
+    uav.fault_settings.user_response = hardware['fault_settings']['user_response']
+    uav.fault_settings.classifier_time = hardware['fault_settings']['classifier_time']
+    uav.fault_settings.action_time = hardware['fault_settings']['action_time']
+
+    uav.home.latitude = hardware['home']['lat']
+    uav.home.longitude = hardware['home']['lon']
+    uav.home.altitude = hardware['home']['alt']
+
     return uav
 
 def get_map(map):
@@ -305,6 +321,36 @@ def get_objects(hardware, map, goals):
     mission.goals = get_goals(goals)
 
     return mission
+
+
+def set_home_position(latitude, longitude, altitude, current_gps=True, yaw=0):
+    # Wait for the required services to become available
+    rospy.wait_for_service('/mavros/cmd/set_home')
+
+    try:
+        # Create a proxy for the CommandHome service
+        set_home_service = rospy.ServiceProxy('/mavros/cmd/set_home', CommandHome)
+
+        # Create a CommandHome request with the desired home position
+        home_request = CommandHome()
+        # home_request.current_gps = current_gps  # Set to True if you want to use the current GPS position as home
+        # home_request.latitude = latitude
+        # home_request.longitude = longitude
+        # home_request.altitude = altitude
+        # home_request.yaw = 0
+
+
+
+        # Call the service to set the new home position
+        response = set_home_service.call(current_gps, yaw, latitude, longitude, altitude)
+
+        if response.success:
+            rospy.loginfo("Home position set successfully!")
+        else:
+            rospy.logerr("Failed to set home position: %s", response.result)
+
+    except rospy.ServiceException as e:
+        rospy.logerr("Service call failed: %s", e)
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Runs a mission with a map")

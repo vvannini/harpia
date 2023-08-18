@@ -40,7 +40,17 @@
 		"max_velocity": 65.0,
 		"efficient_velocity": 3.5
 	},
-	"input_capacity": 3
+	"input_capacity": 3,
+	"fault_settings":{
+		"user_response": 30,
+		"classifier_time": 10,
+		"action_time": 60
+	},
+	"home":{
+		"lat":-22.001333,
+		"lon":-47.934152,
+		"alt":847.142652
+	}
 	
 },
 {

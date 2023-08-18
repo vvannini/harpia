@@ -587,6 +587,7 @@ def replan(mission, uav, base, goals, op):
 		print(obj)
 		add_instance(obj)
 
+
 def replan1(mission, goals, op, uav):
 	rospy.loginfo("CANCEL DISPATCH - MissionGoalManager")
 

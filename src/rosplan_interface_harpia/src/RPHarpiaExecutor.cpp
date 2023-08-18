@@ -120,8 +120,11 @@ void Mission::chatterCallback_IDGoal(const harpia_msgs::MissionPlannerActionGoal
 
 void Mission::chatterCallback_current(const mavros_msgs::WaypointReached::ConstPtr& msg)
 {
-	ROS_INFO("Waypoint: %i", msg->wp_seq+1);
-	currentWP = msg->wp_seq;
+	if(currentWP!=msg->wp_seq)
+	{
+		currentWP = msg->wp_seq;
+		ROS_INFO("Waypoint: %i", msg->wp_seq+1);
+	}
 	if(WPqtd == msg->wp_seq)
 	{
 		Ended = true;

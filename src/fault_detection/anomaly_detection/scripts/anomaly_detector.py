@@ -4,7 +4,8 @@ import rospy
 from std_msgs.msg import String
 from mavros_msgs.msg import *
 from nav_msgs.msg import *
-from harpia_msgs.msg import *
+from harpia_msgs.msg import DronePose
+from harpia_msgs.msg import UAV as UAVHarpia
 from geometry_msgs.msg import *
 from sensor_msgs.msg import NavSatFix, Imu, BatteryState
 
@@ -51,7 +52,6 @@ def sequential_noise(data):
 
 class UAV(object):
     def __init__(self):
-        self.sub_pose   = rospy.Subscriber('/drone_info/pose'  , DronePose, self.pose_callback)
         self.sequential = {'roll':-math.inf,
                           'pitch':-math.inf,
                           'yaw' : -math.inf,
@@ -63,6 +63,11 @@ class UAV(object):
                           'climbRate':-math.inf, 
                           'altitudeRelative':-math.inf,
                           'throttlePct':-math.inf}
+        self.user_response_time = 30
+        self.classifier_win_time = 10
+        self.action_win_time = 60
+        self.sub_pose   = rospy.Subscriber('/drone_info/pose'  , DronePose, self.pose_callback)
+        self.sub_hardware = rospy.Subscriber('/hapia/uav', UAVHarpia, self.hardware_callback)
         # self.weightedCluster = []
 
     
@@ -78,6 +83,12 @@ class UAV(object):
         self.sequential['throttlePct'] = data.throttle
         self.sequential['altitudeRelative'] = data.altRelative
         self.sequential['climbRate'] = data.climbRate
+
+    def hardware_callback(self, data): 
+        self.user_response_time = data.fault_settings.user_response
+        self.classifier_win_time = data.fault_settings.classifier_time
+        self.action_win_time = data.fault_settings.action_time
+   
 
 
     def get_uav(hardware):
@@ -99,7 +110,7 @@ def land():
 
 def listener():
 
-    rospy.init_node('listener', anonymous=True)
+    rospy.init_node('anomaly_detector', anonymous=True)
     kenny = UAV()
 
 
@@ -121,8 +132,10 @@ def listener():
     pct_mild = 0
     pct_abnormal = 0
 
+    flag_error = False
+
     #deixar a janela de tempo no uav
-    time_win = 10 
+    time_win = kenny.classifier_win_time
     # noise_limit = 0.85 # percent
     # mild_limit = 0.5 # percent
     # abnormal_limit = 0.1 # percent
@@ -143,6 +156,8 @@ def listener():
     end = time.time()
     print("\n>> Loaded Tree Module in {} seconds.".format(round((end-start),3)))
 
+    rospy.loginfo("Anomaly Detector Ready")
+
     # while not rospy.is_shutdown():
     startMain = time.time()
     win = 0 
@@ -159,25 +174,6 @@ def listener():
             pct_mild = uav_stat['mild'] / total
             pct_abnormal = uav_stat['abnormal'] / total
 
-            # ok -> nao tem abnormal e ruido (noise+mild)< 40%
-            # base -> abnormal < 5% e mild < 40%
-            # land -> abnormal > 5% ou mild > 50/70%  
-
-            # [ok ok ok ok ok] -> segue
-            # [ok base ok base ok] 
-
-            # a cada 30 segundos 
-            # ver se percentuais estao crescendo
-
-            # uav_stat_decision.append()
-            # print(pct_normal)
-            # print(pct_noise)
-            # print(pct_mild)
-            # print(pct_abnormal)
-            # print(total)
-            
-
-            #formalizar isso matematicamente
             if (pct_noise <= 0.7 and pct_abnormal == 0.0 and pct_mild <= 0.05):
                 uav_action.append(0) # ok
 
@@ -208,25 +204,22 @@ def listener():
             uav_stat['abnormal'] = 0
             uav_stat['data'] = []
     
-            # print(np.sum(uav_action[-5:]))
     
-        if(time.time()-startMain > 1000) and (time.time()-startMain < 120):
+        if(flag_error and time.time()-startMain > 10) and (time.time()-startMain < 120):
             print('noisyData')
-
-            
             error_data = sequential_noise(kenny.sequential)
             uav_stat, flag = anomalyDetection.checkAnomaly(error_data,uav_stat, module1, module2, module3, win)
-        elif(time.time()-startMain > 300):
-            break
+
         else:
             uav_stat, flag = anomalyDetection.checkAnomaly(kenny.sequential,uav_stat, module1, module2, module3, win)
 
         #deixar a janela de tempo no uav
-        flag_action = np.sum(uav_action[-6:])
+
+        action_win = int(kenny.action_win_time/kenny.classifier_win_time)
+        flag_action = np.sum(uav_action[:])
         
-        # stop mission node
-        
-        if(flag_action>32):
+
+        if(flag_action>24):
             print("Do you want to continue? (y/[n])")
             start_input = time.time()
 
@@ -234,7 +227,7 @@ def listener():
                 elapsed_time = time.time() - start_input
 
                 # definir tempo de espera no arquivo uav
-                if elapsed_time >= 30:
+                if elapsed_time >= kenny.user_response_time:
                     print("\nTimeout reached. Exiting.")
                     if(flag_action>48):
                         print('land')
@@ -252,8 +245,9 @@ def listener():
                     user_input = input().lower()
                     if user_input == 'y':
                         print("Continuing...")
+                        break
                     elif user_input == 'n':
-                        if(flag_action>25):
+                        if(flag_action>48):
                             print('land')
                             action.land()
                             break
@@ -265,24 +259,11 @@ def listener():
                                 action.land()
                             break
                 time.sleep(0.1)
+                print("Do you want to continue? (y/[n])")
         
         rospy.Rate(1)
         
 
-    # print(uav_stat['normal'])
-    # print(uav_stat['noise'])
-    # print(uav_stat['mild'])
-    # print(uav_stat['abnormal'])
-    # print(len(uav_stat['data']))
-    print(pct_normal)
-    print(pct_noise)
-    print(pct_mild)
-    print(pct_abnormal)
-    print(uav_action)
-    print(uav_action[-5:])
-
-
-    # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
 
 if __name__ == '__main__':

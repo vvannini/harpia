@@ -14,6 +14,7 @@ harpia_msgs
 /home/vannini/harpia/devel/.private/harpia_msgs/share/common-lisp/ros/harpia_msgs/msg/MissionPlannerAction.lisp /home/vannini/harpia/devel/share/common-lisp/ros/harpia_msgs/msg/MissionPlannerAction.lisp
 /home/vannini/harpia/devel/.private/harpia_msgs/share/common-lisp/ros/harpia_msgs/msg/_package_MissionPlannerActionFeedback.lisp /home/vannini/harpia/devel/share/common-lisp/ros/harpia_msgs/msg/_package_MissionPlannerActionFeedback.lisp
 /home/vannini/harpia/devel/.private/harpia_msgs/share/common-lisp/ros/harpia_msgs/msg/Goal.lisp /home/vannini/harpia/devel/share/common-lisp/ros/harpia_msgs/msg/Goal.lisp
+/home/vannini/harpia/devel/.private/harpia_msgs/share/common-lisp/ros/harpia_msgs/msg/SafetyParams.lisp /home/vannini/harpia/devel/share/common-lisp/ros/harpia_msgs/msg/SafetyParams.lisp
 /home/vannini/harpia/devel/.private/harpia_msgs/share/common-lisp/ros/harpia_msgs/msg/RegionPoint.lisp /home/vannini/harpia/devel/share/common-lisp/ros/harpia_msgs/msg/RegionPoint.lisp
 /home/vannini/harpia/devel/.private/harpia_msgs/share/common-lisp/ros/harpia_msgs/msg/_package_MissionPlannerAction.lisp /home/vannini/harpia/devel/share/common-lisp/ros/harpia_msgs/msg/_package_MissionPlannerAction.lisp
 /home/vannini/harpia/devel/.private/harpia_msgs/share/common-lisp/ros/harpia_msgs/msg/MissionPlannerGoal.lisp /home/vannini/harpia/devel/share/common-lisp/ros/harpia_msgs/msg/MissionPlannerGoal.lisp
@@ -36,6 +37,7 @@ harpia_msgs
 /home/vannini/harpia/devel/.private/harpia_msgs/share/common-lisp/ros/harpia_msgs/msg/Mission.lisp /home/vannini/harpia/devel/share/common-lisp/ros/harpia_msgs/msg/Mission.lisp
 /home/vannini/harpia/devel/.private/harpia_msgs/share/common-lisp/ros/harpia_msgs/msg/_package.lisp /home/vannini/harpia/devel/share/common-lisp/ros/harpia_msgs/msg/_package.lisp
 /home/vannini/harpia/devel/.private/harpia_msgs/share/common-lisp/ros/harpia_msgs/msg/_package_ChangeMission.lisp /home/vannini/harpia/devel/share/common-lisp/ros/harpia_msgs/msg/_package_ChangeMission.lisp
+/home/vannini/harpia/devel/.private/harpia_msgs/share/common-lisp/ros/harpia_msgs/msg/_package_SafetyParams.lisp /home/vannini/harpia/devel/share/common-lisp/ros/harpia_msgs/msg/_package_SafetyParams.lisp
 /home/vannini/harpia/devel/.private/harpia_msgs/share/common-lisp/ros/harpia_msgs/msg/UAV.lisp /home/vannini/harpia/devel/share/common-lisp/ros/harpia_msgs/msg/UAV.lisp
 /home/vannini/harpia/devel/.private/harpia_msgs/share/common-lisp/ros/harpia_msgs/msg/MissionPlannerFeedback.lisp /home/vannini/harpia/devel/share/common-lisp/ros/harpia_msgs/msg/MissionPlannerFeedback.lisp
 /home/vannini/harpia/devel/.private/harpia_msgs/share/common-lisp/ros/harpia_msgs/msg/Battery.lisp /home/vannini/harpia/devel/share/common-lisp/ros/harpia_msgs/msg/Battery.lisp
@@ -68,6 +70,7 @@ harpia_msgs
 /home/vannini/harpia/devel/.private/harpia_msgs/share/gennodejs/ros/harpia_msgs/msg/MissionPlannerGoal.js /home/vannini/harpia/devel/share/gennodejs/ros/harpia_msgs/msg/MissionPlannerGoal.js
 /home/vannini/harpia/devel/.private/harpia_msgs/share/gennodejs/ros/harpia_msgs/msg/Goal.js /home/vannini/harpia/devel/share/gennodejs/ros/harpia_msgs/msg/Goal.js
 /home/vannini/harpia/devel/.private/harpia_msgs/share/gennodejs/ros/harpia_msgs/msg/MissionPlannerActionResult.js /home/vannini/harpia/devel/share/gennodejs/ros/harpia_msgs/msg/MissionPlannerActionResult.js
+/home/vannini/harpia/devel/.private/harpia_msgs/share/gennodejs/ros/harpia_msgs/msg/SafetyParams.js /home/vannini/harpia/devel/share/gennodejs/ros/harpia_msgs/msg/SafetyParams.js
 /home/vannini/harpia/devel/.private/harpia_msgs/share/gennodejs/ros/harpia_msgs/msg/Camera.js /home/vannini/harpia/devel/share/gennodejs/ros/harpia_msgs/msg/Camera.js
 /home/vannini/harpia/devel/.private/harpia_msgs/share/gennodejs/ros/harpia_msgs/msg/Frame.js /home/vannini/harpia/devel/share/gennodejs/ros/harpia_msgs/msg/Frame.js
 /home/vannini/harpia/devel/.private/harpia_msgs/share/gennodejs/ros/harpia_msgs/msg/MissionPlannerActionGoal.js /home/vannini/harpia/devel/share/gennodejs/ros/harpia_msgs/msg/MissionPlannerActionGoal.js
@@ -92,6 +95,7 @@ harpia_msgs
 /home/vannini/harpia/devel/.private/harpia_msgs/share/roseus/ros/harpia_msgs/srv/MissionGoalManager.l /home/vannini/harpia/devel/share/roseus/ros/harpia_msgs/srv/MissionGoalManager.l
 /home/vannini/harpia/devel/.private/harpia_msgs/share/roseus/ros/harpia_msgs/srv/MissionFaultMitigation.l /home/vannini/harpia/devel/share/roseus/ros/harpia_msgs/srv/MissionFaultMitigation.l
 /home/vannini/harpia/devel/.private/harpia_msgs/share/roseus/ros/harpia_msgs/srv/WeatherCheck.l /home/vannini/harpia/devel/share/roseus/ros/harpia_msgs/srv/WeatherCheck.l
+/home/vannini/harpia/devel/.private/harpia_msgs/share/roseus/ros/harpia_msgs/msg/SafetyParams.l /home/vannini/harpia/devel/share/roseus/ros/harpia_msgs/msg/SafetyParams.l
 /home/vannini/harpia/devel/.private/harpia_msgs/share/roseus/ros/harpia_msgs/msg/Region.l /home/vannini/harpia/devel/share/roseus/ros/harpia_msgs/msg/Region.l
 /home/vannini/harpia/devel/.private/harpia_msgs/share/roseus/ros/harpia_msgs/msg/MissionPlannerFeedback.l /home/vannini/harpia/devel/share/roseus/ros/harpia_msgs/msg/MissionPlannerFeedback.l
 /home/vannini/harpia/devel/.private/harpia_msgs/share/roseus/ros/harpia_msgs/msg/Battery.l /home/vannini/harpia/devel/share/roseus/ros/harpia_msgs/msg/Battery.l
@@ -135,6 +139,7 @@ harpia_msgs
 /home/vannini/harpia/devel/.private/harpia_msgs/lib/python2.7/dist-packages/harpia_msgs/msg/__init__.py /home/vannini/harpia/devel/lib/python2.7/dist-packages/harpia_msgs/msg/__init__.py
 /home/vannini/harpia/devel/.private/harpia_msgs/lib/python2.7/dist-packages/harpia_msgs/msg/_MissionPlannerActionFeedback.py /home/vannini/harpia/devel/lib/python2.7/dist-packages/harpia_msgs/msg/_MissionPlannerActionFeedback.py
 /home/vannini/harpia/devel/.private/harpia_msgs/lib/python2.7/dist-packages/harpia_msgs/msg/_MissionPlannerAction.py /home/vannini/harpia/devel/lib/python2.7/dist-packages/harpia_msgs/msg/_MissionPlannerAction.py
+/home/vannini/harpia/devel/.private/harpia_msgs/lib/python2.7/dist-packages/harpia_msgs/msg/_SafetyParams.py /home/vannini/harpia/devel/lib/python2.7/dist-packages/harpia_msgs/msg/_SafetyParams.py
 /home/vannini/harpia/devel/.private/harpia_msgs/lib/python2.7/dist-packages/harpia_msgs/msg/_MissionPlannerResult.py /home/vannini/harpia/devel/lib/python2.7/dist-packages/harpia_msgs/msg/_MissionPlannerResult.py
 /home/vannini/harpia/devel/.private/harpia_msgs/lib/python2.7/dist-packages/harpia_msgs/msg/_MissionPlannerActionGoal.py /home/vannini/harpia/devel/lib/python2.7/dist-packages/harpia_msgs/msg/_MissionPlannerActionGoal.py
 /home/vannini/harpia/devel/.private/harpia_msgs/lib/python2.7/dist-packages/harpia_msgs/msg/_Goal.py /home/vannini/harpia/devel/lib/python2.7/dist-packages/harpia_msgs/msg/_Goal.py
@@ -142,6 +147,7 @@ harpia_msgs
 /home/vannini/harpia/devel/.private/harpia_msgs/include/harpia_msgs/Mission.h /home/vannini/harpia/devel/include/harpia_msgs/Mission.h
 /home/vannini/harpia/devel/.private/harpia_msgs/include/harpia_msgs/PathPlanning.h /home/vannini/harpia/devel/include/harpia_msgs/PathPlanning.h
 /home/vannini/harpia/devel/.private/harpia_msgs/include/harpia_msgs/DronePose.h /home/vannini/harpia/devel/include/harpia_msgs/DronePose.h
+/home/vannini/harpia/devel/.private/harpia_msgs/include/harpia_msgs/SafetyParams.h /home/vannini/harpia/devel/include/harpia_msgs/SafetyParams.h
 /home/vannini/harpia/devel/.private/harpia_msgs/include/harpia_msgs/MissionPlannerActionFeedback.h /home/vannini/harpia/devel/include/harpia_msgs/MissionPlannerActionFeedback.h
 /home/vannini/harpia/devel/.private/harpia_msgs/include/harpia_msgs/MissionGoalManager.h /home/vannini/harpia/devel/include/harpia_msgs/MissionGoalManager.h
 /home/vannini/harpia/devel/.private/harpia_msgs/include/harpia_msgs/MissionPlannerAction.h /home/vannini/harpia/devel/include/harpia_msgs/MissionPlannerAction.h

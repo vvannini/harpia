@@ -19,7 +19,7 @@
     (picture-goal region_1)
 
 
-    (= (battery-amount) 50)
+    (= (battery-amount) 100)
 
     (= (input-amount) 0)
 

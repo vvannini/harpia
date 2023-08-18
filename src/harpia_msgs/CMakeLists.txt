@@ -36,6 +36,7 @@ add_message_files(
   Mission.msg
   ChangeMission.msg
   DronePose.msg
+  SafetyParams.msg
 )
 
 generate_messages(

@@ -25,8 +25,9 @@
     <node name="mission_fault_mitigation_server" pkg="mission_fault_mitigation"	type="mission_fault_mitigation_server.py"   respawn="false" output="screen" />
     <node name="mission_goal_manager_server"	 pkg="mission_goal_manager" 	type="mission_goal_manager_server.py" 		respawn="true"  output="screen" />
     <node name="path_planning_server"        	 pkg="path_planning"        	type="path_planning_server.py"        		respawn="false" output="screen" />
-    <node name="weather_check_server"        	 pkg="fault_detection"  		type="weather_check_server.py"        		respawn="false" output="screen" />
+    <!-- <node name="weather_check_server"        	 pkg="fault_detection"  		type="weather_check_server.py"        		respawn="false" output="screen" /> -->
     <node name="drone_info"      		     	 pkg="fault_detection"  		type="DroneInfoCompiler"        			respawn="false" output="screen" />
+    <node name="anomaly_detector"      		     pkg="fault_detection"  		type="anomaly_detector.py"        			respawn="false" output="screen" />
 
 	<!-- ROSPlan -->
 	<include file="$(find rosplan_planning_system)/launch/interfaced_planning_system.launch" >
