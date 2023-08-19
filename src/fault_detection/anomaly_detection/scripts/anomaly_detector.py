@@ -163,7 +163,7 @@ def listener():
     win = 0 
     last_win = 0
     uav_stat, flag = anomalyDetection.checkAnomaly(kenny.sequential,uav_stat, module1, module2, module3, win)
-
+    response_time = time.time()
     while flag:
         win = int(round((time.time()-startMain),3)//time_win)
         if last_win != win:
@@ -216,14 +216,15 @@ def listener():
         #deixar a janela de tempo no uav
 
         action_win = int(kenny.action_win_time/kenny.classifier_win_time)
-        flag_action = np.sum(uav_action[:])
+        flag_action = np.sum(uav_action[-action_win:])
         
 
-        if(flag_action>24):
+        if(flag_action>24 and time.time() > response_time):
             print("Do you want to continue? (y/[n])")
             start_input = time.time()
 
-            while True:
+            flag_continue = True
+            while flag_continue and time.time() > response_time:
                 elapsed_time = time.time() - start_input
 
                 # definir tempo de espera no arquivo uav
@@ -232,34 +233,35 @@ def listener():
                     if(flag_action>48):
                         print('land')
                         action.land()
-                        break
+                        flag_continue = False
                     else:
                         print('base')
                         try:
                             action.go_to_base()
                         except:
                             action.land()
-                        break
+                        flag_continue = False
 
                 if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
                     user_input = input().lower()
+                    response_time = time.time() + kenny.user_response_time 
+                    print("User response: ",user_input)
                     if user_input == 'y':
                         print("Continuing...")
-                        break
+                        flag_continue = False
                     elif user_input == 'n':
                         if(flag_action>48):
                             print('land')
                             action.land()
-                            break
+                            flag_continue = False
                         else:
                             print('base')
                             try:
                                 action.go_to_base()
                             except:
                                 action.land()
-                            break
+                            flag_continue = False
                 time.sleep(0.1)
-                print("Do you want to continue? (y/[n])")
         
         rospy.Rate(1)
         

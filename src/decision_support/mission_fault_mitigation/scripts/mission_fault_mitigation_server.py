@@ -279,7 +279,7 @@ def mission_fault_mitigation(req):
             else:
                 print("\n------------------------- REPLANNING -----------------------------\n")
                 FLAG = 1
-                log(1, bn)
+                # log(1, bn)#erro em salvar
                 return MissionFaultMitigationResponse(FLAG)
         else:
             ie.eraseAllEvidence()

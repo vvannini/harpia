@@ -200,7 +200,7 @@ def test_client(hardware, map, mission, mission_file):
 
 '''
     Hello again my brave friend,
-    I know this entire code it's not ideal, but it'sa try,
+    I know this entire code it's not ideal, but it's a try, please feel free to create a lib with all this ocuring fuctions
 
    get_regions -> is an auxiliar function to create a list of a certain type of regions, as bases, nfz and roi read from the json file
    get_uav -> same as regions but for the uav

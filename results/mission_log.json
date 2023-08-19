@@ -76960,5 +76960,121 @@
         "plans": [
             35149
         ]
+    },
+    {
+        "id": 408,
+        "map_id": 1,
+        "mission_id": 3,
+        "total_goals": 7,
+        "replan": 0,
+        "knn": [
+            0,
+            2,
+            0
+        ],
+        "cpu_time": [
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            35150
+        ]
+    },
+    {
+        "id": 409,
+        "map_id": 1,
+        "mission_id": 3,
+        "total_goals": 7,
+        "replan": 0,
+        "knn": [
+            0,
+            4,
+            0
+        ],
+        "cpu_time": [
+            Infinity,
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            35151,
+            35152
+        ]
+    },
+    {
+        "id": 410,
+        "map_id": 1,
+        "mission_id": 3,
+        "total_goals": 7,
+        "replan": 0,
+        "knn": [
+            0,
+            1,
+            0
+        ],
+        "cpu_time": [
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            35153
+        ]
+    },
+    {
+        "id": 411,
+        "map_id": 1,
+        "mission_id": 3,
+        "total_goals": 7,
+        "replan": 0,
+        "knn": [
+            0,
+            1,
+            0
+        ],
+        "cpu_time": [
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            35154
+        ]
+    },
+    {
+        "id": 412,
+        "map_id": 1,
+        "mission_id": 3,
+        "total_goals": 7,
+        "replan": 0,
+        "knn": [
+            0,
+            1,
+            0
+        ],
+        "cpu_time": [
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            35155
+        ]
+    },
+    {
+        "id": 413,
+        "map_id": 1,
+        "mission_id": 3,
+        "total_goals": 7,
+        "replan": 0,
+        "knn": [
+            0,
+            1,
+            0
+        ],
+        "cpu_time": [
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            35156
+        ]
     }
 ]
