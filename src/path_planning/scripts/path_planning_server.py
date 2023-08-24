@@ -28,6 +28,8 @@ from harpia_msgs.srv import *
 # PathPlanningResponse
 # PathPlanning
 
+import shapely.geometry
+
 # Behaviours
 from libs.Behaviours.behaviours import pulverize, picture
 
@@ -176,7 +178,23 @@ def get_first_factible_route(ag):
 
     return None
 
+def pass_through_obstacle(obstacle_points, line_points):
+    poly = shapely.geometry.Polygon(obstacle_points)
+    line = shapely.geometry.LineString(line_points)
+    
+    return line.intersects(poly)
 
+def count_obstacles(from_wp, to_wp, map, geo_home):
+    obst_qty = 0
+    line = Conversor.list_geo_to_cart([origin[:-1]] + [destination[:-1]], geo_home)
+
+    for nfz in m['nfz']:
+        poly = Conversor.list_geo_to_cart(nfz['geo_points'], geo_home)
+        # poly1 = list_geo_to_cart(nfz['geo_points'], geo_home)
+        if(pass_through_obstacle(poly, line)):
+            obst_qty += 1
+
+    return obst_qty
 # ---
 # PATH PLANNERS
 
@@ -394,12 +412,12 @@ def select_planner(obstacles_qty, distance, battery):
         selected_planner (str): the name of the selected planner, according to the intelligence
     """
 
-    return "rrt"
+    # return "rrt"
 
-    # global KNN
+    global KNN
 
-    # # Predict the best planner
-    # return KNN.predict([[obstacles_qty, distance, battery]])
+    # Predict the best planner
+    return KNN.predict([[obstacles_qty, distance, battery]])
 
 def run_path_planning(from_wp, to_wp, map, obstacles_qty):
     distance = euclidean_distance(from_wp.cartesian, to_wp.cartesian)
@@ -513,7 +531,7 @@ def path_planning_server():
     # doing it, but it loads the model only once and is able to use ROS parameters.
     global KNN
 
-    knn_pickle_file = os.path.join(harpia_root_dir, "src/path_planning/scripts/libs/KNN/models/model_latest.pickle")
+    knn_pickle_file = os.path.join(harpia_root_dir, "src/path_planning/scripts/libs/KNN/models/knn29.pickle")
 
     # Load the model from disk a single time
     KNN = pickle.load(open(knn_pickle_file, "rb"))

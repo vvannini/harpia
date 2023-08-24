@@ -133,7 +133,9 @@ def test_client(hardware, map, mission, mission_file):
 
     # Waits for the server to finish performing the action.
     # client.wait_for_result()
-
+    print("AD D GOAL   -> 1")
+    print("REMOVE GOAL -> 2")
+    print("mission_id goal_op")
     rate = rospy.Rate(1)
     while client.get_state() in [GoalStatus.PENDING, GoalStatus.ACTIVE]:
         pub.publish(goal.mission)

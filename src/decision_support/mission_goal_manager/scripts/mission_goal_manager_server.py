@@ -129,15 +129,21 @@ class ActionServer():
 			rospy.loginfo("REPLAN - MissionGoalManager")
 			replan(data.mission)
 		elif data.op == OP_ADD_RM_GOALS:
-			rospy.logerr("ADD/RM GOALS - MissionGoalManager not implemented yet")
-			self.abort()
+			rospy.logerr("ADD/RM GOALS - MissionGoalManager")
+			# self.abort()
+			replan(data.mission)
 			return
 
 		feedback_msg = MissionPlannerFeedback()
 		
 
 		print(self.a_server)
-		while not call_mission_planning():
+		# while not call_mission_planning():
+		# result = call_mission_planning()
+		# print(result)
+		# print(not result)
+		# while call_mission_planning() == None or self.change_goals:
+		while not call_mission_planning() or self.change_goals:
 			if self.change_goals:
 				print('MISSION GOAL Manager CANCEL')
 				feedback_msg.status = 1				
@@ -164,6 +170,8 @@ class ActionServer():
 			feedback_msg.status = 0
 			self.a_server.publish_feedback(feedback_msg)
 			self.change_goals = 0
+
+			result = call_mission_planning()
 
 		# Land the drone
 		land()
@@ -523,6 +531,7 @@ def replan(mission, uav, base, goals, op):
 		# add_instance(create_function("total-goals", total_goals))
 
 	elif (op == 1):
+		# add
 		print("Op 1")
 		if pulverize:
 			add_instance(create_predicate("has-pulverize-goal"))
@@ -559,7 +568,7 @@ def replan(mission, uav, base, goals, op):
 
 	elif (op == 2):
 		print("Op 2")
-
+		# Remove
 		for goal in get_goal('').attributes:
 			# print(goal)
 			# if goal.attribute_name != "at":
@@ -572,13 +581,13 @@ def replan(mission, uav, base, goals, op):
 				for goal_toRemove in photo:
 					if (goal.values[0].value == goal_toRemove):
 					# f.attributes[0].function_value = f.attributes[0].function_value - 1
-						print(goal)
+						# print(goal)
 						remove_goal(goal)
 			elif(goal.attribute_name == 'pulverized'):
 				for goal_toRemove in pulverize:
 					if (goal.values[0].value == goal_toRemove):
 					# f.attributes[0].function_value = f.attributes[0].function_value - 1
-						print(goal)
+						# print(goal)
 						remove_goal(goal)
 			else:
 				print('not implemented yet')

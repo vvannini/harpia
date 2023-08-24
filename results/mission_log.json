@@ -77076,5 +77076,697 @@
         "plans": [
             35156
         ]
+    },
+    {
+        "id": 414,
+        "map_id": 1,
+        "mission_id": 3,
+        "total_goals": 7,
+        "replan": 0,
+        "knn": [
+            0,
+            1,
+            0
+        ],
+        "cpu_time": [
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            35157
+        ]
+    },
+    {
+        "id": 415,
+        "map_id": 1,
+        "mission_id": 0,
+        "total_goals": 2,
+        "replan": 0,
+        "knn": [
+            0,
+            3,
+            0
+        ],
+        "cpu_time": [
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            35158,
+            35159,
+            35160,
+            35161
+        ]
+    },
+    {
+        "id": 416,
+        "map_id": 2,
+        "mission_id": 0,
+        "total_goals": 2,
+        "replan": 0,
+        "knn": [
+            0,
+            2,
+            0
+        ],
+        "cpu_time": [
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            35162,
+            35163,
+            35164,
+            35165,
+            35166,
+            35167
+        ]
+    },
+    {
+        "id": 417,
+        "map_id": 2,
+        "mission_id": 0,
+        "total_goals": 2,
+        "replan": 0,
+        "knn": [
+            0,
+            2,
+            0
+        ],
+        "cpu_time": [
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            35168
+        ]
+    },
+    {
+        "id": 418,
+        "map_id": 2,
+        "mission_id": 0,
+        "total_goals": 2,
+        "replan": 0,
+        "knn": [
+            0,
+            2,
+            0
+        ],
+        "cpu_time": [
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            35169
+        ]
+    },
+    {
+        "id": 419,
+        "map_id": 2,
+        "mission_id": 0,
+        "total_goals": 2,
+        "replan": 0,
+        "knn": [
+            0,
+            1,
+            0
+        ],
+        "cpu_time": [
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            35170
+        ]
+    },
+    {
+        "id": 420,
+        "map_id": 2,
+        "mission_id": 0,
+        "total_goals": 2,
+        "replan": 0,
+        "knn": [
+            0,
+            2,
+            0
+        ],
+        "cpu_time": [
+            Infinity,
+            Infinity,
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            35171,
+            35172,
+            35173
+        ]
+    },
+    {
+        "id": 421,
+        "map_id": 2,
+        "mission_id": 3,
+        "total_goals": 7,
+        "replan": 0,
+        "knn": [
+            0,
+            1,
+            0
+        ],
+        "cpu_time": [
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            35174
+        ]
+    },
+    {
+        "id": 422,
+        "map_id": 2,
+        "mission_id": 3,
+        "total_goals": 7,
+        "replan": 0,
+        "knn": [
+            0,
+            1,
+            0
+        ],
+        "cpu_time": [
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            35175
+        ]
+    },
+    {
+        "id": 423,
+        "map_id": 2,
+        "mission_id": 3,
+        "total_goals": 7,
+        "replan": 0,
+        "knn": [
+            0,
+            1,
+            0
+        ],
+        "cpu_time": [
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            35176
+        ]
+    },
+    {
+        "id": 424,
+        "map_id": 2,
+        "mission_id": 3,
+        "total_goals": 7,
+        "replan": 0,
+        "knn": [
+            0,
+            1,
+            0
+        ],
+        "cpu_time": [
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            35177
+        ]
+    },
+    {
+        "id": 425,
+        "map_id": 2,
+        "mission_id": 3,
+        "total_goals": 7,
+        "replan": 0,
+        "knn": [
+            0,
+            2,
+            0
+        ],
+        "cpu_time": [
+            Infinity,
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            35178,
+            35179
+        ]
+    },
+    {
+        "id": 426,
+        "map_id": 2,
+        "mission_id": 3,
+        "total_goals": 7,
+        "replan": 0,
+        "knn": [
+            0,
+            5,
+            0
+        ],
+        "cpu_time": [
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            35180,
+            35181,
+            35182,
+            35183,
+            35184
+        ]
+    },
+    {
+        "id": 427,
+        "map_id": 2,
+        "mission_id": 3,
+        "total_goals": 7,
+        "replan": 0,
+        "knn": [
+            0,
+            7,
+            0
+        ],
+        "cpu_time": [
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            35185,
+            35186,
+            35187,
+            35188,
+            35189,
+            35190,
+            35191
+        ]
+    },
+    {
+        "id": 428,
+        "map_id": 2,
+        "mission_id": 0,
+        "total_goals": 2,
+        "replan": 0,
+        "knn": [
+            0,
+            2,
+            0
+        ],
+        "cpu_time": [
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            35192,
+            35193,
+            35194,
+            35195,
+            35196,
+            35197,
+            35198,
+            35199
+        ]
+    },
+    {
+        "id": 429,
+        "map_id": 2,
+        "mission_id": 0,
+        "total_goals": 2,
+        "replan": 0,
+        "knn": [
+            0,
+            2,
+            0
+        ],
+        "cpu_time": [
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            35200,
+            35201,
+            35202,
+            35203,
+            35204,
+            35205,
+            35206,
+            35207,
+            35208,
+            35209,
+            35210,
+            35211,
+            35212,
+            35213,
+            35214,
+            35215,
+            35216,
+            35217,
+            35218,
+            35219,
+            35220,
+            35221,
+            35222,
+            35223,
+            35224,
+            35225,
+            35226,
+            35227,
+            35228,
+            35229,
+            35230
+        ]
+    },
+    {
+        "id": 430,
+        "map_id": 2,
+        "mission_id": 0,
+        "total_goals": 2,
+        "replan": 0,
+        "knn": [
+            0,
+            2,
+            0
+        ],
+        "cpu_time": [
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            35231
+        ]
+    },
+    {
+        "id": 431,
+        "map_id": 2,
+        "mission_id": 0,
+        "total_goals": 2,
+        "replan": 0,
+        "knn": [
+            0,
+            2,
+            0
+        ],
+        "cpu_time": [
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            35232
+        ]
+    },
+    {
+        "id": 432,
+        "map_id": 2,
+        "mission_id": 0,
+        "total_goals": 2,
+        "replan": 0,
+        "knn": [
+            0,
+            2,
+            0
+        ],
+        "cpu_time": [
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            35233
+        ]
+    },
+    {
+        "id": 433,
+        "map_id": 2,
+        "mission_id": 0,
+        "total_goals": 2,
+        "replan": 0,
+        "knn": [
+            0,
+            0,
+            0
+        ],
+        "cpu_time": [],
+        "bn_net": [],
+        "plans": []
+    },
+    {
+        "id": 434,
+        "map_id": 2,
+        "mission_id": 0,
+        "total_goals": 2,
+        "replan": 0,
+        "knn": [
+            0,
+            0,
+            0
+        ],
+        "cpu_time": [],
+        "bn_net": [],
+        "plans": []
+    },
+    {
+        "id": 435,
+        "map_id": 2,
+        "mission_id": 0,
+        "total_goals": 2,
+        "replan": 0,
+        "knn": [
+            0,
+            2,
+            0
+        ],
+        "cpu_time": [
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            35234
+        ]
+    },
+    {
+        "id": 436,
+        "map_id": 2,
+        "mission_id": 0,
+        "total_goals": 1,
+        "replan": 0,
+        "knn": [
+            0,
+            1,
+            0
+        ],
+        "cpu_time": [
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            35235
+        ]
+    },
+    {
+        "id": 437,
+        "map_id": 2,
+        "mission_id": 0,
+        "total_goals": 1,
+        "replan": 0,
+        "knn": [
+            0,
+            0,
+            0
+        ],
+        "cpu_time": [],
+        "bn_net": [],
+        "plans": []
+    },
+    {
+        "id": 438,
+        "map_id": 2,
+        "mission_id": 0,
+        "total_goals": 1,
+        "replan": 0,
+        "knn": [
+            0,
+            1,
+            0
+        ],
+        "cpu_time": [
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            35236
+        ]
+    },
+    {
+        "id": 439,
+        "map_id": 2,
+        "mission_id": 0,
+        "total_goals": 1,
+        "replan": 0,
+        "knn": [
+            0,
+            0,
+            0
+        ],
+        "cpu_time": [],
+        "bn_net": [],
+        "plans": []
+    },
+    {
+        "id": 440,
+        "map_id": 2,
+        "mission_id": 0,
+        "total_goals": 1,
+        "replan": 0,
+        "knn": [
+            0,
+            0,
+            0
+        ],
+        "cpu_time": [],
+        "bn_net": [],
+        "plans": []
+    },
+    {
+        "id": 441,
+        "map_id": 2,
+        "mission_id": 0,
+        "total_goals": 1,
+        "replan": 0,
+        "knn": [
+            0,
+            0,
+            0
+        ],
+        "cpu_time": [],
+        "bn_net": [],
+        "plans": []
+    },
+    {
+        "id": 442,
+        "map_id": 2,
+        "mission_id": 0,
+        "total_goals": 1,
+        "replan": 0,
+        "knn": [
+            0,
+            0,
+            0
+        ],
+        "cpu_time": [],
+        "bn_net": [],
+        "plans": []
+    },
+    {
+        "id": 443,
+        "map_id": 2,
+        "mission_id": 0,
+        "total_goals": 1,
+        "replan": 0,
+        "knn": [
+            0,
+            0,
+            0
+        ],
+        "cpu_time": [],
+        "bn_net": [],
+        "plans": []
+    },
+    {
+        "id": 444,
+        "map_id": 2,
+        "mission_id": 3,
+        "total_goals": 7,
+        "replan": 0,
+        "knn": [
+            0,
+            0,
+            0
+        ],
+        "cpu_time": [
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            35237
+        ]
+    },
+    {
+        "id": 445,
+        "map_id": 2,
+        "mission_id": 3,
+        "total_goals": 7,
+        "replan": 0,
+        "knn": [
+            5,
+            2,
+            0
+        ],
+        "cpu_time": [
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            35238
+        ]
     }
 ]

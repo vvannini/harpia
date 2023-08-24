@@ -109,7 +109,7 @@ def test_client(hardware, map, mission):
 
     # Creates a goal to send to the action server.
     goal = MissionPlannerGoal()
-    goal.op = 2 # first add in the kwoledge base
+    goal.op = 1 # first add in the kwoledge base
     goal.mission = get_objects(hardware, map, mission)
 
     # Sends the goal to the action server.

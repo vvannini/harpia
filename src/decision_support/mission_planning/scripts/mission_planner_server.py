@@ -76,7 +76,34 @@ def log():
     with open(log_path, 'w') as outfile:
         json.dump(log_file, outfile, indent=4)
 
+class Plan(object):
+    def __init__(self):
+        self.sub  = rospy.Subscriber("rosplan_parsing_interface/complete_plan", CompletePlan, self.plan_callback)   
+        self.sub2 = rospy.Subscriber("/rosplan_plan_dispatcher/action_dispatch", ActionDispatch, self.action_callback)   
+        self.plan = CompletePlan()
+        self.current_action = ActionDispatch()
+    
+    def plan_callback(self, data): 
+        self.plan = data
+        self.unsubscribe()
+
+    def action_callback(self, data): 
+        self.current_action = data
+
+    def end_mission(self):
+        print(self.plan.plan[-1].action_id)
+        print(self.current_action.action_id)
+        return self.plan.plan[-1].action_id == self.current_action.action_id
+
+    def unsubscribe(self):
+        self.sub.unregister()
+
 def mission_planning(req):
+    p = Plan()
+    has_plan = False
+    if(has_plan and p.end_mission): return True
+
+
     rospy.loginfo("Creating problem")
     if not call_problem_generator(): return None
 
@@ -86,6 +113,8 @@ def mission_planning(req):
     rospy.loginfo("Calling Plan genarator")
     if not call_plan_generator(): return None
 
+    has_plan = True
+
     rospy.loginfo("Calling Parser")
     log()
     if not call_parser(): return None
@@ -93,10 +122,10 @@ def mission_planning(req):
     rospy.loginfo("Call Dispach")
     rospy.loginfo(req)
 
-    if not call_dispach(): return None
+    if not call_dispach(): 
+        return None
 
-    return []
-
+    return True
 '''
     Callers for ROSPlan Services
 '''
@@ -109,22 +138,23 @@ def try_call_srv(topic, msg_ty):
         return True
     except rospy.ServiceException as e:
         rospy.logerr(f"Service call failed: {e}")
-        return False
+        return None
 
 def call_problem_generator(): return try_call_srv('/rosplan_problem_interface/problem_generation_server', Empty)
 def call_plan_generator():    return try_call_srv('/rosplan_planner_interface/planning_server', Empty)
 def call_parser():            return try_call_srv('/rosplan_parsing_interface/parse_plan', Empty)
+def call_dispach():            return try_call_srv('/rosplan_plan_dispatcher/dispatch_plan', DispatchService)
 
-def call_dispach():
-    rospy.wait_for_service('/rosplan_plan_dispatcher/dispatch_plan')
-    try:
-        query_proxy = rospy.ServiceProxy('/rosplan_plan_dispatcher/dispatch_plan', DispatchService)
-        result = query_proxy()
-        return result.success
-    except rospy.ServiceException as e:
-        rospy.logerr(f"Service call failed: {e}")
-        # Should we return false here? I guess...
-        return False
+# def call_dispach():
+#     rospy.wait_for_service('/rosplan_plan_dispatcher/dispatch_plan')
+#     try:
+#         query_proxy = rospy.ServiceProxy('/rosplan_plan_dispatcher/dispatch_plan', DispatchService)
+#         result = query_proxy()
+#         return result.success
+#     except rospy.ServiceException as e:
+#         rospy.logerr(f"Service call failed: {e}")
+#         # Should we return false here? I guess...
+#         return None
 
 def mission_planning_server():
     rospy.init_node('mission_planning_server')
