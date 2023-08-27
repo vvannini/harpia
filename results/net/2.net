@@ -1,0 +1,18 @@
+
+net {
+  name = FaultDetection;
+  software = "aGrUM 0.21.0";
+  node_size = (50 50);
+}
+
+node 0_go_to_base_1 {
+   states = (Replan Do_Action );
+   label = "0_go_to_base_1";
+   ID = "0_go_to_base_1";
+}
+
+potential (0_go_to_base_1) {
+   data = (  0.15 0.85);
+}
+
+

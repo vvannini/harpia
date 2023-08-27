@@ -1,0 +1,42 @@
+
+net {
+  name = FaultDetection;
+  software = "aGrUM 0.21.0";
+  node_size = (50 50);
+}
+
+node 0_go_to_region_6 {
+   states = (Replan Do_Action );
+   label = "0_go_to_region_6";
+   ID = "0_go_to_region_6";
+}
+
+node 1_take_image_region_6 {
+   states = (Replan Do_Action );
+   label = "1_take_image_region_6";
+   ID = "1_take_image_region_6";
+}
+
+node 2_go_to_base_1 {
+   states = (Replan Do_Action );
+   label = "2_go_to_base_1";
+   ID = "2_go_to_base_1";
+}
+
+potential (0_go_to_region_6) {
+   data = (  0.05 0.95);
+}
+
+potential ( 1_take_image_region_6 | 0_go_to_region_6   ) {
+   data = 
+   ((   1   0)   % 0_go_to_region_6=Replan   
+   (   0.05   0.95));   % 0_go_to_region_6=Do_Action   
+}
+
+potential ( 2_go_to_base_1 | 1_take_image_region_6   ) {
+   data = 
+   ((   1   0)   % 1_take_image_region_6=Replan   
+   (   0.05   0.95));   % 1_take_image_region_6=Do_Action   
+}
+
+

@@ -160,6 +160,7 @@ def get_DecisionString(obj):
     else:
         return  obj.name +'_'+ str(obj.parameters[0].value)
 
+
 def log(replan, bn):
     # log path
     LOG_PATH = "~/harpia/results/"
@@ -169,23 +170,25 @@ def log(replan, bn):
 
     # open log
     with open(log_json, "r") as log_file:
-            log_file = json.load(log_file)
+        log_data = json.load(log_file)
 
     # add replan
-    log_file[-1]['replan'] = log_file[-1]['replan'] + replan
+    log_data[-1]['replan'] = log_data[-1]['replan'] + replan
 
     i = 0
-    while os.path.exists(log_net+"%s.net" % i):
+    while os.path.exists(log_net + f"{i}.net"):
         i += 1
-    gum.saveBN(bn, log_net+"%s.net" % i)
-    # with open("WaterSprinkler.net","r") as out:
-    #   print(out.read())
 
-    log_file[-1]['bn_net'].append(i)
+    # Close any open file streams before saving BN
+    bn_file_path = log_net + f"{i}.net"
+    with open(bn_file_path, "w") as bn_file:
+        gum.saveBN(bn, bn_file_path)
+
+    log_data[-1]['bn_net'].append(i)
+    
     # dump log
     with open(log_json, 'w') as outfile:
-        json.dump(log_file, outfile, indent=4)
-    outfile.close()
+        json.dump(log_data, outfile, indent=4)
 
 def mission_fault_mitigation(req):
     p = Plan()
@@ -279,7 +282,7 @@ def mission_fault_mitigation(req):
             else:
                 print("\n------------------------- REPLANNING -----------------------------\n")
                 FLAG = 1
-                # log(1, bn)#erro em salvar
+                log(1, bn)#erro em salvar
                 return MissionFaultMitigationResponse(FLAG)
         else:
             ie.eraseAllEvidence()
@@ -292,7 +295,7 @@ def mission_fault_mitigation(req):
     # gum.saveBN(bn,"WaterSprinkler.net")
     # with open("WaterSprinkler.net","r") as out:
     #   print(out.read())
-    #log(0, bn) #erro em salvar
+    log(0, bn) #erro em salvar
     return MissionFaultMitigationResponse(FLAG)
 
 def mission_fault_mitigation_server():

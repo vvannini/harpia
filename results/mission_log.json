@@ -77932,5 +77932,76 @@
         "plans": [
             35252
         ]
+    },
+    {
+        "id": 454,
+        "map_id": 2,
+        "mission_id": 0,
+        "total_goals": 2,
+        "replan": 0,
+        "knn": [
+            0,
+            1,
+            0
+        ],
+        "cpu_time": [
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            0
+        ]
+    },
+    {
+        "id": 455,
+        "map_id": 2,
+        "mission_id": 0,
+        "total_goals": 2,
+        "replan": 0,
+        "knn": [
+            0,
+            1,
+            0
+        ],
+        "cpu_time": [
+            Infinity
+        ],
+        "bn_net": [],
+        "plans": [
+            1
+        ]
+    },
+    {
+        "id": 456,
+        "map_id": 2,
+        "mission_id": 0,
+        "total_goals": 2,
+        "replan": 0,
+        "knn": [
+            0,
+            2,
+            0
+        ],
+        "cpu_time": [
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity,
+            Infinity
+        ],
+        "bn_net": [
+            0,
+            1,
+            2
+        ],
+        "plans": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+        ]
     }
 ]
