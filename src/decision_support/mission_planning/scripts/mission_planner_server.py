@@ -57,7 +57,7 @@ def parse_file_plan():
    
     return success, cpu_time, total_time, id
 
-def log():
+def log(cpu_time):
     # log path
     root_dir = get_harpia_root_dir()
     log_path = os.path.join(root_dir, "results/mission_log.json")
@@ -67,7 +67,7 @@ def log():
         log_file = json.load(log_file)
 
 
-    sucsses, cpu_time, total_time, plan_id = parse_file_plan()
+    sucsses, _, total_time, plan_id = parse_file_plan()
     # add replan
     log_file[-1]['cpu_time'].append(cpu_time) 
     log_file[-1]['plans'].append(plan_id) 
@@ -103,7 +103,7 @@ def mission_planning(req):
     has_plan = False
     if(has_plan and p.end_mission): return True
 
-
+    start = time.time()
     rospy.loginfo("Creating problem")
     if not call_problem_generator(): return None
 
@@ -116,9 +116,9 @@ def mission_planning(req):
     has_plan = True
 
     rospy.loginfo("Calling Parser")
-    log()
     if not call_parser(): return None
-
+    end = time.time()
+    log(round((end-start),3))
     rospy.loginfo("Call Dispach")
     rospy.loginfo(req)
 

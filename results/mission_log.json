@@ -78003,5 +78003,26 @@
             6,
             7
         ]
+    },
+    {
+        "id": 457,
+        "map_id": 2,
+        "mission_id": 0,
+        "total_goals": 2,
+        "replan": 0,
+        "knn": [
+            0,
+            1,
+            0
+        ],
+        "cpu_time": [
+            0.674
+        ],
+        "bn_net": [
+            3
+        ],
+        "plans": [
+            8
+        ]
     }
 ]
