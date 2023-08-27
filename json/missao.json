@@ -3,7 +3,7 @@
       "name" : "take_picture_0",
       "id" : 0,
       "mission_execution" : [
-         
+         {"instructions" : {"area" : "region_6"},"command" : "take_picture"},
          {"instructions" : { "area" : "base_1"},"command" : "end"}
       ]
    },

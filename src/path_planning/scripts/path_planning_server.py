@@ -186,11 +186,12 @@ def pass_through_obstacle(obstacle_points, line_points):
 
 def count_obstacles(from_wp, to_wp, map, geo_home):
     obst_qty = 0
-    line = Conversor.list_geo_to_cart([origin[:-1]] + [destination[:-1]], geo_home)
+    print(from_wp)
+    line = [(from_wp.cartesian.x, from_wp.cartesian.y), (to_wp.cartesian.x, to_wp.cartesian.y)]
 
-    for nfz in m['nfz']:
-        poly = Conversor.list_geo_to_cart(nfz['geo_points'], geo_home)
-        # poly1 = list_geo_to_cart(nfz['geo_points'], geo_home)
+    print(line)
+    for nfz in map.nfz:
+        poly = [(point.cartesian.x, point.cartesian.y) for point in nfz.points]
         if(pass_through_obstacle(poly, line)):
             obst_qty += 1
 
@@ -495,12 +496,14 @@ def path_planning(data):
     map = data.map
 
     if data.op == PathPlanningOp.PLAN_PATH:
+        obstacles_qty = count_obstacles(from_wp, to_wp, map, map.geo_home)
+        print(obstacles_qty)
         # OBSTACLES
-        mapa_obstacles = pd.read_csv(f"{CSV_PATH}/mapa{data.map.id}_obstacles.csv", index_col=0)
-        if data.name_from == "aux":
-            obstacles_qty = 0  
-        else:
-            obstacles_qty = mapa_obstacles[data.name_from][data.name_to]
+        # mapa_obstacles = pd.read_csv(f"{CSV_PATH}/mapa{data.map.id}_obstacles.csv", index_col=0)
+        # if data.name_from == "aux":
+        #     obstacles_qty = 0  
+        # else:
+        #     obstacles_qty = mapa_obstacles[data.name_from][data.name_to]
 
         route = run_path_planning(from_wp, to_wp, map, obstacles_qty)
 
@@ -508,7 +511,7 @@ def path_planning(data):
         route = pulverize(from_wp)
 
     elif data.op == PathPlanningOp.TAKE_PICTURE:
-        distance = 5
+        distance = 10
         route = picture(from_wp, distance)
 
     elif data.op == PathPlanningOp.PLAN_PATH_RRT:
