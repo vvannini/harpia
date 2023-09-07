@@ -80,10 +80,11 @@ def create_log(map, mission):
     log['mission_id']  = mission['id']
     log['total_goals'] = total_goals(mission)
     log['replan']      = 0
-    log['knn']         = [0, 0, 0]
+    log['knn']         = []
     log['cpu_time']    = []
     log['bn_net']      = []
     log['plans']       = []
+    log['detected_fault'] = []
 
     log_file.append(log)
     print(log['id'])

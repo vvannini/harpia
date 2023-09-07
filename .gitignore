@@ -42,8 +42,8 @@ qtcreator-*
 /planning/docs
 /planning/src
 
-/results/plans
-/results/net
+/results/plans/*
+/results/net/*
 
 *~
 

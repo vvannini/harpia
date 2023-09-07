@@ -28,6 +28,9 @@ from harpia_msgs.srv import *
 # PathPlanningResponse
 # PathPlanning
 
+import time
+
+
 import shapely.geometry
 
 # Behaviours
@@ -57,7 +60,7 @@ class Drone(object):
 
 # ---
 # UTILS
-def log(index):
+def log(info):
     harpia_root_dir = get_harpia_root_dir()
 
     # log path
@@ -69,7 +72,7 @@ def log(index):
         log_file = json.load(log_file)
 
     # add replan
-    log_file[-1]['knn'][index] += 1
+    log_file[-1]['knn'].append(info)
 
     # dump log
     with open(log_json, 'w') as outfile:
@@ -435,18 +438,25 @@ def run_path_planning(from_wp, to_wp, map, obstacles_qty):
 
     if selected_planner == "ag":
         rospy.loginfo("Using ag")
-        log(0)
+        start = time.time()    
         result = ag(from_wp, to_wp, map)
+        end = time.time()
+        log(["ag",obstacles_qty, distance, uav.battery, round((end-start),3), result[1], result[5]])
 
     elif selected_planner == "rrt":
         rospy.loginfo("Using rrt")
-        log(1)
+        start = time.time() 
         result = rrt(from_wp, to_wp, map)
+        end = time.time()
+        log(["RRT",obstacles_qty, distance, uav.battery, round((end-start),3), result[1], result[5]])
 
     elif selected_planner == "pfp":
         rospy.loginfo("Using pfp")
-        log(2)
+        start = time.time() 
         result = pfp(from_wp, to_wp, map)
+        end = time.time()
+        log(["pfp",obstacles_qty, distance, uav.battery, round((end-start),3), result[1], result[5]])
+
 
     else:
         rospy.logerr("ERROR!!! Select or choose a different algorithm")

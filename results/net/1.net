@@ -5,10 +5,10 @@ net {
   node_size = (50 50);
 }
 
-node 0_take_image_region_6 {
+node 0_take_image_region_1 {
    states = (Replan Do_Action );
-   label = "0_take_image_region_6";
-   ID = "0_take_image_region_6";
+   label = "0_take_image_region_1";
+   ID = "0_take_image_region_1";
 }
 
 node 1_go_to_base_1 {
@@ -17,14 +17,14 @@ node 1_go_to_base_1 {
    ID = "1_go_to_base_1";
 }
 
-potential (0_take_image_region_6) {
-   data = (  0.15 0.85);
+potential (0_take_image_region_1) {
+   data = (  0.5 0.5);
 }
 
-potential ( 1_go_to_base_1 | 0_take_image_region_6   ) {
+potential ( 1_go_to_base_1 | 0_take_image_region_1   ) {
    data = 
-   ((   1   0)   % 0_take_image_region_6=Replan   
-   (   0.15   0.85));   % 0_take_image_region_6=Do_Action   
+   ((   1   0)   % 0_take_image_region_1=Replan   
+   (   0.5   0.5));   % 0_take_image_region_1=Do_Action   
 }
 
 

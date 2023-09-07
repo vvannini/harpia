@@ -3,7 +3,8 @@
       "name" : "take_picture_0",
       "id" : 0,
       "mission_execution" : [
-         {"instructions" : {"area" : "region_6"},"command" : "take_picture"},
+         {"instructions" : {"area" : "region_1"},"command" : "take_picture"},
+         {"instructions" : {"area" : "region_2"},"command" : "take_picture"},
          {"instructions" : { "area" : "base_1"},"command" : "end"}
       ]
    },
@@ -11,22 +12,134 @@
       "name" : "take_picture_1",
       "id" : 1,
       "mission_execution" : [
-         {"instructions" : {"area" : "region_1"},"command" : "take_picture"},
          {"instructions" : {"area" : "region_2"},"command" : "take_picture"},
+         {"instructions" : {"area" : "region_3"},"command" : "take_picture"},
          {"instructions" : { "area" : "base_1"},"command" : "end"}
       ]
    },
    {
-      "name" : "take_picture_1",
+      "name" : "take_picture_2",
       "id" : 2,
+      "mission_execution" : [
+         {"instructions" : {"area" : "region_3"},"command" : "take_picture"},
+         {"instructions" : {"area" : "region_4"},"command" : "take_picture"},
+         {"instructions" : { "area" : "base_1"},"command" : "end"}
+      ]
+   },
+   {
+      "name" : "take_picture_3",
+      "id" : 3,
+      "mission_execution" : [
+         {"instructions" : {"area" : "region_4"},"command" : "take_picture"},
+         {"instructions" : {"area" : "region_5"},"command" : "take_picture"},
+         {"instructions" : { "area" : "base_1"},"command" : "end"}
+      ]
+   },
+   {
+      "name" : "take_picture_4",
+      "id" : 4,
+      "mission_execution" : [
+         {"instructions" : {"area" : "region_1"},"command" : "take_picture"},
+         {"instructions" : {"area" : "region_6"},"command" : "take_picture"},
+         {"instructions" : { "area" : "base_1"},"command" : "end"}
+      ]
+   },
+   {
+      "name" : "take_picture_5",
+      "id" : 5,
+      "mission_execution" : [
+         {"instructions" : {"area" : "region_2"},"command" : "take_picture"},
+         {"instructions" : {"area" : "region_4"},"command" : "take_picture"},
+         {"instructions" : { "area" : "base_1"},"command" : "end"}
+      ]
+   },
+   {
+      "name" : "take_picture_6",
+      "id" : 6,
+      "mission_execution" : [
+         {"instructions" : {"area" : "region_3"},"command" : "take_picture"},
+         {"instructions" : {"area" : "region_5"},"command" : "take_picture"},
+         {"instructions" : { "area" : "base_1"},"command" : "end"}
+      ]
+   },
+   {
+      "name" : "take_picture_7",
+      "id" : 7,
       "mission_execution" : [
          {"instructions" : {"area" : "region_1"},"command" : "take_picture"},
          {"instructions" : {"area" : "region_2"},"command" : "take_picture"},
          {"instructions" : {"area" : "region_3"},"command" : "take_picture"},
+         {"instructions" : {"area" : "region_4"},"command" : "take_picture"},
          {"instructions" : { "area" : "base_3"},"command" : "end"}
       ]
    },
-   {"id": 3, "name": "take_picture_7928", "mission_execution": 
+   {
+      "name" : "take_picture_8",
+      "id" : 8,
+      "mission_execution" : [
+         {"instructions" : {"area" : "region_5"},"command" : "take_picture"},
+         {"instructions" : {"area" : "region_2"},"command" : "take_picture"},
+         {"instructions" : {"area" : "region_3"},"command" : "take_picture"},
+         {"instructions" : {"area" : "region_4"},"command" : "take_picture"},
+         {"instructions" : { "area" : "base_3"},"command" : "end"}
+      ]
+   },
+   {
+      "name" : "take_picture_9",
+      "id" : 9,
+      "mission_execution" : [
+         {"instructions" : {"area" : "region_5"},"command" : "take_picture"},
+         {"instructions" : {"area" : "region_6"},"command" : "take_picture"},
+         {"instructions" : {"area" : "region_3"},"command" : "take_picture"},
+         {"instructions" : {"area" : "region_4"},"command" : "take_picture"},
+         {"instructions" : { "area" : "base_3"},"command" : "end"}
+      ]
+   },
+   {
+      "name" : "take_picture_10",
+      "id" : 10,
+      "mission_execution" : [
+         {"instructions" : {"area" : "region_1"},"command" : "take_picture"},
+         {"instructions" : {"area" : "region_4"},"command" : "take_picture"},
+         {"instructions" : {"area" : "region_5"},"command" : "take_picture"},
+         {"instructions" : {"area" : "region_6"},"command" : "take_picture"},
+         {"instructions" : { "area" : "base_3"},"command" : "end"}
+      ]
+   },
+   {
+      "name" : "take_picture_11",
+      "id" : 11,
+      "mission_execution" : [
+         {"instructions" : {"area" : "region_1"},"command" : "take_picture"},
+         {"instructions" : {"area" : "region_2"},"command" : "take_picture"},
+         {"instructions" : {"area" : "region_5"},"command" : "take_picture"},
+         {"instructions" : {"area" : "region_6"},"command" : "take_picture"},
+         {"instructions" : { "area" : "base_3"},"command" : "end"}
+      ]
+   },
+   {
+      "name" : "take_picture_12",
+      "id" : 12,
+      "mission_execution" : [
+         {"instructions" : {"area" : "region_1"},"command" : "take_picture"},
+         {"instructions" : {"area" : "region_2"},"command" : "take_picture"},
+         {"instructions" : {"area" : "region_3"},"command" : "take_picture"},
+         {"instructions" : {"area" : "region_6"},"command" : "take_picture"},
+         {"instructions" : { "area" : "base_3"},"command" : "end"}
+      ]
+   },
+   {
+      "name" : "take_picture_13",
+      "id" : 13,
+      "mission_execution" : [
+         {"instructions" : {"area" : "region_1"},"command" : "take_picture"},
+         {"instructions" : {"area" : "region_6"},"command" : "take_picture"},
+         {"instructions" : {"area" : "region_3"},"command" : "take_picture"},
+         {"instructions" : {"area" : "region_4"},"command" : "take_picture"},
+         {"instructions" : { "area" : "base_3"},"command" : "end"}
+      ]
+   },
+   {"id": 14, "name": "take_picture_14", "mission_execution": 
       [{"command": "take_picture", "instructions": {"area": "region_1"}}, 
        {"command": "take_picture", "instructions": {"area": "region_2"}}, 
        {"command": "take_picture", "instructions": {"area": "region_3"}}, 
@@ -34,27 +147,35 @@
        {"command": "take_picture", "instructions": {"area": "region_5"}}, 
        {"command": "take_picture", "instructions": {"area": "region_6"}}, 
        {"command": "end", "instructions": {"area": "base_3"}}]},
-   {"id": 4, "name": "take_picture_pulverize_7928", "mission_execution": [{"command": "take_picture", "instructions": {"area": "region_1"}}, {"command": "take_picture", "instructions": {"area": "region_2"}}, {"command": "take_picture", "instructions": {"area": "region_3"}}, {"command": "take_picture", "instructions": {"area": "region_4"}}, {"command": "take_picture", "instructions": {"area": "region_5"}}, {"command": "take_picture", "instructions": {"area": "region_6"}},{"command": "pulverize", "instructions": {"area": "region_1"}}, {"command": "pulverize", "instructions": {"area": "region_2"}}, {"command": "pulverize", "instructions": {"area": "region_3"}}, {"command": "pulverize", "instructions": {"area": "region_4"}}, {"command": "pulverize", "instructions": {"area": "region_5"}}, {"command": "pulverize", "instructions": {"area": "region_6"}}, {"command": "end", "instructions": {"area": "base_3"}}]},
-   {"id": 5, "name": "take_picture_7928", "mission_execution": [{"command": "take_picture", "instructions": {"area": "region_1"}}, {"command": "take_picture", "instructions": {"area": "region_3"}}, {"command": "take_picture", "instructions": {"area": "region_5"}}, {"command": "end", "instructions": {"area": "base_3"}}]},
-   {"id": 6, "name": "take_picture_7928", "mission_execution": 
-      [{"command": "take_picture", "instructions": {"area": "region_2"}}, 
-       {"command": "take_picture", "instructions": {"area": "region_4"}}, 
+
+   {"id": 15, "name": "region_1", "mission_execution": 
+      [{"command": "take_picture", "instructions": {"area": "region_1"}}]},
+   {"id": 16, "name": "region_3", "mission_execution": 
+      [{"command": "take_picture", "instructions": {"area": "region_3"}}]},
+   {"id": 17, "name": "add_17", "mission_execution": 
+      [{"command": "take_picture", "instructions": {"area": "region_1"}}, 
+       {"command": "take_picture", "instructions": {"area": "region_2"}},  
        {"command": "take_picture", "instructions": {"area": "region_6"}}]},
-   {"id": 7, "name": "take_picture_7928", "mission_execution": 
-      [ 
-       {"command": "take_picture", "instructions": {"area": "region_1"}}, 
+   {"id": 18, "name": "remove_18", "mission_execution": 
+      [{"command": "take_picture", "instructions": {"area": "region_2"}}, 
+       {"command": "take_picture", "instructions": {"area": "region_4"}}]},
+   {"id": 19, "name": "add_19", "mission_execution": 
+      [{"command": "take_picture", "instructions": {"area": "region_1"}}, 
+       {"command": "take_picture", "instructions": {"area": "region_6"}}]},
+   {"id": 20, "name": "remove_20", "mission_execution": 
+      [{"command": "take_picture", "instructions": {"area": "region_5"}}, 
+       {"command": "take_picture", "instructions": {"area": "region_6"}}]},
+   {"id": 21, "name": "add_21", "mission_execution": 
+      [{"command": "take_picture", "instructions": {"area": "region_2"}}, 
+       {"command": "take_picture", "instructions": {"area": "region_3"}}]},
+   {"id": 22, "name": "remove_22", "mission_execution": 
+      [{"command": "take_picture", "instructions": {"area": "region_2"}}, 
        {"command": "take_picture", "instructions": {"area": "region_3"}}, 
+       {"command": "take_picture", "instructions": {"area": "region_4"}}]},
+   {"id": 23, "name": "remove_23", "mission_execution": 
+      [{"command": "take_picture", "instructions": {"area": "region_4"}}, 
        {"command": "take_picture", "instructions": {"area": "region_5"}}, 
-       {"command": "take_picture", "instructions": {"area": "region_6"}}, 
-       {"command": "end", "instructions": {"area": "base_3"}}]},
-   {"id": 8, "name": "take_picture_7928", "mission_execution": 
-      [  
-       {"command": "take_picture", "instructions": {"area": "region_5"}}, 
-       {"command": "take_picture", "instructions": {"area": "region_6"}}]
-   },
-   {"id": 9, "name": "take_picture_7928", "mission_execution": 
-      [ 
-       {"command": "take_picture", "instructions": {"area": "region_4"}}
-     ]
-   }
+       {"command": "take_picture", "instructions": {"area": "region_6"}}]},
+   {"id": 24, "name": "region_5", "mission_execution": 
+      [{"command": "take_picture", "instructions": {"area": "region_5"}}]}
 ]
