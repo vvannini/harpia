@@ -51,11 +51,19 @@ import json
 #     {"Type": "Circular flight", "Radius": 25, "Wind speed": None},
 #     {"Type": "Circular flight", "Radius": 50, "Wind speed": None},
 #     {"Type": "8", "Radius": 50, "Start Alt": 7, "End Alt": 5},
+#     {"Type": "alt", "delta_Alt": 5}
+
 # ]
 
+
 table = [
-    {"Type": "8", "Radius": 50, "Start Alt": 7, "End Alt": 5},
+    {"Type": "alt", "delta_Alt": 5}
+
 ]
+
+# table = [
+#     {"Type": "alt", "delta_Alt": 5},
+# ]
 
 
 def get_harpia_root_dir():
@@ -78,7 +86,7 @@ def sequential_noise(data):
                           'altitudeRelative':[],
                           'throttlePct':[]}
     for key in sequential:
-        sequential[key] = NoiseGenerator.noisyData(data,key, 1., 50000.)
+        sequential[key] = NoiseGenerator.noisyData(1,data,key, 1., 50000.)
 
     return sequential
 
@@ -159,6 +167,7 @@ class UAV(object):
         self.vtol_state = None
         self.landed_state = None
         self.status = None
+        self.last_commanded_altitude = None
         self.current = None
         self.self_check = 0
         self.qtd_sub = 4
@@ -177,6 +186,9 @@ class UAV(object):
         self.vel_sub      = rospy.Subscriber('/mavros/local_position/velocity', TwistStamped, self.vel_cb)
         self.pos_sub      = rospy.Subscriber('/mavros/local_position/pose', PoseStamped, self.pos_cb)
         self.sub_mission  = rospy.Subscriber('mavros/mission/reached', WaypointReached, self.reached_callback)
+
+        #---
+        self.pub = rospy.Publisher('/mavros/setpoint_position/local', PoseStamped, queue_size=10)
 
 
     def vel_cb(self, msg):
@@ -233,6 +245,36 @@ class UAV(object):
 
     def reached_callback(self, data):
         self.current = data.wp_seq + 1
+
+    def change_altitude(self, delta):
+        # Create the PoseStamped message for the new altitude
+        pose = PoseStamped()
+        pose.header.frame_id = "map"
+        pose.header.stamp = rospy.Time.now()
+
+        # Set the new altitude (z position)
+        pose.pose.position.x = self.cur_pose.pose.position.x
+        pose.pose.position.y = self.cur_pose.pose.position.y
+        pose.pose.position.z = self.cur_pose.pose.position.z + delta
+
+        # Publish the message and update the last commanded altitude
+        print("Sending new altitude")
+        print(pose)
+        self.pub.publish(pose)
+
+        self.last_commanded_altitude = pose.pose.position.z
+
+    def periodic_setpoint(self, event):
+        # You might want to adjust this method to send more precise setpoints
+        pose = PoseStamped()
+        pose.header.frame_id = "map"
+        pose.header.stamp = rospy.Time.now()
+        pose.pose.position.x = self.cur_pose.pose.position.x
+        pose.pose.position.y = self.cur_pose.pose.position.y
+        pose.pose.position.z = self.cur_pose.pose.position.z
+        self.pub.publish(pose)
+
+    
 # ------------   Callers for MAVRos Services
 
 def mavros_cmd(topic, msg_ty, error_msg="MAVROS command failed: ", **kwargs):
@@ -293,6 +335,7 @@ def send_route(route):
         waypoints=route.waypoints
     )
 
+
 def set_home_position(latitude, longitude, altitude):
     rospy.wait_for_service('/mavros/cmd/set_home')
     try:
@@ -306,6 +349,8 @@ def set_home_position(latitude, longitude, altitude):
         rospy.logerr("Service call failed: %s" % e)
 
 # ------------ BEHAVIORS
+
+
 
 def takeoff_land(kenny:UAV, alt:int, flight_time:int,flag_fault:bool) -> list:
     flight_list = []
@@ -355,9 +400,9 @@ def hovering(kenny:UAV, alt:int, flight_time:int,flag_fault:bool) -> list:
         flight_list.append(kenny.noise) if flag_fault else flight_list.append(kenny.sequential)
         rospy.sleep(1) 
 
-    land()
-    while(kenny.landed_state != 1):
-        rospy.sleep(1)
+    # land()
+    # while(kenny.landed_state != 1):
+    #     rospy.sleep(1)
 
     return flight_list
 
@@ -451,11 +496,11 @@ def line_flight(uav, min_alt, max_alt,distance, direction, flight_time, flag_fau
             rospy.sleep(1)
         rospy.sleep(10)
 
-    set_mode("RTL")
+    # set_mode("RTL")
 
-    land()
-    while(uav.landed_state != 1):
-        rospy.sleep(1)
+    # land()
+    # while(uav.landed_state != 1):
+    #     rospy.sleep(1)
 
     return flight_list
     # return None
@@ -548,9 +593,9 @@ def circular_flight(uav, raio, alt, flight_time, flag_fault):
         flight_list.append(uav.noise) if flag_fault else flight_list.append(uav.sequential)
         rospy.sleep(1)
 
-    land()
-    while(uav.landed_state != 1):
-        rospy.sleep(1)
+    # land()
+    # while(uav.landed_state != 1):
+    #     rospy.sleep(1)
 
     return flight_list
     
@@ -635,12 +680,105 @@ def eight_flight(uav, raio, min_alt, max_alt, flight_time, flag_fault):
         flight_list.append(uav.noise) if flag_fault else flight_list.append(uav.sequential)
         rospy.sleep(1)
 
-    land()
-    while(uav.landed_state != 1):
-        rospy.sleep(1)
+    # land()
+    # while(uav.landed_state != 1):
+    #     rospy.sleep(1)
 
     return flight_list
  
+def vertical_line(lat, lon, alt_change):
+    altitude = alt_change
+
+    geo_route = WaypointList()
+
+    geo_wp = Waypoint()
+    geo_wp.frame = 3
+    geo_wp.command = 16
+    if not geo_route.waypoints:
+        geo_wp.is_current = True
+    else:
+        geo_wp.is_current = False
+    geo_wp.autocontinue = True
+    geo_wp.param1 = 0
+    geo_wp.param2 = 0
+    geo_wp.param3 = 0
+    geo_wp.param4 = 0
+    geo_wp.x_lat = lat
+    geo_wp.y_long = lon
+    geo_wp.z_alt = altitude
+    geo_route.waypoints.append(geo_wp)
+
+    return geo_route
+
+def altitude_flight(kenny:UAV, alt:int, flight_time:int,flag_fault:bool) -> list:
+    flight_list = []
+
+    set_mode("AUTO.LOITER")
+
+    while(not kenny.armed):
+            arm()
+            rospy.sleep(1)
+
+    takeoff(10, kenny)
+    while(kenny.landed_state !=2):
+        rospy.sleep(1)
+    rospy.sleep(1)
+    
+    # rospy.Timer(rospy.Duration(0.1), kenny.periodic_setpoint) # Send setpoint every 0.1 seconds
+    # rospy.sleep(2)  # Let a few setpoints be sent before requesting mode change
+    
+    set_mode("AUTO.MISSION")
+    route = WaypointList()
+
+    route.waypoints = vertical_line(kenny.lat, kenny.lon, kenny.alt+alt)
+    route.current_seq = 0
+
+    # send route to uav
+    clear_mission()
+    kenny.current = 0
+    rospy.loginfo("Send Route")
+    send_route(route.waypoints)
+
+    # # set mode to mission
+    rospy.loginfo("Set Mode")
+    set_mode("AUTO.MISSION")
+    start = time.time()
+    while(time.time()-start < flight_time):
+        flight_list.append(kenny.noise) if flag_fault else flight_list.append(kenny.sequential)
+        rospy.sleep(1)
+
+    set_mode("AUTO.LOITER")
+
+
+    rospy.sleep(1)
+    
+
+    
+    route = WaypointList()
+    route.waypoints = vertical_line(kenny.lat, kenny.lon, 5)
+
+    route.current_seq = 0
+
+    clear_mission()
+    kenny.current = 0
+    rospy.loginfo("Send Route")
+    send_route(route.waypoints)
+
+    # # set mode to mission
+    rospy.loginfo("Set Mode")
+    set_mode("AUTO.MISSION")
+    start = time.time()
+    while(time.time()-start < flight_time):
+        flight_list.append(kenny.noise) if flag_fault else flight_list.append(kenny.sequential)
+        rospy.sleep(1)
+
+    set_mode("AUTO.LOITER")
+
+    # land()
+    # while(kenny.landed_state != 1):
+    #     rospy.sleep(1)
+
+    return flight_list
 
 # ------------ MAIN
 def listener():
@@ -650,9 +788,9 @@ def listener():
     flight_list = []
 
     ## quantity of each flight will be executed 
-    # qtd_good_exe = 15
-    qtd_good_exe = 0
-    qtd_fault_exe = 5
+    qtd_good_exe = 15
+    # qtd_good_exe = 0
+    qtd_fault_exe = 0
 
     flight_time = 180 #s
 
@@ -670,16 +808,16 @@ def listener():
     set_home_position(home_latitude, home_longitude, home_altitude)
     # eight_flight(kenny, 5, 10, flight_time, False)
 
-    file_path = "flight_data_gauss_mild.json"
+    file_path = "flight_data_gauss_fixed_good.json"
 
 
     # print(kenny.sequential)
     # print(kenny.armed)
     # print(kenny.vtol_state)
-    j = 110
+    j = 0
     for flight in table:
         for i in range(0, qtd_exe):
-            flag_fault = i <= qtd_fault_exe
+            flag_fault = i < qtd_fault_exe
 
             if flight["Type"] == "Takeoff and landing":
                 print("*-------------------------------------*")
@@ -731,6 +869,18 @@ def listener():
                                     "id":(j),
                                     "data": data
                                     }
+            elif flight["Type"] == "alt":
+                print("*-------------------------------------*")
+                print(j)
+                print(flight["Type"])
+                data = altitude_flight(kenny,flight["delta_Alt"], flight_time, flag_fault)
+                flight_data ={"Type": flight["Type"],
+                                    "error": flag_fault, 
+                                    "id":(j),
+                                    "data": data
+                                    }
+            #     {"Type": "alt", "delta_Alt": 5}, altitude_flight(kenny:UAV, alt:int, flight_time:int,flag_fault:bool) -> list:
+
 
             with open(file_path, "a") as json_file:
                     json.dump(flight_data, json_file)

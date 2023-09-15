@@ -46,7 +46,10 @@ OP_UPDATE_KNOWLEDGE_BASE = 0
 OP_REPLAN				 = 1
 OP_ADD_RM_GOALS			 = 2
 
-
+def control_callback(data):
+    # Assuming data is of type std_msgs/String
+    if data.data == 'kill':
+        rospy.signal_shutdown("Received kill command")
 
 '''
 	Classes to subscribe and publish services
@@ -774,5 +777,6 @@ def send_route(route):
 	)
 
 if __name__ == "__main__":
+	rospy.Subscriber('/harpia/control/kill_mission', String, control_callback)
 	server = ActionServer()
 	server.run()

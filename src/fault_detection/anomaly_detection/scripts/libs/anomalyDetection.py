@@ -11,19 +11,19 @@ relPath = "dependencies"
 filesPath = os.path.join(absPath,relPath)
 
 
-def pca_model(filename='pca_model.pkl',path=filesPath):
+def pca_model(filename='pca_model_alt.pkl',path=filesPath):
     os.chdir(filesPath)
     pca = joblib.load(filename)
     os.chdir(absPath)
     return pca
 
-def scaler_model(filename='scaler_model.pkl',path=filesPath):
+def scaler_model(filename='scaler_model_alt.pkl',path=filesPath):
     os.chdir(filesPath)
     scaler = joblib.load(filename)
     os.chdir(absPath)
     return scaler
 
-def tree_model(filename='tree_pca.pkl',path=filesPath):
+def tree_model(filename='tree_pca_alt.pkl',path=filesPath):
     os.chdir(filesPath)
     tree = joblib.load(filename)
     os.chdir(absPath)
@@ -32,7 +32,7 @@ def tree_model(filename='tree_pca.pkl',path=filesPath):
 
 def checkAnomaly(uav, uav_stat, pca, scaler, tree, time_win):
 
-    uav_var = np.array([[uav['roll'],uav['pitch'],uav['yaw'],uav['rollRate'],uav['pitchRate'],uav['yawRate'],uav['climbRate'],uav['throttlePct']]])
+    uav_var = np.array([[uav['roll'],uav['pitch'],uav['yaw'], uav['heading'],uav['rollRate'],uav['pitchRate'],uav['yawRate'],uav['climbRate'],uav['throttlePct']]])
     scaled_uav = scaler.transform(uav_var)
     pca_uav = pca.transform(scaled_uav)
 
@@ -50,20 +50,20 @@ def checkAnomaly(uav, uav_stat, pca, scaler, tree, time_win):
     uav_stat[flag] = uav_stat[flag] + 1
     
 
-    if uav_stat['last_state'] != flag:
-        uav_stat['last_state'] = flag
-        if flag == 'normal':
-            print(Fore.BLACK + Back.WHITE + "Normal Pattern")
-            print(Style.RESET_ALL)
-        elif flag == 'noise':
-            print(Fore.BLACK + Back.GREEN + "Noise Pattern")
-            print(Style.RESET_ALL)
-        elif flag == 'mild':
-            print(Fore.BLACK + Back.YELLOW + "Mild Pattern")
-            print(Style.RESET_ALL)
-        else:
-            print(Fore.BLACK + Back.RED + "Found Anomalous Pattern!")
-            print(Style.RESET_ALL)
+    # if uav_stat['last_state'] != flag:
+    #     uav_stat['last_state'] = flag
+    #     if flag == 'normal':
+    #         print(Fore.BLACK + Back.WHITE + "Normal Pattern")
+    #         print(Style.RESET_ALL)
+    #     elif flag == 'noise':
+    #         print(Fore.BLACK + Back.GREEN + "Noise Pattern")
+    #         print(Style.RESET_ALL)
+    #     elif flag == 'mild':
+    #         print(Fore.BLACK + Back.YELLOW + "Mild Pattern")
+    #         print(Style.RESET_ALL)
+    #     else:
+    #         print(Fore.BLACK + Back.RED + "Found Anomalous Pattern!")
+    #         print(Style.RESET_ALL)
 
     return uav_stat, True
 

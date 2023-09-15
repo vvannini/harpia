@@ -544,7 +544,7 @@ def path_planning_server():
     # doing it, but it loads the model only once and is able to use ROS parameters.
     global KNN
 
-    knn_pickle_file = os.path.join(harpia_root_dir, "src/path_planning/scripts/libs/KNN/models/knn29.pickle")
+    knn_pickle_file = os.path.join(harpia_root_dir, "src/path_planning/scripts/libs/KNN/models/knn5w.pkl")
 
     # Load the model from disk a single time
     KNN = pickle.load(open(knn_pickle_file, "rb"))

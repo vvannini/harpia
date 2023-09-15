@@ -22,17 +22,56 @@ filesPath = os.path.join(absPath,relPath)
 #             response = noiseModel/60+float
 #         return response
 
-def noisyData(data,colName,xi,xf):
+# def noisyData(data,colName,xi,xf):
 
-    if colName in ['pitch', 'roll', 'yaw', 'heading']:
-        response = float(data[colName]) + random.gauss(-10.0, 10.0)
-    elif colName in ['rollRate', 'pitchRate', 'yawRate', 'altitudeRelative']:
-        response = float(data[colName]) + random.gauss(-5.0, 5.0)
-    elif colName in ['throttlePct', 'climbRate']:
-        response = float(data[colName]) + random.gauss(0, 0.5)
+#     if colName in ['pitch', 'roll', 'yaw', 'heading']:
+#         response = float(data[colName]) + random.gauss(-10.0, 10.0)
+#     elif colName in ['rollRate', 'pitchRate', 'yawRate', 'altitudeRelative']:
+#         response = float(data[colName]) + random.gauss(-5.0, 5.0)
+#     elif colName in ['throttlePct', 'climbRate']:
+#         response = float(data[colName]) + random.gauss(0, 0.5)
+#     else:
+#         response = float(data[colName]) + random.gauss(-1.5, 1.5)
+#     return response
+
+def noisyData(errorType, data,colName,xi,xf):
+
+    if (errorType == 0):
+        if colName in ['pitch', 'roll', 'yaw', 'heading']:
+            response = float(data[colName]) + random.gauss(0, 2.0)
+        elif colName in ['rollRate', 'pitchRate', 'yawRate', 'altitudeRelative']:
+            response = float(data[colName]) + random.gauss(0, 1.0)
+        elif colName in ['throttlePct', 'climbRate']:
+            response = float(data[colName]) + random.gauss(0, 0.1)
+        else:
+            response = float(data[colName]) + random.gauss(0, 0.5)
+        return response
+
+    elif(errorType == 1):
+        if colName in ['pitch', 'roll', 'yaw', 'heading']:
+            response = float(data[colName]) + random.gauss(0.0, 10.0)
+        elif colName in ['rollRate', 'pitchRate', 'yawRate', 'altitudeRelative']:
+            response = float(data[colName]) + random.gauss(0, 5.0)
+        elif colName in ['throttlePct', 'climbRate']:
+            response = float(data[colName]) + random.gauss(0, 0.5)
+        else:
+            response = float(data[colName]) + random.gauss(0, 1.5)
+        return response
+
+    elif(errorType == 2):
+        if colName in ['pitch', 'roll', 'yaw', 'heading']:
+            response = float(data[colName]) + random.gauss(0.0, 15.0)
+        elif colName in ['rollRate', 'pitchRate', 'yawRate', 'altitudeRelative']:
+            response = float(data[colName]) + random.gauss(0.0, 7.0)
+        elif colName in ['throttlePct', 'climbRate']:
+            response = float(data[colName]) + random.gauss(0, 1.0)
+        else:
+            response = float(data[colName]) + random.gauss(0.0, 3.0)
+        return response
     else:
-        response = float(data[colName]) + random.gauss(-1.5, 1.5)
-    return response
+        noiseModel = np.pi*np.arctan(random.uniform(xi,xf))
+        response = noiseModel*float(data[colName])
+        return response
 
 
 def oneCosineGust(filename='rawData.csv',path=filesPath,print=True):

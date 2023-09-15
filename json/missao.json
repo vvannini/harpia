@@ -157,8 +157,7 @@
        {"command": "take_picture", "instructions": {"area": "region_2"}},  
        {"command": "take_picture", "instructions": {"area": "region_6"}}]},
    {"id": 18, "name": "remove_18", "mission_execution": 
-      [{"command": "take_picture", "instructions": {"area": "region_2"}}, 
-       {"command": "take_picture", "instructions": {"area": "region_4"}}]},
+      [{"command": "take_picture", "instructions": {"area": "region_4"}}]},
    {"id": 19, "name": "add_19", "mission_execution": 
       [{"command": "take_picture", "instructions": {"area": "region_1"}}, 
        {"command": "take_picture", "instructions": {"area": "region_6"}}]},

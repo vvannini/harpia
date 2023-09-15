@@ -33,6 +33,8 @@ from geometry_msgs.msg import *
 
 from actionlib_msgs.msg import GoalStatusArray, GoalID
 
+import collections
+
 KB_UPDATE_ADD_KNOWLEDGE = 0
 KB_UPDATE_RM_KNOWLEDGE = 2
 KB_UPDATE_ADD_GOAL = 1
@@ -50,6 +52,7 @@ OP_REPLAN                = 1
 OP_ADD_RM_GOALS          = 2
 
 
+CartesianPoint = collections.namedtuple("CartesianPoint", "x y")
 
 absPath = os.path.dirname(__file__)
 relPath = "dependencies"
@@ -76,17 +79,17 @@ class Drone(object):
     def reached_callback(self, data):
         self.current = data.wp_seq + 1
 
-class Mission(object):
+class MissionC(object):
 
     def __init__(self):
-        self.Mission_Sub  = rospy.Subscriber('/harpia/mission_goal_manager/goal', MissionPlannerActionGoal, self.mission_callback)
-        self.mission = None
+        self.Mission_Sub  = rospy.Subscriber('harpia/mission', Mission, self.mission_callback)
+        self.mission_info = None
 
     def mission_callback(self, data):
-        self.mission = data.goal.mission
+        self.mission_info = data
         
     def get_mission(self):
-        return self.mission
+        return self.mission_info
 
 
 def wait_until(check, msg=None, rate=1):
@@ -99,6 +102,39 @@ def wait_until(check, msg=None, rate=1):
 
     return True
 
+
+def geo_to_cart(geo_point, geo_home):
+    def calc_y(lat, lat_):
+        return (lat - lat_) * (10000000.0 / 90)
+
+    def calc_x(longi, longi_, lat_):
+        return (longi - longi_) * (
+            6400000.0 * (math.cos(lat_ * math.pi / 180) * 2 * math.pi / 360)
+        )
+    x = calc_x(geo_point.longitude, geo_home.longitude, geo_home.latitude)
+    y = calc_y(geo_point.latitude, geo_home.latitude)
+
+ 
+
+    # return CartesianPoint(x, y, geo_point.altitude)
+    return CartesianPoint(x, y)
+
+# def geo_to_cart(geo_point, geo_home):
+#     def calc_y(lat, lat_):
+#         return (lat - lat_) * (10000000.0 / 90)
+#     def calc_x(longi, longi_, lat_):
+#         return (longi - longi_) * (
+#             6400000.0 * (math.cos(lat_ * math.pi / 180) * 2 * math.pi / 360)
+#         )
+
+#     x = calc_x(geo_point[0], geo_home[0], geo_home[1])
+#     y = calc_y(geo_point[1], geo_home[1])
+
+#     return [x, y]
+
+def euclidean_distance(A, B):
+    return math.sqrt((B.x - A.x) ** 2 + (B.y - A.y) ** 2)
+
 def find_at(map, goals, latitude, longitude):
     """
     Finds a base that is withing a 50m radius. If none is found, try to find a region which has a center
@@ -107,8 +143,8 @@ def find_at(map, goals, latitude, longitude):
     """
 
     #get current lat long
+    # print(GeoPoint(latitude, longitude, 15))
     cart_location = geo_to_cart(GeoPoint(latitude, longitude, 15), map.geo_home)
-
     for base in map.bases:
         d = euclidean_distance(base.center.cartesian, cart_location)
         # rospy.loginfo(f"base = {base.name} distance={d}")
@@ -128,6 +164,7 @@ def find_at(map, goals, latitude, longitude):
 
 
 def find_nearest_base(map, latitude, longitude):
+
     cart_location = geo_to_cart(GeoPoint(latitude, longitude, 15), map.geo_home)
 
     return min(map.bases, key=lambda base: euclidean_distance(base.center.cartesian, cart_location))
@@ -193,9 +230,12 @@ def go_to_base():
     Go to nearest base immediately and land.
     """
     uav = Drone()
-    mission_obj = Mission()
-    mission = mission_obj.get_mission()
-    print(mission)
+    mission_obj = MissionC()
+    if not wait_until(lambda: mission_obj.mission_info is not None, msg="Waiting for Mission..."):
+        rospy.logerr("CRITICAL - MissionGoalManager was terminated while going to nearest base and will not finish the action")
+        return
+
+    # mission = mission_obj.mission_info
 
     rate = rospy.Rate(1)
 
@@ -203,10 +243,10 @@ def go_to_base():
         rospy.logerr("CRITICAL - MissionGoalManager was terminated while going to nearest base and will not finish the action")
         return
 
-    at = find_at(mission.map, mission.goals, uav.latitude, uav.longitude)
-    base = find_nearest_base(mission.map, uav.latitude, uav.longitude)
-
-    route = call_path_planning(at, base, mission.map)
+    at = find_at(mission_obj.mission_info.map, mission_obj.mission_info.goals, uav.latitude, uav.longitude)
+    base = find_nearest_base(mission_obj.mission_info.map, uav.latitude, uav.longitude)
+    rospy.sleep(5)
+    route = call_path_planning(at, base, mission_obj.mission_info.map)
 
     # send route to uav
     clear_mission()
@@ -224,6 +264,6 @@ def go_to_base():
 
     # land
     land()
-    rospy.sleep(30)
+    rospy.sleep(15)
 
     return base

@@ -25,6 +25,8 @@ import os
 import sys
 import select  
 
+from colorama import Fore, Back, Style
+
 
 def get_harpia_root_dir():
 	return rospy.get_param("/harpia_home", default=os.path.expanduser("~/harpia"))
@@ -46,6 +48,13 @@ def sequential_noise(errorType, data):
 
 	return sequential
 
+def kill_mission():
+    pub = rospy.Publisher('/harpia/control/kill_mission', String, queue_size=10)
+    rate = rospy.Rate(10) # 10hz
+    
+    while not rospy.is_shutdown():
+        pub.publish("kill")
+        rate.sleep()
 
 # Classes
 
@@ -128,6 +137,8 @@ def listener(input_error, error_type, error_start_time, error_end_time):
 	rospy.init_node('anomaly_detector', anonymous=True)
 	kenny = UAV()
 
+	flag_aux = 0
+
 
 	startMain = time.time()
 
@@ -176,6 +187,8 @@ def listener(input_error, error_type, error_start_time, error_end_time):
 	last_win = 0
 	uav_stat, flag = anomalyDetection.checkAnomaly(kenny.sequential,uav_stat, module1, module2, module3, win)
 	response_time = time.time()
+
+	
 	while flag:
 		win = int(round((time.time()-startMain),3)//time_win)
 		if last_win != win:
@@ -209,6 +222,30 @@ def listener(input_error, error_type, error_start_time, error_end_time):
 			else:
 				uav_action.append(32) # land 
 
+			if  len(uav_action) == 1 or uav_action[-1] != uav_action[-2]:
+				if uav_action[-1] == 0:
+					print(Fore.BLACK + Back.GREEN + "Normal Pattern")
+					print(Style.RESET_ALL)
+				elif uav_action[-1] == 1:
+					print(Fore.BLACK + Back.CYAN + "Light Noise Pattern")
+					print(Style.RESET_ALL)
+				elif uav_action[-1] == 2:
+					print(Fore.WHITE + Back.BLUE + "Mild Noise Pattern")
+					print(Style.RESET_ALL)
+				elif uav_action[-1] == 4:
+					print(Fore.WHITE + Back.YELLOW + "Strong Noise Pattern")
+					print(Style.RESET_ALL)
+				elif uav_action[-1] == 8:
+					print(Fore.WHITE + Back.YELLOW + "Soft Anomalous Pattern")
+					print(Style.RESET_ALL)
+				elif uav_action[-1] == 16:
+					print(Fore.WHITE + Back.MAGENTA + "Mild Anomalous Pattern")
+					print(Style.RESET_ALL)
+				else:
+					print(Fore.WHITE + Back.RED + "Strong Anomalous Pattern!")
+					print(Style.RESET_ALL)
+
+
 			#reset params
 			last_win = win
 			
@@ -217,14 +254,20 @@ def listener(input_error, error_type, error_start_time, error_end_time):
 			uav_stat['mild'] = 0
 			uav_stat['abnormal'] = 0
 			uav_stat['data'] = []
-	
+		
+
 	
 		if(flag_error and time.time()-startMain > error_start_time) and (time.time()-startMain < error_end_time):
-			# print('noisyData')
+			if flag_aux == 0:
+				print('noisyData')
+				flag_aux = 1
 			error_data = sequential_noise(error_type, kenny.sequential)
 			uav_stat, flag = anomalyDetection.checkAnomaly(error_data,uav_stat, module1, module2, module3, win)
 
 		else:
+			if flag_aux == 1:
+				print('normal Data')
+				flag_aux = 0
 			uav_stat, flag = anomalyDetection.checkAnomaly(kenny.sequential,uav_stat, module1, module2, module3, win)
 
 		action_win = int(kenny.action_win_time/kenny.classifier_win_time)
@@ -235,7 +278,6 @@ def listener(input_error, error_type, error_start_time, error_end_time):
 			if(flag_action<24):
 				rospy.logwarn("Found anomalous behavior") 
 			else:
-				# def log(ErrorTime, ArrayPct, Action=None, FalsePositive='n'):
 				print("Do you want to continue? (y/[n])")
 				start_input = time.time()
 
@@ -243,25 +285,26 @@ def listener(input_error, error_type, error_start_time, error_end_time):
 				while flag_continue and time.time() > response_time:
 					elapsed_time = time.time() - start_input
 
-					if elapsed_time >= kenny.action_win_time:
+					if elapsed_time >= kenny.user_response_time:
 						print("\nTimeout reached. Exiting.")
 						if(flag_action>48):
 							print('land')
-							log(start_input, ArrayPct, uav_action,'land', 'n')
+							log(start_input-startMain, ArrayPct, uav_action,'land', 'n')
 							action.land()
 							flag_continue = False
 						else:
 							print('base')
-							log(start_input, ArrayPct, uav_action,'base', 'n')
+							log(start_input-startMain, ArrayPct, uav_action,'base', 'n')
 							try:
 								action.go_to_base()
 							except:
 								action.land()
 							flag_continue = False
+						kill_mission()
 
 					if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
 						user_input = input().lower()
-						response_time = time.time() + kenny.user_response_time 
+						response_time = time.time() + kenny.action_win_time 
 						print("User response: ",user_input)
 
 						if user_input == 'y':
@@ -272,17 +315,18 @@ def listener(input_error, error_type, error_start_time, error_end_time):
 						elif user_input == 'n':
 							if(flag_action>48):
 								print('land')
-								log(start_input, ArrayPct, uav_action,'land', user_input)
+								log(start_input-startMain, ArrayPct, uav_action,'land', user_input)
 								action.land()
 								flag_continue = False
 							else:
 								print('base')
 								try:
-									log(start_input, ArrayPct, 'base', user_input)
+									log(start_input-startMain, ArrayPct, uav_action, 'base', user_input)
 									action.go_to_base()
 								except:
 									action.land()
 								flag_continue = False
+							kill_mission()
 					time.sleep(0.1)
 		
 		rospy.Rate(1)
