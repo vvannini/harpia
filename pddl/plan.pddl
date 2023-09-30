@@ -24,7 +24,7 @@ Cueing down from goal distance:   13 into depth [1]
                                    5            [1]
                                    4            [1]
                                    3            [1]
-                                   2            [1]
+                                   2            [1][2] --- pruning stopped --- [1][2][3][4]
                                    1            [1]
                                    0            
 
@@ -40,15 +40,18 @@ step    0: GO_TO BASE_1 REGION_1
         8: GO_TO REGION_4 REGION_5
         9: TAKE_IMAGE REGION_5
        10: GO_TO REGION_5 REGION_6
-       11: TAKE_IMAGE REGION_6
-       12: GO_TO REGION_6 BASE_3
-plan cost: 6878.153320
+       11: GO_TO REGION_6 BASE_3
+       12: RECHARGE_BATTERY BASE_3
+       13: GO_TO BASE_3 REGION_6
+       14: TAKE_IMAGE REGION_6
+       15: GO_TO REGION_6 BASE_3
+plan cost: 8164.893066
 
 time spent:    0.00 seconds instantiating 93 easy, 0 hard action templates
                0.00 seconds reachability analysis, yielding 24 facts and 84 actions
                0.00 seconds creating final representation with 24 relevant facts, 4 relevant fluents
                0.00 seconds computing LNF
                0.00 seconds building connectivity graph
-               0.00 seconds searching, evaluating 29 states, to a max depth of 1
+               0.00 seconds searching, evaluating 72 states, to a max depth of 4
                0.00 seconds total time
 

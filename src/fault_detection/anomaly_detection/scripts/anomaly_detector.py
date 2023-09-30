@@ -306,7 +306,7 @@ def listener(input_error, error_type, error_start_time, error_end_time):
 							action.go_to_base()
 						except:
 							action.land()
-					kill_mission()
+					# kill_mission()
 
 				if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
 					user_input = input().lower()
@@ -334,7 +334,7 @@ def listener(input_error, error_type, error_start_time, error_end_time):
 								action.land()
 							flag_asked = False
 
-						kill_mission()
+						# kill_mission()
 			time.sleep(1)
 		
 		rospy.Rate(1)

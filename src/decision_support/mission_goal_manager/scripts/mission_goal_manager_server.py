@@ -174,7 +174,7 @@ class ActionServer():
 			self.a_server.publish_feedback(feedback_msg)
 			self.change_goals = 0
 
-			result = call_mission_planning()
+			# result = call_mission_planning()
 
 		# Land the drone
 		land()
