@@ -44,6 +44,61 @@ class Plan(object):
     def unsubscribe(self):
         self.sub.unregister()
 
+class oMission(object):
+    def __init__(self):
+        self.sub  = rospy.Subscriber("harpia/mission", Mission, self.mission_callback)   
+        self.map = None
+    
+    def mission_callback(self, data): 
+        self.map = data.map
+        self.unsubscribe()
+
+    # def get_all_regions(self):
+    #     regions = {}
+    #     for r in self.map.bases:
+    #         print(r)
+    #         regions.append(r)
+
+    #     for r in self.map.roi:
+    #         regions.append(r)
+
+    #     return(regions)
+
+    def calculate_distances(self):
+        distances = {}
+        while self.map ==  None:
+                print("Waiting for Map...")
+                rospy.sleep(1)
+
+        all_regions = self.map.bases + self.map.roi
+
+        for region1 in all_regions:
+            region1_name = region1.name
+            region1_center = region1.center.cartesian
+
+            if region1_name not in distances:
+                distances[region1_name] = {}
+
+            for region2 in all_regions:
+                region2_name = region2.name
+                region2_center = region2.center.cartesian
+
+                if region1_name == region2_name:
+                    continue  # Skip calculating distance with itself
+
+                distance = self.euclidean_distance(region1_center, region2_center)
+                distances[region1_name][region2_name] = distance
+
+        return distances
+
+    @staticmethod
+    def euclidean_distance(point1, point2):
+        return math.sqrt((point2.x - point1.x)**2 + (point2.y - point1.y)**2)
+
+
+    def unsubscribe(self):
+        self.sub.unregister()
+
 class Drone(object):
     def __init__(self):
         self.sub = rospy.Subscriber('mavros/global_position/global',  NavSatFix, self.global_position_callback)  
@@ -112,7 +167,7 @@ def dist_prob(bateria):
 #Rede Bayesiana definida no sistema que utiliza:
 ## Bateria inicial, consumo definido à partir da bateria,
 ## ArrayActions (vetor de objeto da classe ação) e as probabilidades definidas
-def calc_probabilities(bateria_init, consumo, ArrayActions, prob) :
+def calc_probabilities(bateria_init, consumo, ArrayActions, prob, distances) :
     bateria = []
     bateria.append(bateria_init)
 
@@ -128,16 +183,25 @@ def calc_probabilities(bateria_init, consumo, ArrayActions, prob) :
         if(obj.name == "recharge_battery" or obj.name == "recharge_input"):
         # if(obj.name == "recharge_battery"):
             bateria.append(100)
-            print("Bateria recarregada")
+            print("Recharged Battery")
             prob.append(1)
             print()
         # senao
         else:
-        # calcula a prob e a bateria restante para chegar a proxima regiao
-            bateria.append(bateria[len(bateria)-1] - consumo*float(obj.duration))
-            prob.append(dist_prob(bateria[len(bateria) - 1]))
-            print("Probabilidade de " + get_DecisionString(obj) + " : " + str(prob[len(prob)-1]))
-            print("bateria restante = " + str(bateria[len(bateria)-1]))
+        # calcula a prob e a bateria restante para chegar a proxima regiao (%/s)*((m)/(m/s))
+            if(obj.name == "go_to"):
+                r_from = obj.parameters[0].value 
+                r_to   = obj.parameters[1].value
+
+                d = distances[r_from][r_to]
+                
+                bateria.append(bateria[-1] - consumo*(d/5))
+                prob.append(dist_prob(bateria[-1]))
+            else:
+                bateria.append(bateria[-1] - consumo*(50/5))
+                prob.append(dist_prob(bateria[-1]))
+            print("Probability" + get_DecisionString(obj) + " : " + str(prob[len(prob)-1]))
+            print("Battery remain = " + str(bateria[-1]))
             print()
     return prob
 
@@ -193,6 +257,9 @@ def log(replan, bn):
 def mission_fault_mitigation(req):
     p = Plan()
     uav = Drone()
+    mission = oMission()
+    distances = mission.calculate_distances()
+
     while p.plan.plan ==  []:
         print("Waiting for Complete Plan...")
         rospy.sleep(1)
@@ -237,7 +304,7 @@ def mission_fault_mitigation(req):
 
     #Pega os valores das probabilidades definidas na rede
                          #  current batt, uav discharge rate, plan, prob
-    prob = calc_probabilities(bateria_init, consumo, ArrayActions, prob)
+    prob = calc_probabilities(bateria_init, consumo, ArrayActions, prob, distances)
 
     dict_evidences = {}
 

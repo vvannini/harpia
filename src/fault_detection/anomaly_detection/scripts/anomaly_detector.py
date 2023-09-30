@@ -49,12 +49,13 @@ def sequential_noise(errorType, data):
 	return sequential
 
 def kill_mission():
-    pub = rospy.Publisher('/harpia/control/kill_mission', String, queue_size=10)
-    rate = rospy.Rate(10) # 10hz
-    
-    while not rospy.is_shutdown():
-        pub.publish("kill")
-        rate.sleep()
+	rospy.loginfo("Killing System")
+	pub = rospy.Publisher('/harpia/control/kill_mission', String, queue_size=50)
+	rate = rospy.Rate(1) # 10hz
+	
+	while not rospy.is_shutdown():
+		pub.publish("kill")
+		rate.sleep()
 
 # Classes
 
@@ -188,7 +189,8 @@ def listener(input_error, error_type, error_start_time, error_end_time):
 	uav_stat, flag = anomalyDetection.checkAnomaly(kenny.sequential,uav_stat, module1, module2, module3, win)
 	response_time = time.time()
 
-	
+	flag_asked = False
+
 	while flag:
 		win = int(round((time.time()-startMain),3)//time_win)
 		if last_win != win:
@@ -201,7 +203,7 @@ def listener(input_error, error_type, error_start_time, error_end_time):
 
 			ArrayPct = [pct_normal, pct_noise, pct_mild, pct_abnormal]
 
-			if (pct_noise <= 0.7 and pct_abnormal == 0.0 and pct_mild <= 0.05):
+			if(pct_noise <= 0.7 and pct_abnormal == 0.0 and pct_mild <= 0.05):
 				uav_action.append(0) # ok
 
 			elif(pct_noise > 0.7 and pct_abnormal == 0.0 and pct_mild <= 0.1):
@@ -248,7 +250,7 @@ def listener(input_error, error_type, error_start_time, error_end_time):
 
 			#reset params
 			last_win = win
-			
+			# print(uav_action)
 			uav_stat['normal'] = 0
 			uav_stat['noise'] = 0
 			uav_stat['mild'] = 0
@@ -267,6 +269,7 @@ def listener(input_error, error_type, error_start_time, error_end_time):
 		else:
 			if flag_aux == 1:
 				print('normal Data')
+				log(time.time()-startMain, ArrayPct, uav_action,'normal', 'n')
 				flag_aux = 0
 			uav_stat, flag = anomalyDetection.checkAnomaly(kenny.sequential,uav_stat, module1, module2, module3, win)
 
@@ -278,56 +281,61 @@ def listener(input_error, error_type, error_start_time, error_end_time):
 			if(flag_action<24):
 				rospy.logwarn("Found anomalous behavior") 
 			else:
-				print("Do you want to continue? (y/[n])")
-				start_input = time.time()
+				if(not flag_asked):
+					print("Do you want to continue? (y/[n])")
+					start_input = time.time()
+					flag_asked = True
 
-				flag_continue = True
-				while flag_continue and time.time() > response_time:
-					elapsed_time = time.time() - start_input
 
-					if elapsed_time >= kenny.user_response_time:
-						print("\nTimeout reached. Exiting.")
+				elapsed_time = time.time() - start_input
+				# print(elapsed_time)
+				# print(kenny.user_response_time)
+				# print(elapsed_time >= kenny.user_response_time)
+				
+				wait_time = kenny.user_response_time if flag_action<48 else kenny.user_response_time/2
+				if elapsed_time >= wait_time:
+					print("\nTimeout reached. Exiting.")
+					if(flag_action>48):
+						print('land')
+						log(start_input-startMain, ArrayPct, uav_action,'land', 'n')
+						action.land()
+					else:
+						print('base')
+						log(start_input-startMain, ArrayPct, uav_action,'base', 'n')
+						try:
+							action.go_to_base()
+						except:
+							action.land()
+					kill_mission()
+
+				if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+					user_input = input().lower()
+					response_time = time.time() + kenny.action_win_time 
+					print("User response: ",user_input)
+
+					if user_input == 'y':
+						print("Continuing...")
+						log(start_input, ArrayPct,uav_action, 'Continuing', user_input)
+						flag_asked = False
+
+					elif user_input == 'n':
 						if(flag_action>48):
 							print('land')
-							log(start_input-startMain, ArrayPct, uav_action,'land', 'n')
+							log(start_input-startMain, ArrayPct, uav_action,'land', user_input)
 							action.land()
-							flag_continue = False
+							flag_asked = False
+
 						else:
 							print('base')
-							log(start_input-startMain, ArrayPct, uav_action,'base', 'n')
 							try:
+								log(start_input-startMain, ArrayPct, uav_action, 'base', user_input)
 								action.go_to_base()
 							except:
 								action.land()
-							flag_continue = False
+							flag_asked = False
+
 						kill_mission()
-
-					if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
-						user_input = input().lower()
-						response_time = time.time() + kenny.action_win_time 
-						print("User response: ",user_input)
-
-						if user_input == 'y':
-							print("Continuing...")
-							log(start_input, ArrayPct,uav_action, 'Continuing', user_input)
-							flag_continue = False
-
-						elif user_input == 'n':
-							if(flag_action>48):
-								print('land')
-								log(start_input-startMain, ArrayPct, uav_action,'land', user_input)
-								action.land()
-								flag_continue = False
-							else:
-								print('base')
-								try:
-									log(start_input-startMain, ArrayPct, uav_action, 'base', user_input)
-									action.go_to_base()
-								except:
-									action.land()
-								flag_continue = False
-							kill_mission()
-					time.sleep(0.1)
+			time.sleep(1)
 		
 		rospy.Rate(1)
 		

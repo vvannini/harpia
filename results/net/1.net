@@ -11,20 +11,44 @@ node 0_take_image_region_1 {
    ID = "0_take_image_region_1";
 }
 
-node 1_go_to_base_1 {
+node 1_go_to_region_2 {
    states = (Replan Do_Action );
-   label = "1_go_to_base_1";
-   ID = "1_go_to_base_1";
+   label = "1_go_to_region_2";
+   ID = "1_go_to_region_2";
+}
+
+node 2_take_image_region_2 {
+   states = (Replan Do_Action );
+   label = "2_take_image_region_2";
+   ID = "2_take_image_region_2";
+}
+
+node 3_go_to_base_1 {
+   states = (Replan Do_Action );
+   label = "3_go_to_base_1";
+   ID = "3_go_to_base_1";
 }
 
 potential (0_take_image_region_1) {
-   data = (  0.5 0.5);
+   data = (  0.05 0.95);
 }
 
-potential ( 1_go_to_base_1 | 0_take_image_region_1   ) {
+potential ( 1_go_to_region_2 | 0_take_image_region_1   ) {
    data = 
    ((   1   0)   % 0_take_image_region_1=Replan   
-   (   0.5   0.5));   % 0_take_image_region_1=Do_Action   
+   (   0.05   0.95));   % 0_take_image_region_1=Do_Action   
+}
+
+potential ( 2_take_image_region_2 | 1_go_to_region_2   ) {
+   data = 
+   ((   1   0)   % 1_go_to_region_2=Replan   
+   (   0.05   0.95));   % 1_go_to_region_2=Do_Action   
+}
+
+potential ( 3_go_to_base_1 | 2_take_image_region_2   ) {
+   data = 
+   ((   1   0)   % 2_take_image_region_2=Replan   
+   (   0.05   0.95));   % 2_take_image_region_2=Do_Action   
 }
 
 

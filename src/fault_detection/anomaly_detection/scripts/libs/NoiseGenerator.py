@@ -17,35 +17,35 @@ def noisyData(errorType, data,colName,xi,xf):
 
     if (errorType == 0):
         if colName in ['pitch', 'roll', 'yaw', 'heading']:
-            response = float(data[colName]) + random.gauss(-2.0, 2.0)
+            response = float(data[colName]) + random.gauss(0, 3.0)
         elif colName in ['rollRate', 'pitchRate', 'yawRate', 'altitudeRelative']:
-            response = float(data[colName]) + random.gauss(-1.0, 1.0)
+            response = float(data[colName]) + random.gauss(0, 2.0)
         elif colName in ['throttlePct', 'climbRate']:
-            response = float(data[colName]) + random.gauss(0, 0.1)
+            response = float(data[colName]) + random.gauss(0, 0.2)
         else:
-            response = float(data[colName]) + random.gauss(-0.5, 0.5)
+            response = float(data[colName]) + random.gauss(0, 0.8)
         return response
 
     elif(errorType == 1):
         if colName in ['pitch', 'roll', 'yaw', 'heading']:
-            response = float(data[colName]) + random.gauss(-10.0, 10.0)
+            response = float(data[colName]) + random.gauss(.0, 7.0)
         elif colName in ['rollRate', 'pitchRate', 'yawRate', 'altitudeRelative']:
-            response = float(data[colName]) + random.gauss(-5.0, 5.0)
+            response = float(data[colName]) + random.gauss(0, 5.0)
         elif colName in ['throttlePct', 'climbRate']:
             response = float(data[colName]) + random.gauss(0, 0.5)
         else:
-            response = float(data[colName]) + random.gauss(-1.5, 1.5)
+            response = float(data[colName]) + random.gauss(0, 1.5)
         return response
 
     elif(errorType == 2):
         if colName in ['pitch', 'roll', 'yaw', 'heading']:
-            response = float(data[colName]) + random.gauss(-15.0, 15.0)
+            response = float(data[colName]) + random.gauss(0.0, 15.0)
         elif colName in ['rollRate', 'pitchRate', 'yawRate', 'altitudeRelative']:
-            response = float(data[colName]) + random.gauss(-7.0, 7.0)
+            response = float(data[colName]) + random.gauss(0.0, 7.0)
         elif colName in ['throttlePct', 'climbRate']:
             response = float(data[colName]) + random.gauss(0, 1.0)
         else:
-            response = float(data[colName]) + random.gauss(-3.0, 3.0)
+            response = float(data[colName]) + random.gauss(0.0, 3.0)
         return response
     else:
         noiseModel = np.pi*np.arctan(random.uniform(xi,xf))

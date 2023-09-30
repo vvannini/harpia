@@ -153,6 +153,7 @@ def test_client(hardware, map, mission, mission_file):
             while feedback == 0:
                 # print(feedback)
                 pub2.publish(msg)
+                pub.publish(goal.mission)
                 # rate.sleep()
                 
             msg.op = 0
@@ -182,7 +183,11 @@ def test_client(hardware, map, mission, mission_file):
             pub2.publish(msg)
             pub2.publish(msg)
             pub2.publish(msg)
-            
+            pub.publish(goal.mission)
+            pub.publish(goal.mission)
+            pub.publish(goal.mission)
+            pub.publish(goal.mission)
+            pub.publish(goal.mission)
 
             print("Mission: " + str(mission_id)+ " Operation: "+str(goal_op))
             

@@ -1,0 +1,92 @@
+{
+    "conditions": [
+        {
+            "checks": {
+                "pct_noise": {"lte": 0.7},
+                "pct_abnormal": {"eq": 0.0},
+                "pct_mild": {"lte": 0.05}
+            },
+            "action": 0
+        },
+        {
+            "checks": {
+                "pct_noise": {"gt": 0.7},
+                "pct_abnormal": {"eq": 0.0},
+                "pct_mild": {"lte": 0.1}
+            },
+            "action": 1
+        },
+        {
+            "checks": {
+                "pct_mild": {"gt": 0.1, "lte": 0.4},
+                "pct_abnormal": {"eq": 0.0}
+            },
+            "action": 2
+        },
+        {
+            "checks": {
+                "pct_abnormal": {"lt": 0.05},
+                "pct_mild": {"gt": 0.4, "lte": 0.6}
+            },
+            "action": 4
+        },
+        {
+            "checks": {
+                "pct_abnormal": {"lt": 0.1},
+                "pct_mild": {"gt": 0.6}
+            },
+            "action": 8
+        },
+        {
+            "checks": {
+                "pct_abnormal": {"lt": 0.1},
+                "pct_mild": {"lte": 0.6}
+            },
+            "action": 8
+        },
+        {
+            "checks": {
+                "pct_abnormal": {"lt": 0.2}
+            },
+            "action": 16
+        }
+    ],
+    "default_action": 32,
+    "pattern_mapping": {
+        "0": {
+            "color_fore": "BLACK",
+            "color_back": "GREEN",
+            "message": "Normal Pattern"
+        },
+        "1": {
+            "color_fore": "BLACK",
+            "color_back": "CYAN",
+            "message": "Light Noise Pattern"
+        },
+        "2": {
+            "color_fore": "WHITE",
+            "color_back": "BLUE",
+            "message": "Mild Noise Pattern"
+        },
+        "4": {
+            "color_fore": "WHITE",
+            "color_back": "YELLOW",
+            "message": "Strong Noise Pattern"
+        },
+        "8": {
+            "color_fore": "WHITE",
+            "color_back": "YELLOW",
+            "message": "Soft Anomalous Pattern"
+        },
+        "16": {
+            "color_fore": "WHITE",
+            "color_back": "MAGENTA",
+            "message": "Mild Anomalous Pattern"
+        },
+        "32": {
+            "color_fore": "WHITE",
+            "color_back": "RED",
+            "message": "Strong Anomalous Pattern!"
+        }
+    }
+}

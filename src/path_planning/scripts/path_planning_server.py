@@ -424,7 +424,7 @@ def select_planner(obstacles_qty, distance, battery):
     return KNN.predict([[obstacles_qty, distance, battery]])
 
 def run_path_planning(from_wp, to_wp, map, obstacles_qty):
-    distance = euclidean_distance(from_wp.cartesian, to_wp.cartesian)
+    distance = euclidean_distance(from_wp.cartesian, to_wp.cartesian)/1000
 
     uav = Drone()
 
@@ -476,8 +476,11 @@ def run_path_planning(from_wp, to_wp, map, obstacles_qty):
     backup_planners = [rrt, ag, pfp]
     i = 0
     while feasibility_res != 'feasible':
+        start = time.time() 
         result = backup_planners[i % 3](from_wp, to_wp, map)
         (route, _, feasibility_res, _, _, _) = result
+        end = time.time()
+        log([str(backup_planners[i % 3]),obstacles_qty, distance, uav.battery, round((end-start),3), result[1], result[5]])
         i += 1
 
     return route

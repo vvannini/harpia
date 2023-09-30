@@ -17,34 +17,22 @@ node 1_take_image_region_1 {
    ID = "1_take_image_region_1";
 }
 
-node 2_go_to_base_1 {
+node 2_go_to_region_2 {
    states = (Replan Do_Action );
-   label = "2_go_to_base_1";
-   ID = "2_go_to_base_1";
+   label = "2_go_to_region_2";
+   ID = "2_go_to_region_2";
 }
 
-node 3_recharge_battery_base_1 {
+node 3_take_image_region_2 {
    states = (Replan Do_Action );
-   label = "3_recharge_battery_base_1";
-   ID = "3_recharge_battery_base_1";
+   label = "3_take_image_region_2";
+   ID = "3_take_image_region_2";
 }
 
-node 4_go_to_region_2 {
+node 4_go_to_base_1 {
    states = (Replan Do_Action );
-   label = "4_go_to_region_2";
-   ID = "4_go_to_region_2";
-}
-
-node 5_take_image_region_2 {
-   states = (Replan Do_Action );
-   label = "5_take_image_region_2";
-   ID = "5_take_image_region_2";
-}
-
-node 6_go_to_base_1 {
-   states = (Replan Do_Action );
-   label = "6_go_to_base_1";
-   ID = "6_go_to_base_1";
+   label = "4_go_to_base_1";
+   ID = "4_go_to_base_1";
 }
 
 potential (0_go_to_region_1) {
@@ -57,34 +45,22 @@ potential ( 1_take_image_region_1 | 0_go_to_region_1   ) {
    (   0.05   0.95));   % 0_go_to_region_1=Do_Action   
 }
 
-potential ( 2_go_to_base_1 | 1_take_image_region_1   ) {
+potential ( 2_go_to_region_2 | 1_take_image_region_1   ) {
    data = 
    ((   1   0)   % 1_take_image_region_1=Replan   
    (   0.05   0.95));   % 1_take_image_region_1=Do_Action   
 }
 
-potential ( 3_recharge_battery_base_1 | 2_go_to_base_1   ) {
+potential ( 3_take_image_region_2 | 2_go_to_region_2   ) {
    data = 
-   ((   1   0)   % 2_go_to_base_1=Replan   
-   (   0   1));   % 2_go_to_base_1=Do_Action   
+   ((   1   0)   % 2_go_to_region_2=Replan   
+   (   0.05   0.95));   % 2_go_to_region_2=Do_Action   
 }
 
-potential ( 4_go_to_region_2 | 3_recharge_battery_base_1   ) {
+potential ( 4_go_to_base_1 | 3_take_image_region_2   ) {
    data = 
-   ((   1   0)   % 3_recharge_battery_base_1=Replan   
-   (   0.05   0.95));   % 3_recharge_battery_base_1=Do_Action   
-}
-
-potential ( 5_take_image_region_2 | 4_go_to_region_2   ) {
-   data = 
-   ((   1   0)   % 4_go_to_region_2=Replan   
-   (   0.05   0.95));   % 4_go_to_region_2=Do_Action   
-}
-
-potential ( 6_go_to_base_1 | 5_take_image_region_2   ) {
-   data = 
-   ((   1   0)   % 5_take_image_region_2=Replan   
-   (   0.05   0.95));   % 5_take_image_region_2=Do_Action   
+   ((   1   0)   % 3_take_image_region_2=Replan   
+   (   0.05   0.95));   % 3_take_image_region_2=Do_Action   
 }
 
 
