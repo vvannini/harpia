@@ -167,7 +167,7 @@ class ActionServer():
 
 			if self.uav.battery <= 20:
 				base = go_to_base(data.mission, self.uav)
-				replan(self.mission, self.uav, base, None, 0)
+				replan(data.mission, self.uav, base, None, 0)
 			else:
 				replan(data.mission, self.uav, None, None, 0)
 			feedback_msg.status = 0

@@ -509,6 +509,7 @@ namespace KCL_rosplan {
 	    	ROS_INFO("BN not called");
 	    	replan = 0;
 	  	}
+	  	// replan = srv.response.replan;
 	 //  	if(mission.Cancelled)
 		// {
 		// 	ROS_ERROR("Preempted %s", msg->name.c_str());
