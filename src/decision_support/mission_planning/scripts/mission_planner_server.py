@@ -91,8 +91,8 @@ class Plan(object):
         self.current_action = data
 
     def end_mission(self):
-        print(self.plan.plan[-1].action_id)
-        print(self.current_action.action_id)
+        # print(self.plan.plan[-1].action_id)
+        # print(self.current_action.action_id)
         return self.plan.plan[-1].action_id == self.current_action.action_id
 
     def unsubscribe(self):

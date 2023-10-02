@@ -189,10 +189,10 @@ def pass_through_obstacle(obstacle_points, line_points):
 
 def count_obstacles(from_wp, to_wp, map, geo_home):
     obst_qty = 0
-    print(from_wp)
+    # print(from_wp)
     line = [(from_wp.cartesian.x, from_wp.cartesian.y), (to_wp.cartesian.x, to_wp.cartesian.y)]
 
-    print(line)
+    # print(line)
     for nfz in map.nfz:
         poly = [(point.cartesian.x, point.cartesian.y) for point in nfz.points]
         if(pass_through_obstacle(poly, line)):
@@ -510,7 +510,7 @@ def path_planning(data):
 
     if data.op == PathPlanningOp.PLAN_PATH:
         obstacles_qty = count_obstacles(from_wp, to_wp, map, map.geo_home)
-        print(obstacles_qty)
+        # print(obstacles_qty)
         # OBSTACLES
         # mapa_obstacles = pd.read_csv(f"{CSV_PATH}/mapa{data.map.id}_obstacles.csv", index_col=0)
         # if data.name_from == "aux":

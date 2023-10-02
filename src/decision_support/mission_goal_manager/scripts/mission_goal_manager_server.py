@@ -140,7 +140,7 @@ class ActionServer():
 		feedback_msg = MissionPlannerFeedback()
 		
 
-		print(self.a_server)
+		# print(self.a_server)
 		# while not call_mission_planning():
 		# result = call_mission_planning()
 		# print(result)
@@ -167,9 +167,9 @@ class ActionServer():
 
 			if self.uav.battery <= 20:
 				base = go_to_base(data.mission, self.uav)
-				replan(data.mission, self.uav, base, None, 0)
+				replan(self.mission, self.uav, base, None, 0)
 			else:
-				replan(data.mission, self.uav, None, None, 0)
+				replan(self.mission, self.uav, None, None, 0)
 			feedback_msg.status = 0
 			self.a_server.publish_feedback(feedback_msg)
 			self.change_goals = 0
@@ -596,7 +596,7 @@ def replan(mission, uav, base, goals, op):
 				print('not implemented yet')
 
 		
-		print(obj)
+		# print(obj)
 		add_instance(obj)
 
 
@@ -678,7 +678,7 @@ def replan1(mission, goals, op, uav):
 			total_goals = total_goals + 1
 
 		add_instance(create_function("total-goals", total_goals))
-		print(obj)
+		# print(obj)
 		add_instance(obj)
 
 		for g in goals: mission.goals.append(g)
