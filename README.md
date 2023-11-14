@@ -10,6 +10,53 @@ Harpia is a system for UAV mission and path planning. The project aims to provid
 
 ## The Architecture
 
+### User Input for Mission Execution
+
+The first step is for the user to provide data for mission execution, including:
+
+- The map on which the mission will take place, containing:
+  - Bases for support
+  - Areas to be monitored, with photo retrieval by the Unmanned Aerial Vehicle (UAV)
+  - No-fly zone where the aircraft can't fly
+
+- Mission details
+  - Information about the region and action to be performed
+    
+- Hardware Information
+  - including hardware information such as battery power, flight speed, and camera information.
+
+All this information is parsed in the ROS node of the backend, which sends these data as ROS messages to other nodes, such as the Mission Goal Manager.
+
+[//]: # All this information are structed as json files and can be found on the json folder
+
+## Mission Goal Manager
+
+The Mission Goal Manager node is responsible for high-level mission command. It receives user changes for additions and removals of areas of interest and triggers a new planning process.
+
+## Mission Planner
+
+The Mission Planner is activated by the Goal Manager and is responsible for invoking all stages of ROSPlan for the creation of an action plan. ROSPlan reads the problem information and domain code, generating a PDDL plan to meet the problem requirements.
+
+The ROS Mission Manager node receives the actions to be executed one by one, containing the necessary code to execute specific system actions.
+
+Before continuing the plan, the Mission Manager sends the current action and the remaining actions of the plan to the Risk Mitigation node, which evaluates whether the current plan is still safe or needs replanning.
+
+## Risk Mitigation
+
+The Bayesian network starts with the next action, assessing the probability of its execution with the current battery level compared to the need for replanning. If the probability is higher or equal, the action is assumed to be completed, and the next action is evaluated. If the probability is lower, a mission failure flag is returned, signaling the need for a new plan by the Mission Planner and ROSPlan.
+
+## 'Go_To' Action
+
+With the 'go_to' action, the system calls the Path Planning Server node, which receives information about the number of obstacles, current battery level, and straight-line distance between region centers. This information is processed by the KNN model, choosing the HGA as a planner for the route. The Mission Manager then sends the route and necessary commands for the aircraft to execute the action.
+
+## Fault Detection System
+
+Simultaneously, the Fault Detection System continually analyzes for any failure behavior. When a new value for one of the analyzed variables is received, it is transformed into two components by the algorithm and classified by the decision tree, returning Normal, Noise, Mild, or Anomalous.
+
+These values are stored, and every 10 seconds, the system evaluates the percentage frequency of each category, assuming a classification for that window. Classifications range from Normal Pattern to Strong Anomalous Pattern, each associated with a numerical value (e.g., 0 for normal behavior).
+
+These values are stored in a vector and analyzed over a 60-second interval, signaling the aircraft's behavior in the last minute. If there are many occurrences of erroneous behaviors in this 60-second window, the system decides whether to go to the nearest base or perform a vertical landing, considering the severity of the system's gravity.
+
 ## Instalation
 <aside>
 💡 Make sure that the system is updated →`sudo apt-get update`
