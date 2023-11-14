@@ -156,7 +156,7 @@ These values are stored in a vector and analyzed over a 60-second interval, sign
 ## Simulation Video
 
 [![Video](https://i9.ytimg.com/vi_webp/--hn0I5QUJ8/mq2.webp?sqp=CJzBop4G-oaymwEmCMACELQB8quKqQMa8AEB-AHUBoAC4AOKAgwIABABGGQgZShUMA8=&rs=AOn4CLALXTaHg7IRncNrzhT9RfPaIgf7Pg)](https://youtu.be/--hn0I5QUJ8)
-
+[![Video](https://ars.els-cdn.com/content/image/1-s2.0-S2772375523000217-mmc1.mp4)
 ## Articles 
 - [Service-Oriented Architecture to Integrate Flight Safety and Mission Management Subsystems into UAVs, ICAS, BeloHorizonte, 2018](https://www.icas.org/ICAS_ARCHIVE/ICAS2018/data/papers/ICAS2018_0374_paper.pdf)
 - [Harpia: A Hybrid System for Agricultural UAV Missions](https://doi.org/10.1016/j.atech.2023.100191)
