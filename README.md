@@ -27,7 +27,7 @@ The first step is for the user to provide data for mission execution, including:
 
 All this information is parsed in the ROS node of the backend, which sends these data as ROS messages to other nodes, such as the Mission Goal Manager.
 
-[//]: # All this information are structed as json files and can be found on the json folder
+> All this information are structed as json files and can be found on the json folder
 
 ## Mission Goal Manager
 
@@ -157,7 +157,7 @@ These values are stored in a vector and analyzed over a 60-second interval, sign
 
 ## Articles 
 - [Service-Oriented Architecture to Integrate Flight Safety and Mission Management Subsystems into UAVs, ICAS, BeloHorizonte, 2018](https://www.icas.org/ICAS_ARCHIVE/ICAS2018/data/papers/ICAS2018_0374_paper.pdf)
-- [Harpia: A Hybrid System for Agricultural UAV Missions](https://authors.elsevier.com/tracking/article/details.do?surname=Vannini&aid=100191&jid=ATECH)
+- [Harpia: A Hybrid System for Agricultural UAV Missions](https://doi.org/10.1016/j.atech.2023.100191)
 
 ## Implementation Schedule 
 
