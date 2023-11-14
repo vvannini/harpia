@@ -10,6 +10,8 @@ Harpia is a system for UAV mission and path planning. The project aims to provid
 
 ## The Architecture
 
+![Harpia Architecture.](https://ars.els-cdn.com/content/image/1-s2.0-S2772375523000217-gr003.jpg)
+
 ### User Input for Mission Execution
 
 The first step is for the user to provide data for mission execution, including:
