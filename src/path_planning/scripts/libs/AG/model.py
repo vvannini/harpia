@@ -13,6 +13,30 @@ class Mapa:
     def __init__(
         self, origin, destination, areas_n=None, areas_b=None, inflation_rate=0.1
     ):
+    """
+        Represents a map with origin, destination, navigable and non-navigable areas.
+
+        Parameters:
+        - origin (CartesianPoint): The starting point of the route.
+        - destination (CartesianPoint): The destination point of the route.
+        - areas_n (list of list of CartesianPoint, optional): Non-navigable areas defined by lists of vertices.
+        - areas_b (list of list of CartesianPoint, optional): Bonifying areas defined by lists of vertices.
+        - inflation_rate (float, optional): The inflation rate for non-navigable areas. Default is 0.1.
+
+        Attributes:
+        - origin (CartesianPoint): The starting point of the route.
+        - destination (CartesianPoint): The destination point of the route.
+        - areas_b (list of list of CartesianPoint): Bonifying areas defined by lists of vertices.
+        - areas_n (list of list of CartesianPoint): Non-navigable areas defined by lists of vertices.
+        - areas_n_inf (list of list of CartesianPoint): Inflated non-navigable areas.
+
+        Examples:
+        >>> origin = CartesianPoint(0, 0)
+        >>> destination = CartesianPoint(5, 5)
+        >>> areas_n = [[CartesianPoint(1, 1), CartesianPoint(2, 2), CartesianPoint(3, 1)]]
+        >>> areas_b = [[CartesianPoint(2, 3), CartesianPoint(3, 4), CartesianPoint(4, 3)]]
+        >>> mapa = Mapa(origin, destination, areas_n, areas_b)
+        """
         self.origin = origin  # CartesianPoint : Define o ponto de partida da rota
         self.destination = destination  # CartesianPoint : Define o ponto de destino da rota
         self.areas_b = areas_b  # [area, ...] : Areas bonificadoras
@@ -22,6 +46,21 @@ class Mapa:
 
     def _inflate_area(self, area, inflation_rate):
 
+        """
+        Inflates a non-navigable area defined by a list of vertices.
+
+        Parameters:
+        - area (list of CartesianPoint): List of vertices defining the non-navigable area.
+        - inflation_rate (float): The inflation rate for the non-navigable area.
+
+        Returns:
+        - list of CartesianPoint: Inflated non-navigable area defined by a list of vertices.
+
+        Examples:
+        >>> area = [CartesianPoint(1, 1), CartesianPoint(2, 2), CartesianPoint(3, 1)]
+        >>> inflation_rate = 0.1
+        >>> inflated_area = _inflate_area(area, inflation_rate)
+        """
         lines = []
 
         for V1, V2 in pairwise_circle(area):
@@ -56,14 +95,66 @@ class Mapa:
 
 class Conversor:
     def list_geo_to_cart(l, geo_home):
+        """
+        Converts a list of GeoPoint objects to CartesianPoint objects relative to a home GeoPoint.
+
+        Parameters:
+        - l (list of GeoPoint): List of GeoPoint objects to convert.
+        - geo_home (GeoPoint): The reference GeoPoint.
+
+        Yields:
+        - CartesianPoint: Converted CartesianPoint objects.
+
+        Example:
+        >>> geo_points = [GeoPoint(37.7749, -122.4194, 0), GeoPoint(37.7749, -122.4194, 0)]
+        >>> home_point = GeoPoint(37.7749, -122.4194, 0)
+        >>> cartesian_points = Conversor.list_geo_to_cart(geo_points, home_point)
+        >>> list(cartesian_points)
+        [CartesianPoint(...), CartesianPoint(...)]
+        """
         for i in l:
             yield Conversor.geo_to_cart(i, geo_home)
 
     def list_cart_to_geo(l, geo_home):
+        """
+        Converts a list of CartesianPoint objects to GeoPoint objects relative to a home GeoPoint.
+
+        Parameters:
+        - l (list of CartesianPoint): List of CartesianPoint objects to convert.
+        - geo_home (GeoPoint): The reference GeoPoint.
+
+        Yields:
+        - GeoPoint: Converted GeoPoint objects.
+
+        Example:
+        >>> cartesian_points = [CartesianPoint(0, 0, 0), CartesianPoint(1, 1, 0)]
+        >>> home_point = GeoPoint(37.7749, -122.4194, 0)
+        >>> geo_points = Conversor.list_cart_to_geo(cartesian_points, home_point)
+        >>> list(geo_points)
+        [GeoPoint(...), GeoPoint(...)]
+        """
         for i in l:
             yield Conversor.cart_to_geo(i, geo_home)
 
     def geo_to_cart(geo_point, geo_home):
+        """
+        Converts a GeoPoint object to a CartesianPoint object relative to a home GeoPoint.
+
+        Parameters:
+        - geo_point (GeoPoint): The GeoPoint to convert.
+        - geo_home (GeoPoint): The reference GeoPoint.
+
+        Returns:
+        - CartesianPoint: Converted CartesianPoint object.
+
+        Example:
+        >>> geo_point = GeoPoint(37.7749, -122.4194, 0)
+        >>> home_point = GeoPoint(37.7749, -122.4194, 0)
+        >>> cartesian_point = Conversor.geo_to_cart(geo_point, home_point)
+        >>> print(cartesian_point)
+        CartesianPoint(...)
+        """
+
         def calc_y(lat, lat_):
             return (lat - lat_) * (10000000.0 / 90)
 
@@ -79,6 +170,23 @@ class Conversor:
         return CartesianPoint(x, y)
 
     def cart_to_geo(cartesian_point, geo_home):
+        """
+        Converts a CartesianPoint object to a GeoPoint object relative to a home GeoPoint.
+
+        Parameters:
+        - cartesian_point (CartesianPoint): The CartesianPoint to convert.
+        - geo_home (GeoPoint): The reference GeoPoint.
+
+        Returns:
+        - GeoPoint: Converted GeoPoint object.
+
+        Example:
+        >>> cartesian_point = CartesianPoint(0, 0, 0)
+        >>> home_point = GeoPoint(37.7749, -122.4194, 0)
+        >>> geo_point = Conversor.cart_to_geo(cartesian_point, home_point)
+        >>> print(geo_point)
+        GeoPoint(...)
+        """
         def calc_latitude_y(lat_, y):
             return ((y * 90) / 10000000.0) + lat_
 

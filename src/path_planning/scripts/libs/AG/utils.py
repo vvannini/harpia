@@ -9,6 +9,23 @@ Vector = collections.namedtuple("Vector", "x y")
 # Support Functions
 # _________________________________________________________________________________________________
 def pairwise_circle(iterable):
+    """
+    Generates pairs of elements from an iterable in a circular manner.
+
+    Parameters:
+    - iterable (iterable): Any iterable (e.g., list, tuple, string) from which pairs are generated.
+
+    Returns:
+    - itertools.zip_longest iterator: An iterator yielding pairs of elements from the input iterable.
+      The last pair will be composed of the last element and the first element of the iterable.
+
+    Example:
+    >>> list(pairwise_circle([1, 2, 3, 4]))
+    [(1, 2), (2, 3), (3, 4), (4, 1)]
+
+    >>> list(pairwise_circle("abcde"))
+    [('a', 'b'), ('b', 'c'), ('c', 'd'), ('d', 'e'), ('e', 'a')]
+    """
     "s -> (s0,s1), (s1,s2), (s2, s3), ... (s<last>,s0)"
     a, b = itertools.tee(iterable)
     first_value = next(b, None)
@@ -16,6 +33,22 @@ def pairwise_circle(iterable):
 
 
 def pairwise(iterable):
+    """
+    Generates pairs of consecutive elements from an iterable.
+
+    Parameters:
+    - iterable (iterable): Any iterable (e.g., list, tuple, string) from which pairs are generated.
+
+    Returns:
+    - zip iterator: An iterator yielding pairs of consecutive elements from the input iterable.
+
+    Example:
+    >>> list(pairwise([1, 2, 3, 4]))
+    [(1, 2), (2, 3), (3, 4)]
+
+    >>> list(pairwise("abcd"))
+    [('a', 'b'), ('b', 'c'), ('c', 'd')]
+    """
     "s -> (s0,s1), (s1,s2), (s2, s3), ..."
     a, b = itertools.tee(iterable)
     next(b, None)
@@ -23,6 +56,27 @@ def pairwise(iterable):
 
 
 def boundary(val, val_min, val_max):
+    """
+    Constrains a value within a specified range.
+
+    Parameters:
+    - val: The input value to be constrained.
+    - val_min: The minimum allowed value.
+    - val_max: The maximum allowed value.
+
+    Returns:
+    - The input value if it is within the specified range, otherwise the nearest boundary value.
+
+    Example:
+    >>> boundary(5, 0, 10)
+    5
+
+    >>> boundary(15, 0, 10)
+    10
+
+    >>> boundary(-5, 0, 10)
+    0
+    """
     if val < val_min:
         return val_min
     if val > val_max:
@@ -36,6 +90,32 @@ epsilon = 0.00001  # Used on the Ray-Tracing Algorithm
 
 
 def point_in_polygon(point, polygon):
+    """
+    Determines whether a point is inside a polygon using the ray casting algorithm.
+
+    Parameters:
+    - point (Point): The point to check for inclusion in the polygon.
+    - polygon (iterable): List of vertices defining the polygon boundary.
+
+    Returns:
+    - bool: True if the point is inside the polygon, False otherwise.
+
+    Notes:
+    - The function uses the ray casting algorithm to check if a point is inside a polygon.
+    - It iterates through consecutive pairs of vertices forming the polygon, and checks for intersections.
+    - If the number of intersections is odd, the point is considered inside the polygon.
+
+    Example:
+    >>> point = Point(1, 1)
+    >>> polygon = [(0, 0), (0, 2), (2, 2), (2, 0)]
+    >>> point_in_polygon(point, polygon)
+    True
+
+    >>> point = Point(3, 3)
+    >>> polygon = [(0, 0), (0, 2), (2, 2), (2, 0)]
+    >>> point_in_polygon(point, polygon)
+    False
+    """
     # Using ray_casting algorithm
     # https://rosettacode.org/wiki/Ray-casting_algorithm
 
@@ -60,6 +140,34 @@ def point_in_polygon(point, polygon):
 
 
 def ray_intersects_segment(P, A, B):
+    """
+    Determines if a ray cast from a point intersects with a line segment.
+
+    Parameters:
+    - P (Point): The starting point of the ray.
+    - A (Point): The end-point of the line segment with the smallest y coordinate.
+    - B (Point): The end-point of the line segment with the greatest y coordinate.
+
+    Returns:
+    - bool: True if the ray intersects the line segment, False otherwise.
+
+    Notes:
+    - To avoid the "ray on vertex" problem, the point is moved upward by a small quantity epsilon.
+    - The function checks whether the ray intersects the line segment defined by points A and B.
+
+    Example:
+    >>> P = Point(1, 1)
+    >>> A = Point(0, 0)
+    >>> B = Point(2, 2)
+    >>> ray_intersects_segment(P, A, B)
+    True
+
+    >>> P = Point(3, 3)
+    >>> A = Point(0, 0)
+    >>> B = Point(2, 2)
+    >>> ray_intersects_segment(P, A, B)
+    False
+    """
     # P : the point from which the ray starts
     # A : the end-point of the segment with the smallest y coordinate
     #     (A must be "below" B)
@@ -128,6 +236,34 @@ def segment_in_polygon(wp1, wp2, polygon):
 
 
 def segment_intersects_segment(p1, q1, p2, q2):
+    """
+    Determines if a line segment defined by two waypoints intersects with a polygon.
+
+    Parameters:
+    - wp1 (Point): The first waypoint defining the start of the line segment.
+    - wp2 (Point): The second waypoint defining the end of the line segment.
+    - polygon (iterable): List of vertices defining the polygon boundary.
+
+    Returns:
+    - bool: True if the line segment intersects with the polygon, False otherwise.
+
+    Notes:
+    - The function iterates through consecutive pairs of vertices forming the polygon.
+    - It checks if the line segment intersects with any of the polygon's edges.
+
+    Example:
+    >>> wp1 = Point(1, 1)
+    >>> wp2 = Point(3, 3)
+    >>> polygon = [(0, 0), (0, 2), (2, 2), (2, 0)]
+    >>> segment_in_polygon(wp1, wp2, polygon)
+    False
+
+    >>> wp1 = Point(1, 1)
+    >>> wp2 = Point(2, 2)
+    >>> polygon = [(0, 0), (0, 2), (2, 2), (2, 0)]
+    >>> segment_in_polygon(wp1, wp2, polygon)
+    True
+    """
     # Returns true if line segment 'p1q1' and 'p2q2' intersect.
     # Based on the algorithm from https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
 
@@ -177,6 +313,33 @@ def segment_intersects_segment(p1, q1, p2, q2):
 
 
 def on_segment(p, q, r):
+    """
+    Checks if a point q lies on the line segment 'pr' defined by points p and r.
+
+    Parameters:
+    - p (Point): The first endpoint of the line segment.
+    - q (Point): The point to check if it lies on the line segment.
+    - r (Point): The second endpoint of the line segment.
+
+    Returns:
+    - bool: True if the point q lies on the line segment 'pr', False otherwise.
+
+    Notes:
+    - The function checks if the coordinates of point q fall within the range defined by points p and r.
+
+    Example:
+    >>> p = Point(1, 1)
+    >>> q = Point(2, 2)
+    >>> r = Point(3, 3)
+    >>> on_segment(p, q, r)
+    True
+
+    >>> p = Point(1, 1)
+    >>> q = Point(4, 4)
+    >>> r = Point(3, 3)
+    >>> on_segment(p, q, r)
+    False
+    """
     # Given three colinear points p, q, r, the function checks if
     # point q lies on line segment 'pr'
     if (

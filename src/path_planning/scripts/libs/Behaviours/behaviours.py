@@ -15,6 +15,28 @@ from harpia_msgs.srv import *
 
 
 def pulverize(from_wp):
+    """
+    Generates a circular buffer around a waypoint and converts it to a list of waypoints.
+
+    Parameters:
+    - from_wp (Waypoint): A waypoint object representing the center of the circular buffer.
+
+    Returns:
+    - WaypointList: A list of waypoints defining the circular buffer.
+
+    Notes:
+    - The function creates a circular buffer around the specified waypoint using a local azimuthal projection.
+    - The buffer is then converted back to WGS84 coordinates, and its perimeter points are used to create a polygon.
+    - Waypoints are generated from the polygon's perimeter and added to a WaypointList.
+
+    Example:
+    >>> waypoint = Waypoint()
+    >>> waypoint.geo.longitude = -122.4194
+    >>> waypoint.geo.latitude = 37.7749
+    >>> result_route = pulverize(waypoint)
+    >>> print(result_route)
+    WaypointList([...])  # Output contains a list of waypoints defining the circular buffer.
+    """
     point = Point(from_wp.geo.longitude, from_wp.geo.latitude)
     alt = 10
     raio = 50
@@ -73,6 +95,29 @@ def pulverize(from_wp):
 
 
 def picture(from_wp, distance):
+    """
+    Generates a WaypointList representing a rectangular flight path for capturing images.
+
+    Parameters:
+    - from_wp (Waypoint): A waypoint object representing the starting location.
+    - distance (float): The distance between each leg of the rectangular flight path.
+
+    Returns:
+    - WaypointList: A list of waypoints defining the rectangular flight path.
+
+    Notes:
+    - The function calculates the next set of waypoints to form a rectangular flight path based on the input distance.
+    - The flight path is defined by four waypoints, with each leg of the rectangle formed by a pair of waypoints.
+    - Waypoints are generated with changing latitude and longitude, maintaining a constant altitude.
+
+    Example:
+    >>> waypoint = Waypoint()
+    >>> waypoint.geo.longitude = -122.4194
+    >>> waypoint.geo.latitude = 37.7749
+    >>> result_route = picture(waypoint, 250)
+    >>> print(result_route)
+    WaypointList([...])  # Output contains a list of waypoints defining the rectangular flight path.
+    """
     longitude = from_wp.geo.longitude
     latitude = from_wp.geo.latitude
     alt = 10

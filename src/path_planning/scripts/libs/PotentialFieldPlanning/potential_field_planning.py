@@ -48,11 +48,53 @@ def get_XY(area, loop=False):
 
 
 def calc_attractive_potential(point, destination, max_dist):
+    """
+    Calculate the attractive potential between a point and a destination.
+
+    Parameters:
+    - `point`: Current point.
+    - `destination`: Destination point.
+    - `max_dist`: Maximum distance for normalization.
+
+    Returns:
+    - Attractive potential value.
+
+    This function calculates the attractive potential between a given point (`point`) and a destination point (`destination`). The potential is higher when the point is closer to the destination.
+
+    Parameters:
+    - `point`: Current point for which the potential is calculated.
+    - `destination`: The target destination point.
+    - `max_dist`: Maximum distance for normalization.
+
+    Returns:
+    - Attractive potential value, normalized by the maximum distance.
+
+    """
     # Closer to the objective, higher the potential
     return euclidean_distance(point, destination) / max_dist
 
 
 def calc_repulsive_potential(point, obstacles):
+    """
+    Calculate the repulsive potential based on chance constraints over all obstacles.
+
+    Parameters:
+    - `point`: Current point.
+    - `obstacles`: List of obstacles.
+
+    Returns:
+    - Repulsive potential value.
+
+    This function calculates the repulsive potential based on chance constraints over all obstacles. The repulsive potential is influenced by the chance constraints evaluated for each obstacle.
+
+    Parameters:
+    - `point`: Current point for which the repulsive potential is calculated.
+    - `obstacles`: List of obstacles in the environment.
+
+    Returns:
+    - Repulsive potential value.
+
+    """
     # Considers the chance constraint over all obstacles as the repulsive potential
     gps_imprecision = 5
     rp = 0
@@ -62,7 +104,25 @@ def calc_repulsive_potential(point, obstacles):
 
 
 def get_minimax(origin, destination):
+    """
+    Calculate the minimax bounding box for a given line segment.
 
+    Parameters:
+    - `origin`: Starting point of the line segment.
+    - `destination`: Ending point of the line segment.
+
+    Returns:
+    - Tuple containing the coordinates of the minimax bounding box: (x_min, x_max, y_min, y_max).
+
+    This function calculates the minimax bounding box for a given line segment defined by the origin and destination points. The minimax bounding box contains the minimal and maximal x and y coordinates of the line segment, ensuring that it completely covers the segment.
+
+    Parameters:
+    - `origin`: Starting point of the line segment.
+    - `destination`: Ending point of the line segment.
+
+    Returns:
+    - Tuple containing the coordinates of the minimax bounding box: (x_min, x_max, y_min, y_max).
+    """
     x_min = min(origin.x, destination.x)
     x_max = max(origin.x, destination.x)
     y_min = min(origin.y, destination.y)
@@ -81,6 +141,37 @@ def get_minimax(origin, destination):
 
 def calc_potential_field(origin, destination, obstacles, discretization=10):
 
+    """
+    Calculate the potential field for path planning using attractive and repulsive potentials.
+
+    Parameters:
+    - `origin`: Starting point of the path.
+    - `destination`: Ending point of the path.
+    - `obstacles`: List of obstacle areas represented by their boundaries.
+    - `discretization`: Grid spacing for potential field calculation.
+
+    Returns:
+    - Tuple containing the potential field map, x-axis minimum, and y-axis minimum.
+
+    This function calculates the potential field for path planning by combining attractive and repulsive potentials. It uses a discretized grid to represent the field.
+
+    Parameters:
+    - `origin`: Starting point of the path.
+    - `destination`: Ending point of the path.
+    - `obstacles`: List of obstacle areas represented by their boundaries.
+    - `discretization`: Grid spacing for potential field calculation.
+
+    Returns:
+    - Tuple containing the potential field map, x-axis minimum, and y-axis minimum.
+
+    Additional Visualization:
+    - The function generates a visual representation of the potential field with obstacle boundaries.
+
+    Example:
+    ```
+    potential_field, x_min, y_min = calc_potential_field(origin, destination, obstacles, discretization=10)
+    ```
+    """
     max_dist = euclidean_distance(origin, destination)
 
     x_min, x_max, y_min, y_max = get_minimax(origin, destination)
@@ -125,6 +216,19 @@ def calc_potential_field(origin, destination, obstacles, discretization=10):
 
 
 def get_motion_model():
+     """
+    Get a motion model for path planning.
+
+    Returns:
+    - List of possible motion directions represented as [dx, dy] pairs.
+
+    This function returns a motion model, which is a list of possible motion directions. Each direction is represented as a pair [dx, dy], indicating the change in x and y coordinates.
+
+    Example:
+    ```
+    motion_model = get_motion_model()
+    ```
+    """
     # dx, dy
     motion = [[1, 0],
               [0, 1],
@@ -139,6 +243,25 @@ def get_motion_model():
 
 
 def oscillations_detection(previous_ids, ix, iy):
+    """
+    Detect oscillations in path planning.
+
+    Args:
+    - previous_ids (deque): A deque containing previous indices (ix, iy) in the path.
+    - ix (int): Current x-index in the path.
+    - iy (int): Current y-index in the path.
+
+    Returns:
+    - bool: True if oscillations are detected, False otherwise.
+
+    This function detects oscillations in path planning by keeping track of previous indices in a deque. It checks for duplicates in the deque, indicating a repetitive pattern in the path.
+
+    Example:
+    ```
+    previous_indices = deque(maxlen=5)
+    is_oscillating = oscillations_detection(previous_indices, current_x, current_y)
+    ```
+    """
     previous_ids.append((ix, iy))
 
     if (len(previous_ids) > OSCILLATIONS_DETECTION_LENGTH):
@@ -155,6 +278,30 @@ def oscillations_detection(previous_ids, ix, iy):
 
 
 def potential_field_planning(origin, destination, obstacles, resolution):
+    """
+    Perform potential field path planning from origin to destination.
+
+    Args:
+    - origin (CartesianPoint): The starting point of the path.
+    - destination (CartesianPoint): The destination point of the path.
+    - obstacles (list): List of obstacle coordinates.
+    - resolution (float): The resolution for potential field calculations.
+
+    Returns:
+    - WaypointList: The generated path as a list of waypoints.
+
+    This function performs potential field path planning using the given origin, destination, obstacles, and resolution. It calculates the potential field, searches for a path, and returns the generated path as a list of waypoints.
+
+    Example:
+    ```
+    start_point = CartesianPoint(0, 0)
+    end_point = CartesianPoint(10, 10)
+    obstacle_list = [(5, 5), (6, 6), (7, 7)]
+    resolution = 1.0
+
+    path = potential_field_planning(start_point, end_point, obstacle_list, resolution)
+    ```
+    """
     print("Starting Potential Field Planning")
 
     # Calculate potential field
@@ -223,6 +370,26 @@ def potential_field_planning(origin, destination, obstacles, resolution):
 
 
 def convert_output_to_wp(rx, ry):
+     """
+    Convert the output path coordinates to a list of waypoints.
+
+    Args:
+    - rx (list): List of x-coordinates of the path.
+    - ry (list): List of y-coordinates of the path.
+
+    Returns:
+    - WaypointList: The generated path as a list of waypoints.
+
+    This function takes lists of x and y coordinates of a path (`rx` and `ry`) and converts them into a list of waypoints (`WaypointList`). Each waypoint is represented as a list `[x, y]`.
+
+    Example:
+    ```
+    x_coordinates = [0, 1, 2, 3]
+    y_coordinates = [0, 1, 4, 9]
+
+    waypoints = convert_output_to_wp(x_coordinates, y_coordinates)
+    ```
+    """
     waypoints = []
     for x, y in zip(rx, ry):
         wp = [x, y]
@@ -232,5 +399,24 @@ def convert_output_to_wp(rx, ry):
 
 
 def draw_heatmap(data):
+     """
+    Draw a heatmap from the given data.
+
+    Args:
+    - data (list or np.array): The input data for the heatmap.
+
+    This function takes a list or NumPy array of data and draws a heatmap using the `pcolor` function from Matplotlib. The color intensity represents the values in the input data.
+
+    Example:
+    ```
+    data_matrix = [
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9]
+    ]
+
+    draw_heatmap(data_matrix)
+    ```
+    """
     data = np.array(data).T
     plt.pcolor(data, vmax=100.0, cmap=plt.cm.Blues)

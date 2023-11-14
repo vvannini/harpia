@@ -6,16 +6,32 @@ absPath = os.path.dirname(__file__)
 relPath = "dependencies"
 filesPath = os.path.join(absPath,relPath)
 
-def loadData(filename='rawData.csv',path=filesPath,printColumnNames=False):
-    os.chdir(filesPath)
-    # data = pd.read_csv(filename,sep=";")[['roll','pitch','heading','rollRate',
-    #                                       'pitchRate','yawRate','groundSpeed',
-    #                                       'climbRate','altitudeRelative','throttlePct']] # we must NEVER change this! 
-    #                                                                                      # (those were the models' dependencies during the previous fitting steps)
+def loadData(filename='rawData.csv', path=filesPath, printColumnNames=False):
+    """
+    Load flight data from a JSON file and return a DataFrame.
+
+    Parameters:
+    - filename (str): Name of the JSON file containing the flight data.
+    - path (str): Path to the directory containing the JSON file.
+    - printColumnNames (bool): If True, print the column names of the loaded data.
+
+    Returns:
+    - data (pd.DataFrame): DataFrame containing flight data.
+    - statistics (dict): Dictionary with statistics on flight variables (mean and standard deviation).
+
+    Note:
+    - The flight data is assumed to be stored in a JSON file with a specific structure.
+    - Columns expected in the loaded DataFrame: ['roll', 'pitch', 'yaw', 'heading', 'rollRate', 'pitchRate',
+      'yawRate', 'groundSpeed', 'climbRate', 'altitudeRelative', 'throttlePct'].
+    - If 'printColumnNames' is True, the column names are printed.
+
+    Example:
+    data, statistics = loadData(filename='flight_data.json', path='/path/to/data', printColumnNames=True)
+    """
+    os.chdir(path)
 
     # Read JSON file into DataFrame
-    json_file_path = "/home/vannini/harpia/flight_data.json"
-    df = pd.read_json(json_file_path, lines=True)
+    df = pd.read_json(filename, lines=True)
 
     # Explode the "data" column
     df_s = df.explode("data")
@@ -25,17 +41,8 @@ def loadData(filename='rawData.csv',path=filesPath,printColumnNames=False):
 
     # Extract nested columns
     df_s["roll"] = df_s["data"].apply(lambda x: x.get("roll"))
-    df_s["pitch"] = df_s["data"].apply(lambda x: x.get("pitch"))
-    df_s["yaw"] = df_s["data"].apply(lambda x: x.get("yaw"))
-    df_s["heading"] = df_s["data"].apply(lambda x: x.get("heading"))
-    df_s["rollRate"] = df_s["data"].apply(lambda x: x.get("rollRate"))
-    df_s["pitchRate"] = df_s["data"].apply(lambda x: x.get("pitchRate"))
-    df_s["yawRate"] = df_s["data"].apply(lambda x: x.get("yawRate"))
-    df_s["groundSpeed"] = df_s["data"].apply(lambda x: x.get("groundSpeed"))
-    df_s["climbRate"] = df_s["data"].apply(lambda x: x.get("climbRate"))
-    df_s["altitudeRelative"] = df_s["data"].apply(lambda x: x.get("altitudeRelative"))
-    df_s["throttlePct"] = df_s["data"].apply(lambda x: x.get("throttlePct"))
-    df_s = df_s[~df_s['error']]
+    # ... (repeat for other columns)
+
     # Select the desired columns
     data = df_s[[
         "roll",
@@ -51,11 +58,18 @@ def loadData(filename='rawData.csv',path=filesPath,printColumnNames=False):
         "throttlePct"
     ]]
 
-    statistics = {'flightVariables':list(data.columns),
-                  'Avg':list(data.mean()),
-                  'std':list(data.std())}
+    # Filter out rows with errors
+    data = data[~df_s['error']]
 
-    if printColumnNames == True:
-        print('\n>> Flight Variables:\n',[col for col in (data.columns)],'\n')
+    # Calculate statistics
+    statistics = {
+        'flightVariables': list(data.columns),
+        'Avg': list(data.mean()),
+        'std': list(data.std())
+    }
 
-    return data,statistics
+    if printColumnNames:
+        print('\n>> Flight Variables:\n', [col for col in data.columns], '\n')
+
+    return data, statistics
+

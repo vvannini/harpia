@@ -40,6 +40,55 @@ class Subject:
         id=-1,
         **kwargs
     ):
+     """
+        Represents an individual in a genetic algorithm for trajectory optimization.
+
+        Parameters:
+        - px0 (float): Initial position in the x-axis (m).
+        - py0 (float): Initial position in the y-axis (m).
+        - v0 (float): Initial velocity (m/s).
+        - al0 (float): Initial angle (degrees).
+        - v_min (float): Minimum velocity (m/s).
+        - v_max (float): Maximum velocity (m/s).
+        - e_min (int): Minimum angular velocity (degrees/s).
+        - e_max (int): Maximum angular velocity (degrees/s).
+        - a_min (float): Minimum acceleration (m/s**2).
+        - a_max (float): Maximum acceleration (m/s**2).
+        - T (int): Planning horizon (number of waypoints).
+        - T_min (int): Minimum planning horizon.
+        - T_max (int): Maximum planning horizon.
+        - delta_T (int): Time discretization (s) time taken from one waypoint to another.
+        - m (float): Mass of the unmanned aerial vehicle (grams).
+        - mutation_prob (float): Probability of mutation in the DNA (%).
+        - start_time (time): Time when the genetic algorithm started running.
+        - generation (int): Generation of the individual.
+        - id (int): Unique identifier for the individual.
+        - **kwargs: Additional parameters.
+
+        Attributes:
+        - gene_decoded_0 (GeneDecoded): Object containing the decoded gene of position 0.
+        - v_min (float): Minimum velocity (m/s).
+        - v_max (float): Maximum velocity (m/s).
+        - e_min (int): Minimum angular velocity (degrees/s).
+        - e_max (int): Maximum angular velocity (degrees/s).
+        - a_min (float): Minimum acceleration (m/s**2).
+        - a_max (float): Maximum acceleration (m/s**2).
+        - T_min (int): Minimum planning horizon.
+        - T_max (int): Maximum planning horizon.
+        - delta_T (int): Time discretization (s) time taken from one waypoint to another.
+        - m (float): Mass of the unmanned aerial vehicle (grams).
+        - mutation_prob (float): Probability of mutation in the DNA (%).
+        - fitness (float): Fitness of the individual.
+        - dna (list): Set of genes forming the DNA ([Gene, ...]).
+        - dna_decoded (list): Decoded DNA ([GeneDecoded, ...]).
+        - start_time (time): Time when the genetic algorithm started running.
+        - generation (int): Generation of the individual.
+        - id (int): Unique identifier for the individual.
+        - parents (list): List of parent individuals.
+
+        Examples:
+        >>> subject = Subject(px0=0, py0=0, v0=5, al0=45, T=20, m=1000)
+        """
         # codificação - u
         # dna = [Gene, ...]
         #     Gene = [a, e]
@@ -119,6 +168,17 @@ class Subject:
         self.spawn()
 
     def __repr__(self):
+        """
+        Returns a string representation of the object for debugging purposes.
+
+        Returns:
+        - str: A string representation of the object.
+
+        Example:
+        >>> subject = Subject(px0=0, py0=0, v0=5, al0=45, T=20, m=1000)
+        >>> print(repr(subject))
+        '(id, [parent1, parent2])'
+        """
         return f'({self.id}, {self.parents})'
 
     # ---
@@ -153,6 +213,13 @@ class Subject:
     # ---
 
     def spawn(self):
+        """
+        Initializes the DNA of the individual with randomly generated genes.
+
+        Example:
+        >>> subject = Subject(px0=0, py0=0, v0=5, al0=45, T=20, m=1000)
+        >>> subject.spawn()
+        """
         # def spawn(self, mode):
         #     self.dna = [self._build_gene(mode) for _ in range(self.T)]
         self.dna = [self._build_gene() for _ in range(self.T)]
@@ -172,6 +239,14 @@ class Subject:
     # ---
 
     def decode(self):
+        """
+        Decodes the DNA of the individual to obtain a list of decoded genes.
+
+        Example:
+        >>> subject = Subject(px0=0, py0=0, v0=5, al0=45, T=20, m=1000)
+        >>> subject.spawn()
+        >>> subject.decode()
+        """
         # self.dna_decoded = [self._decode_gene() for i in range(len(self.dna))]
         self.dna_decoded = (
             self._decode_gene()
@@ -179,6 +254,19 @@ class Subject:
         self.birth_time = time.time() - self.start_time
 
     def _decode_gene(self):
+        """
+        Decodes a single gene in the DNA of the individual to obtain a list of decoded genes.
+
+        Returns:
+        - list: A list of decoded genes.
+
+        Example:
+        >>> subject = Subject(px0=0, py0=0, v0=5, al0=45, T=20, m=1000)
+        >>> subject.spawn()
+        >>> decoded_gene = subject._decode_gene()
+        >>> print(decoded_gene)
+        [GeneDecoded(...), GeneDecoded(...), ...]
+        """
         dna = self.dna
 
         # parametros
@@ -230,18 +318,64 @@ class Subject:
     # ---
 
     def crossover(self, parent2, Specie, **kwargs):
+         """
+        Performs crossover between the current individual and another parent individual.
+
+        Parameters:
+        - parent2 (Subject): The second parent individual for crossover.
+        - Specie: The species of the individuals.
+        - **kwargs: Additional parameters.
+
+        Returns:
+        - Subject: A new individual resulting from the crossover.
+
+        Example:
+        >>> parent1 = Subject(px0=0, py0=0, v0=5, al0=45, T=20, m=1000)
+        >>> parent2 = Subject(px0=10, py0=10, v0=3, al0=90, T=20, m=1000)
+        >>> child = parent1.crossover(parent2, Specie)
+        """
         dna = random.choice([self._OX, self._BLX_Alpha])(self.dna, parent2.dna)
         dna = self._complete(dna, self.dna, parent2.dna)
         child = self.generate(dna, Specie, **kwargs)
         return child
 
     def _OX(self, dna1, dna2):
+        """
+        Performs Ordered Crossover (OX) between two DNA sequences.
+
+        Parameters:
+        - dna1 (list): The DNA sequence of the first individual.
+        - dna2 (list): The DNA sequence of the second individual.
+
+        Returns:
+        - list: The new DNA sequence after the crossover.
+
+        Example:
+        >>> parent1 = Subject(px0=0, py0=0, v0=5, al0=45, T=20, m=1000)
+        >>> parent2 = Subject(px0=10, py0=10, v0=3, al0=90, T=20, m=1000)
+        >>> child_dna = parent1._OX(parent1.dna, parent2.dna)
+        """
         dna = []
         for gene1, gene2 in zip(dna1, dna2):
             dna.append(random.choice([gene1, gene2]))
         return dna
 
     def _BLX_Alpha(self, dna1, dna2):
+        """
+        Performs Blend Crossover (BLX-Alpha) between two DNA sequences.
+
+        Parameters:
+        - dna1 (list): The DNA sequence of the first individual.
+        - dna2 (list): The DNA sequence of the second individual.
+
+        Returns:
+        - list: The new DNA sequence after the crossover.
+
+        Example:
+        >>> parent1 = Subject(px0=0, py0=0, v0=5, al0=45, T=20, m=1000)
+        >>> parent2 = Subject(px0=10, py0=10, v0=3, al0=90, T=20, m=1000)
+        >>> child_dna = parent1._BLX_Alpha(parent1.dna, parent2.dna)
+        """
         dna = []
         for gene1, gene2 in zip(dna1, dna2):
             a = self.__BLX_ALpha_select_gene(gene1.a, gene2.a)
@@ -262,6 +396,21 @@ class Subject:
         return dna
 
     def __BLX_ALpha_select_gene(self, x, y):
+        """
+        Selects a gene value using Blend Crossover (BLX-Alpha) method.
+
+        Parameters:
+        - x (float): The value of the gene from the first parent.
+        - y (float): The value of the gene from the second parent.
+
+        Returns:
+        - float: The selected gene value.
+
+        Example:
+        >>> parent1 = Subject(px0=0, py0=0, v0=5, al0=45, T=20, m=1000)
+        >>> parent2 = Subject(px0=10, py0=10, v0=3, al0=90, T=20, m=1000)
+        >>> selected_gene = parent1.__BLX_Alpha_select_gene(parent1.a, parent2.a)
+        """
         # x - Gene : gene do pai 1
         # y - Gene : gene do pai 2
         alpha = random.uniform(0, 1)
@@ -270,6 +419,22 @@ class Subject:
         return u
 
     def _complete(self, dna, dna1, dna2):
+        """
+        Completes the DNA with the remaining genes from the larger DNA sequence.
+
+        Parameters:
+        - dna (list): The DNA sequence to be completed.
+        - dna1 (list): The first DNA sequence.
+        - dna2 (list): The second DNA sequence.
+
+        Returns:
+        - list: The completed DNA sequence.
+
+        Example:
+        >>> parent1 = Subject(px0=0, py0=0, v0=5, al0=45, T=20, m=1000)
+        >>> parent2 = Subject(px0=10, py0=10, v0=3, al0=90, T=20, m=1000)
+        >>> child_dna = parent1._complete(parent1.dna, parent1.dna, parent2.dna)
+        """
         # Adiciona os genes restantes da diferença de tamanho entre os dois DNAs
 
         if len(dna1) > len(dna2):
@@ -286,6 +451,22 @@ class Subject:
         return dna
 
     def generate(self, dna, Specie, **kwargs):
+        """
+        Generates a new individual with the provided DNA sequence.
+
+        Parameters:
+        - dna (list): The DNA sequence for the new individual.
+        - Specie: The species of the individuals.
+        - **kwargs: Additional parameters.
+
+        Returns:
+        - Subject: A new individual with the specified DNA.
+
+        Example:
+        >>> parent = Subject(px0=0, py0=0, v0=5, al0=45, T=20, m=1000)
+        >>> child_dna = parent._OX(parent.dna, parent.dna)
+        >>> child = parent.generate(child_dna, Specie)
+        """
         # Cria um filho com os mesmos parametros do pai, mas com um dna fornecido
         # child = copy.deepcopy(self)
         child = Specie(
@@ -299,6 +480,19 @@ class Subject:
     # ---
 
     def mutation(self, mutation_prob=None):
+        """
+        Applies mutation to the individual's DNA with a specified probability.
+
+        Parameters:
+        - mutation_prob (float, optional): The probability of mutation. If not provided, uses the individual's mutation probability.
+
+        Returns:
+        - bool: True if mutation occurred, False otherwise.
+
+        Example:
+        >>> individual = Subject(px0=0, py0=0, v0=5, al0=45, T=20, m=1000)
+        >>> mutation_occurred = individual.mutation()
+        """
         mutation_prob = (
             self.mutation_prob if not mutation_prob else mutation_prob
         )  # 0.7
@@ -324,6 +518,19 @@ class Subject:
         return False
 
     def _mutation_change(self, dna):
+        """
+        Applies mutation by changing a gene randomly.
+
+        Parameters:
+        - dna (list): The current DNA sequence.
+
+        Returns:
+        - list: The new DNA sequence after mutation.
+
+        Example:
+        >>> individual = Subject(px0=0, py0=0, v0=5, al0=45, T=20, m=1000)
+        >>> mutated_dna = individual._mutation_change(individual.dna)
+        """
         # Reinicia um gene aleatoriamente
         new_dna = []
         for gene in dna:
@@ -336,6 +543,19 @@ class Subject:
         return new_dna
 
     def _mutation_remove(self, dna):
+        """
+        Applies mutation by removing a random gene from the DNA sequence.
+
+        Parameters:
+        - dna (list): The current DNA sequence.
+
+        Returns:
+        - list or None: The new DNA sequence after mutation or None if the minimum DNA size is reached.
+
+        Example:
+        >>> individual = Subject(px0=0, py0=0, v0=5, al0=45, T=20, m=1000)
+        >>> mutated_dna = individual._mutation_remove(individual.dna)
+        """
         # Remove UM gene aleatório do DNA
         if len(dna) > self.T_min:
             i = random.randint(0, len(dna) - 1)
@@ -344,6 +564,21 @@ class Subject:
         return None
 
     def _mutation_insert(self, dna):
+        
+        """
+        Applies mutation by inserting a random gene into the DNA sequence at a random position.
+
+        Parameters:
+        - dna (list): The current DNA sequence.
+
+        Returns:
+        - list or None: The new DNA sequence after mutation or None if the maximum DNA size is reached.
+
+        Example:
+        >>> individual = Subject(px0=0, py0=0, v0=5, al0=45, T=20, m=1000)
+        >>> mutated_dna = individual._mutation_insert(individual.dna)
+        """
+
         # Insere UM gene aleatório no DNA em uma posição aleatória
         if len(dna) < self.T_max:
             i = random.randint(0, len(dna) - 1)
@@ -353,6 +588,19 @@ class Subject:
         return None
 
     def _mutation_creep(self, dna):
+        """
+        Applies mutation by adding a small random value to all genes in the DNA sequence.
+
+        Parameters:
+        - dna (list): The current DNA sequence.
+
+        Returns:
+        - list: The new DNA sequence after mutation.
+
+        Example:
+        >>> individual = Subject(px0=0, py0=0, v0=5, al0=45, T=20, m=1000)
+        >>> mutated_dna = individual._mutation_creep(individual.dna)
+        """
         # Muta em um pequeno valor aleatorio todos os genes
         new_dna = []
         for gene in dna:
@@ -366,6 +614,21 @@ class Subject:
         return new_dna
 
     def __mute(self, val, min_val, max_val):
+        """
+        Applies mutation by adding a small random value to a given value within specified bounds.
+
+        Parameters:
+        - val (float): The current value.
+        - min_val (float): The minimum allowed value.
+        - max_val (float): The maximum allowed value.
+
+        Returns:
+        - float: The new value after mutation.
+
+        Example:
+        >>> individual = Subject(px0=0, py0=0, v0=5, al0=45, T=20, m=1000)
+        >>> mutated_value = individual.__mute(individual.gene_decoded_0.x, 0, 100)
+        """
         mutation_rate = random.uniform(0, max_val * 0.5)
         s = random.choice([1, -1])
         val = val * (1 + (mutation_rate * s))
@@ -383,6 +646,16 @@ class Subject:
     # ---
 
     def get_route(self):
+        """
+        Retrieves the route defined by the decoded DNA.
+
+        Returns:
+        - list of list: A list containing the coordinates of each waypoint in the route.
+
+        Example:
+        >>> individual = Subject(px0=0, py0=0, v0=5, al0=45, T=20, m=1000)
+        >>> route_coordinates = individual.get_route()
+        """
         return [[gene.x, gene.y] for gene in self.dna_decoded]
 
 
@@ -408,6 +681,32 @@ class Genetic:
         planning_mode='planning',
         **kwargs
     ):
+         """
+        Initializes the Genetic Algorithm.
+
+        Parameters:
+        - Specie (class): The class definition for the genetic individuals.
+        - mapa (Mapa): The map with mission characteristics.
+        - taxa_cross (float): Crossover occurrence rate in the range [0, 1].
+        - population_size (int): Maximum number of individuals in the population.
+        - C_d (int): Cost associated with the destination fitness.
+        - C_obs (int): Cost associated with the obstacles fitness.
+        - C_con (int): Cost associated with the fuel consumption fitness.
+        - C_cur (int): Cost associated with the route curvature fitness.
+        - C_t (int): Cost associated with the DNA size fitness (T or planning horizon).
+        - C_dist (int): Cost associated with the route length fitness.
+        - C_z_bonus (int): Cost associated with the bonus zones fitness. Should be negative (< 0).
+        - max_exec_time (float): Maximum execution time in seconds (stop criterion).
+        - min_precision (float): Minimum precision for reaching the destination (meters).
+        - k_tournament (int): Number of individuals participating in the tournament.
+        - gps_imprecision (float): GPS imprecision (meters).
+        - big_delta: (float): Delta value.
+        - planning_mode (str): Specifies the type of fitness function used: 'planning', 'emergency'.
+        - **kwargs: Additional keyword arguments passed to individual instances.
+
+        Example:
+        >>> genetic_algorithm = Genetic(Specie=YourSpecieClass, mapa=your_map_instance, population_size=20)
+        """
         # Modelo
         self.Specie = Specie  # objeto : Definição da classe (não a instância)
         self.mapa = mapa  # Mapa : Mapa com as características da missão
@@ -445,6 +744,18 @@ class Genetic:
         self.current_id = 0
 
     def run(self, max_exec_time=None, verbose=False, info=False, debug=False):
+        """
+        Run the genetic algorithm.
+
+        Parameters:
+        - max_exec_time (float): Maximum execution time in seconds (stop criterion).
+        - verbose (bool): If True, print detailed information during execution.
+        - info (bool): If True, print information about the algorithm's progress.
+        - debug (bool): If True, print debug information.
+
+        Returns:
+        - best (Specie): The best individual found by the genetic algorithm.
+        """
         # print("ROI")
         self.max_exec_time = max_exec_time if max_exec_time else self.max_exec_time
 
@@ -534,6 +845,15 @@ class Genetic:
     # ---
 
     def _insert(self, child, parent1, parent2):
+        """
+        Determine if a child individual should be inserted into the population and, if so,
+        decide which parent it will replace.
+
+        Parameters:
+        - child (Specie): The child individual.
+        - parent1 (Specie): The first parent individual.
+        - parent2 (Specie): The second parent individual.
+        """
         # Verifica se um indivíduo é digno de entrar na população e tomar o lugar de um de seus pais
 
         self.flag_newbest = False
@@ -552,6 +872,13 @@ class Genetic:
             self.flag_newbest = True
 
     def __substitute(self, child, parent):
+        """
+        Replace a less fit parent individual with a superior child individual in the population.
+
+        Parameters:
+        - child (Specie): The superior child individual.
+        - parent (Specie): The less fit parent individual.
+        """
         i_parent = self.population.index(parent)
 
         child.set_generation(self.generation)
@@ -570,12 +897,24 @@ class Genetic:
     # ---
 
     def stop_criteria(self):
+        """
+        Check the stopping criteria based on the maximum execution time.
+
+        Returns:
+        - bool: True if the elapsed time exceeds the maximum execution time, False otherwise.
+        """
         # Para a execução depois de uma quantidade de segundos
         if (time.time() - self.start_time) >= self.max_exec_time:
             return True
         return False
 
     def converge(self):
+        """
+        Check if the genetic algorithm has converged.
+
+        Returns:
+        - bool: True if no new individuals have been added, indicating convergence. False otherwise.
+        """
         # Converge caso nenhum novo indivíduo seja adicinado
         if self.flag_newborn == 0:
             return True
@@ -584,6 +923,16 @@ class Genetic:
     # ---
 
     def _genesis(self, Specie, population_size):
+        """
+        Generate the initial population of individuals.
+
+        Args:
+        - Specie: Class defining the individual in the population.
+        - population_size (int): Number of individuals in the population.
+
+        Returns:
+        - list: List of Specie instances representing the initial population.
+        """
         current_id = self.current_id
 
         population = [
@@ -603,6 +952,15 @@ class Genetic:
     # ---
 
     def _decode(self, population):
+        """
+        Decode the genetic information (DNA) of individuals in the population.
+
+        Args:
+        - population (list): List of Specie instances representing the population.
+
+        Returns:
+        - bool: Always returns True.
+        """
         for subject in population:
             subject.decode()
         return True
@@ -610,6 +968,16 @@ class Genetic:
     # ---
 
     def _fitness(self, subject, mapa):
+        """
+        Calculate the fitness of an individual based on the specified planning mode.
+
+        Args:
+        - subject: An instance of the Specie class representing an individual.
+        - mapa: An instance of the Mapa class containing map information.
+
+        Returns:
+        - float: The fitness value of the individual.
+        """
         if self.planning_mode == 'planning':
             return self._fitness_planning(subject, mapa)
 
@@ -621,7 +989,16 @@ class Genetic:
 
 
     def _fitness_chance_constraint(self, subject, mapa):
+    """
+        Calculate the fitness of an individual in the chance-constrained planning mode.
 
+        Args:
+        - subject: An instance of the Specie class representing an individual.
+        - mapa: An instance of the Mapa class containing map information.
+
+        Returns:
+        - float: The fitness value of the individual.
+        """
         fit_d = self.__fitness_destination(subject, mapa)
         # fit_obs = self.__fitness_obstacles(subject, mapa)
         fit_obs_cc = self.__fitness_obstacles_chance_constraint(subject, mapa)
@@ -655,6 +1032,16 @@ class Genetic:
         return fitness
 
     def __fitness_obstacles_chance_constraint(self, subject, mapa):
+        """
+        Count the number of obstacles intersected by the route, and chosing rotes that avoid obstacles.
+
+        Args:
+        - subject: An instance of the Specie class representing an individual.
+        - mapa: An instance of the Mapa class containing map information.
+
+        Returns:
+        - int: The count of obstacles intersected by the route.
+        """
         # Prioriza rotas que não ultrapassem obstáculos
         count = 0
 
@@ -675,7 +1062,16 @@ class Genetic:
         return count
 
     def _fitness_emergency(self, subject, mapa):
+        """
+        Calculate the fitness of an individual in an emergency scenario.
 
+        Args:
+        - subject: An instance of the Specie class representing an individual.
+        - mapa: An instance of the Mapa class containing map information.
+
+        Returns:
+        - float: The fitness value of the individual.
+        """
         # fit_d = self.__fitness_destination(subject, mapa)
         fit_obs = self.__fitness_obstacles(subject, mapa)
         fit_con = self.__fitness_consumption(subject, mapa)
@@ -711,6 +1107,16 @@ class Genetic:
         return fitness
 
     def __fitness_z_bonus(self, subject, mapa):
+        """
+        Use Ray Casting to evaluate if the endpoint of the route is in a bonus region.
+
+        Args:
+        - subject: An instance of the Specie class representing an individual.
+        - mapa: An instance of the Mapa class containing map information.
+
+        Returns:
+        - float: The fitness value related to bonus regions.
+        """
         # Usa o Ray Casting para avaliar se o ponto final da rota está em uma região bonificadora
 
         count = 0
@@ -761,7 +1167,16 @@ class Genetic:
     #     return count
 
     def _fitness_planning(self, subject, mapa):
+        """
+        Calculate overall fitness for an individual in the planning mode.
 
+        Args:
+        - subject: An instance of the Specie class representing an individual.
+        - mapa: An instance of the Mapa class containing map information.
+
+        Returns:
+        - float: The overall fitness value for the individual.
+        """
         fit_d = self.__fitness_destination(subject, mapa)
         fit_obs = self.__fitness_obstacles(subject, mapa)
         fit_con = self.__fitness_consumption(subject, mapa)
@@ -794,6 +1209,16 @@ class Genetic:
         return fitness
 
     def __fitness_destination(self, subject, mapa):
+        """
+        Calculate fitness component related to reaching the destination for an individual.
+
+        Args:
+        - subject: An instance of the Specie class representing an individual.
+        - mapa: An instance of the Mapa class containing map information.
+
+        Returns:
+        - float: The fitness component value for destination reaching.
+        """
         # Prioriza rotas que acertem o destino
 
         A = subject.dna_decoded[-1]  # Último waypoint da rota
@@ -821,6 +1246,16 @@ class Genetic:
         return d
 
     def __fitness_obstacles(self, subject, mapa):
+        """
+        Calculate fitness component related to the total distance of the route for an individual.
+
+        Args:
+        - subject: An instance of the Specie class representing an individual.
+        - mapa: An instance of the Mapa class containing map information.
+
+        Returns:
+        - float: The fitness component value for route distance.
+        """
         # def __fitness_obstacles_RC(self, subject, mapa):
         # Prioriza rotas que não ultrapassem obstáculos
         count = 0
@@ -875,22 +1310,65 @@ class Genetic:
         #     return sum(risks_points)
 
     def __fitness_consumption(self, subject, _):
+        """
+        Calculate fitness component related to the consumption of fuel (or battery).
+
+        Args:
+        - subject: An instance of the Specie class representing an individual.
+        - _: Placeholder parameter, not used in the calculation.
+
+        Returns:
+        - float: The fitness component value for fuel (or battery) consumption.
+        """
         # Prioriza rotas com menor consumo de combustível (bateria)
         consumption = [gene.a ** 2 for gene in subject.dna]
         return sum(consumption)
 
     def __fitness_curves(self, subject, _):
+        """
+        Calculate fitness component related to avoiding unnecessary curves in the route.
+
+        Args:
+        - subject: An instance of the Specie class representing an individual.
+        - _: Placeholder parameter, not used in the calculation.
+
+        Returns:
+        - float: The fitness component value for avoiding unnecessary curves.
+        """
         # Prioriza rotas que evitem fazer curvas desnecessárias
+        # Calculate the absolute values of angular variations (curvatures) for each gene in the individual's DNA (route)
         curves = [abs(gene.e) for gene in subject.dna]
+
+        # Return the sum of absolute angular variations normalized by the maximum allowed angular variation
         return (1 / subject.e_max) * sum(curves)
 
     def __fitness_t(self, subject, _):
+        """
+        Calculate fitness component related to preferring routes with a smaller number of waypoints.
+
+        Args:
+        - subject: An instance of the Specie class representing an individual.
+        - _: Placeholder parameter, not used in the calculation.
+
+        Returns:
+        - int: The number of waypoints in the route, representing the fitness component value.
+        """
         # Prioriza rotas com menor quantidade de waypoints
         return len(subject.dna)
 
     # ---
 
     def _tournament(self, population, k=2):
+        """
+        Perform tournament selection to choose parents for crossover.
+
+        Args:
+        - population: List of individuals from which parents will be selected.
+        - k: Number of individuals participating in each tournament.
+
+        Returns:
+        - Tuple: Two parents selected through tournament selection.
+        """
         parents = []
         for i in range(2):
 

@@ -29,8 +29,6 @@ from harpia_msgs.srv import *
 # PathPlanning
 
 import time
-
-
 import shapely.geometry
 
 # Behaviours
@@ -51,37 +49,91 @@ from libs.RRT.rrt import RRT
 from libs.PotentialFieldPlanning.potential_field_planning import potential_field_planning
 
 class Drone(object):
-    def __init__(self):
-        self.sub_battery = rospy.Subscriber('mavros/battery',  BatteryState, self.battery_state_callback)
-        self.battery     = None
+    """
+    A class representing a drone and its battery state information.
 
-    def battery_state_callback(self, data): 
+    Attributes:
+        sub_battery (rospy.Subscriber): A ROS subscriber for monitoring battery state.
+        battery (float): The current battery percentage.
+    """
+
+    def __init__(self):
+        """
+        Initializes a Drone instance with a battery state subscriber and sets the battery percentage to None.
+        """
+        self.sub_battery = rospy.Subscriber('mavros/battery', BatteryState, self.battery_state_callback)
+        self.battery = None
+
+    def battery_state_callback(self, data):
+        """
+        Callback function to update the battery percentage based on received battery state information.
+
+        Args:
+            data (BatteryState): Battery state information received from the 'mavros/battery' topic.
+        """
         self.battery = data.percentage * 100
 
 # ---
 # UTILS
 def log(info):
+    """
+    Log information to a JSON log file.
+
+    Args:
+        info (dict): A dictionary containing information to be logged.
+
+    This function opens an existing JSON log file, appends the provided 'info' dictionary to the log, and then saves the updated log back to the file.
+    """
+
+    # Get the root directory for Harpia.
     harpia_root_dir = get_harpia_root_dir()
 
-    # log path
+    # Define the path to the log directory and the log file.
     log_path = os.path.join(harpia_root_dir, "results")
     log_json = os.path.join(log_path, "mission_log.json")
 
-    # open log
+    # Open the log file for reading.
     with open(log_json, "r") as log_file:
+        # Load the JSON content from the file.
         log_file = json.load(log_file)
 
-    # add replan
+    # Add the 'info' dictionary to the log.
     log_file[-1]['knn'].append(info)
 
-    # dump log
+    # Dump the updated log back to the log file.
     with open(log_json, 'w') as outfile:
         json.dump(log_file, outfile, indent=4)
 
+
 def euclidean_distance(A, B):
+    """
+    Calculate the Euclidean distance between two 2D points A and B.
+
+    Args:
+        A (Point): The first point with attributes x and y.
+        B (Point): The second point with attributes x and y.
+
+    Returns:
+        float: The Euclidean distance between points A and B.
+
+    The function takes two points, A and B, and computes the Euclidean distance
+    between them in a 2D space using the Pythagorean theorem.
+    """
     return math.sqrt((B.x - A.x) ** 2 + (B.y - A.y) ** 2)
 
 def calc_dist_path(path):
+    """
+    Calculate the total distance along a path defined by a list of 2D points.
+
+    Args:
+        path (list of tuples): A list of 2D points, where each point is represented as a tuple (x, y).
+
+    Returns:
+        float: The total Euclidean distance along the path.
+
+    The function iterates through the list of points in the path and calculates the
+    total distance by summing the Euclidean distances between consecutive points.
+    """
     dist = 0
     i = 1
     for p in path:
@@ -94,6 +146,22 @@ def calc_dist_path(path):
     return dist
 
 def wait_until(check, msg=None, rate=1):
+     """
+    Wait until a given condition is met.
+
+    Args:
+        check (callable): A callable that represents the condition to check. It should return a boolean.
+        msg (str, optional): An optional message to log while waiting.
+        rate (float, optional): The rate (in Hz) at which to check the condition.
+
+    Returns:
+        bool: True if the condition is met; False if ROS is shut down or the condition is not met.
+
+    This function repeatedly checks the given condition (the 'check' parameter) until it returns True.
+    It can also log a message (the 'msg' parameter) at each check. The checking rate is controlled by the 'rate' parameter.
+
+    The function returns True if the condition is met or False if ROS is shut down or the condition is not met.
+    """
     rate = rospy.Rate(rate)
 
     while not check():
@@ -104,9 +172,32 @@ def wait_until(check, msg=None, rate=1):
     return True
 
 def get_harpia_root_dir():
+    """
+    Get the root directory path of the 'Harpia' project.
+
+    Returns:
+        str: The root directory path as a string.
+
+    This function retrieves the root directory path of the 'Harpia' project. It does so by obtaining a parameter from the ROS parameter server. If the parameter '/harpia_home' exists, it returns its value as the root directory path. Otherwise, it falls back to a default directory path, which is the user's home directory with 'harpia' appended to it.
+
+    Returns the root directory path as a string.
+    """
     return rospy.get_param("/harpia_home", default=os.path.expanduser("~/harpia"))
 
 def to_waypointList(route, geo_home):
+    """
+    Convert a list of waypoints in Cartesian coordinates to a WaypointList in geographic coordinates.
+
+    Args:
+        route (list): A list of waypoints in Cartesian coordinates.
+        geo_home (GeoPoint): The home location in geographic coordinates.
+
+    Returns:
+        WaypointList: A WaypointList containing the converted waypoints in geographic coordinates.
+
+    This function takes a list of waypoints in Cartesian coordinates and converts them into a WaypointList in geographic coordinates. It performs the conversion for each waypoint by first converting from Cartesian to geographic coordinates using the provided home location (geo_home). The resulting WaypointList includes the converted waypoints with appropriate fields set for mission planning.
+
+     """
     geo_route = WaypointList()
     for wp in route:
         geo = Conversor.cart_to_geo(CartesianPoint(wp[0], wp[1]), geo_home)
@@ -131,6 +222,30 @@ def to_waypointList(route, geo_home):
 
 
 def feasibility_ag(fitness_trace):
+    """
+    Evaluate the feasibility of an action based on a fitness trace.
+
+    Args:
+        fitness_trace (list): A fitness trace containing two fitness values.
+
+    Returns:
+        str: A string indicating the feasibility of the action.
+
+    This function takes a fitness trace as input, which is a list containing two fitness values: the first value represents the fitness related to hitting an obstacle, and the second value represents the fitness related to the distance from the destination waypoint.
+
+    Args:
+        - fitness_trace (list): A list of two fitness values [fit_obs, fit_d].
+
+    Returns:
+        - str: A string indicating the feasibility of the action. Possible values are "feasible," "verify," or "infeasible."
+
+    Feasibility is determined as follows:
+    - If `fit_obs` (fitness related to hitting an obstacle) is greater than 0, it is considered "infeasible" (indicating the action hit an obstacle).
+    - If `fit_d` (fitness related to the distance from the destination waypoint) is greater than 10 meters, it is considered "verify" (indicating the action is away from the destination waypoint).
+    - If neither condition is met, the action is considered "feasible."
+
+    The function returns a string indicating the feasibility status of the action.
+    """
     if fitness_trace[1] > 0:  # Hit obstacle (fit_obs) (max 1 hit)
         return "infeasible"
     elif fitness_trace[0] > 10:  # Away from destination wp (fit_d) (max 10 meters)
@@ -139,19 +254,37 @@ def feasibility_ag(fitness_trace):
         return "feasible"
 
 def feasibility(route, obstacles, destination):
-    """Checks if the route is feasible
+  """
+    Check the feasibility of a route with respect to obstacles and the distance to the destination.
 
     Args:
-        route ([type]): [description]
-        obstacles ([type]): [description]
-        destination ([type]): [description]
+        route (list of tuple): A list of waypoints (x, y) representing the route.
+        obstacles (list of list): A list of obstacle polygons, each represented as a list of vertices.
+        destination (tuple): The (x, y) coordinates of the destination waypoint.
 
     Returns:
-        string: 'infeasible' - the route hits an obstacle
-                'verify'     - the route does not arrive at the destination, according to min precision
-                'feasible'   - the route is alright
-    """
+        tuple: A tuple containing a feasibility status and the distance to the destination.
 
+    This function checks the feasibility of a route by considering potential obstacles and the distance from the last waypoint in the route to the destination waypoint.
+
+    Args:
+        - route (list of tuple): A list of waypoints (x, y) representing the route.
+        - obstacles (list of list): A list of obstacle polygons, each represented as a list of vertices.
+        - destination (tuple): The (x, y) coordinates of the destination waypoint.
+
+    Returns:
+        - tuple: A tuple containing two elements:
+            1. str: A string indicating the feasibility status, which can be one of "feasible," "verify," or "infeasible."
+            2. float: The distance from the last waypoint to the destination waypoint.
+
+    The function first calculates the distance from the last waypoint in the route to the destination waypoint. If this distance is greater than a specified minimum (MIN_PRECISION), the route status is set to "verify."
+
+    It then checks if any of the waypoints in the route fall within any of the obstacle polygons. If any waypoint is inside an obstacle, the route status is set to "infeasible."
+
+    If none of the above conditions are met, the route status is set to "feasible."
+
+    The function returns a tuple with the feasibility status and the distance to the destination.
+    """
     # Minimum distance the last waypoint needs to be from the destination wp
     MIN_PRECISION = 10
 
@@ -173,6 +306,23 @@ def feasibility(route, obstacles, destination):
 
 
 def get_first_factible_route(ag):
+    """
+    Find the first feasible route in an agent's history based on its fitness trace.
+
+    Args:
+        ag (object): An agent with a history attribute that contains fitness traces.
+
+    Returns:
+        int or None: The birth time of the first feasible route found in the agent's history, or None if none are feasible.
+
+    This function iterates through an agent's history and checks the feasibility of each route based on its fitness trace. It looks for the first route that is deemed "feasible" and returns the birth time of that route.
+
+    Args:
+        - ag (object): An agent with a history attribute that contains fitness traces.
+
+    Returns:
+        - int or None: The birth time of the first feasible route found in the agent's history, or None if none are feasible.
+    """
     for subject in ag.history:
         feasibility_result = feasibility_ag(subject['fitness_trace'])
 
@@ -182,17 +332,58 @@ def get_first_factible_route(ag):
     return None
 
 def pass_through_obstacle(obstacle_points, line_points):
+     """
+    Check if a line passes through an obstacle.
+
+    Args:
+        obstacle_points (list of tuples): Points representing the vertices of the obstacle polygon.
+        line_points (list of tuples): Points representing the vertices of the line.
+
+    Returns:
+        bool: True if the line passes through the obstacle, False otherwise.
+
+    This function checks if a line, represented by a sequence of points, passes through an obstacle, represented by a sequence of points. It uses the Shapely library for geometric operations to perform the intersection check.
+
+    Args:
+        - obstacle_points (list of tuples): Points representing the vertices of the obstacle polygon.
+        - line_points (list of tuples): Points representing the vertices of the line.
+
+    Returns:
+        - bool: True if the line passes through the obstacle, False otherwise.
+    """
     poly = shapely.geometry.Polygon(obstacle_points)
     line = shapely.geometry.LineString(line_points)
     
     return line.intersects(poly)
 
 def count_obstacles(from_wp, to_wp, map, geo_home):
+     """
+    Count the number of obstacles intersecting with a line segment.
+
+    Args:
+        from_wp (Waypoint): Starting waypoint.
+        to_wp (Waypoint): Ending waypoint.
+        map (Map): Map containing no-fly zones.
+        geo_home (GeoPoint): Home location in geographic coordinates.
+
+    Returns:
+        int: The number of obstacles intersecting with the line segment.
+
+    This function counts the number of obstacles that intersect with a line segment between two waypoints. It uses the provided map with no-fly zones and the home location in geographic coordinates for reference.
+
+    Args:
+        - from_wp (Waypoint): Starting waypoint.
+        - to_wp (Waypoint): Ending waypoint.
+        - map (Map): Map containing no-fly zones.
+        - geo_home (GeoPoint): Home location in geographic coordinates.
+
+    Returns:
+        - int: The number of obstacles intersecting with the line segment.
+    """
     obst_qty = 0
-    # print(from_wp)
+
     line = [(from_wp.cartesian.x, from_wp.cartesian.y), (to_wp.cartesian.x, to_wp.cartesian.y)]
 
-    # print(line)
     for nfz in map.nfz:
         poly = [(point.cartesian.x, point.cartesian.y) for point in nfz.points]
         if(pass_through_obstacle(poly, line)):
@@ -204,6 +395,37 @@ def count_obstacles(from_wp, to_wp, map, geo_home):
 
 
 def pfp(from_wp, to_wp, map, save_filename=None):
+    """
+    Perform path planning using Potential Field Planning (PFP).
+
+    Args:
+        from_wp (Waypoint): Starting waypoint.
+        to_wp (Waypoint): Ending waypoint.
+        map (Map): Map containing no-fly zones.
+        save_filename (str): Optional filename to save the generated map image.
+
+    Returns:
+        tuple: A tuple containing waypoint list, path length, feasibility status, distance to objective, time taken, and path length.
+
+    This function performs path planning using Potential Field Planning (PFP) to generate a safe path from a starting waypoint to an ending waypoint while avoiding obstacles.
+
+    Args:
+        - from_wp (Waypoint): Starting waypoint.
+        - to_wp (Waypoint): Ending waypoint.
+        - map (Map): Map containing no-fly zones.
+        - save_filename (str): Optional filename to save the generated map image.
+
+    Returns:
+        - tuple: A tuple containing the following elements:
+          - WaypointList: A list of waypoints representing the generated path.
+          - float: The length of the generated path.
+          - str: Feasibility status, which can be 'feasible', 'infeasible', or 'verify'.
+          - float: Distance to the objective (destination waypoint).
+          - float: Time taken to generate the path.
+          - int: Length of the generated path.
+
+    This function calculates a path using Potential Field Planning (PFP) from the provided starting waypoint to the ending waypoint, considering the specified map with no-fly zones. The generated path is returned as a list of waypoints, along with information about its feasibility, length, and the time taken for the planning process. An optional map image can be saved to the provided file.
+    """
     origin = Conversor.geo_to_cart(from_wp.geo, map.geo_home)
     rospy.loginfo(f"origin={origin}")
 
@@ -211,10 +433,9 @@ def pfp(from_wp, to_wp, map, save_filename=None):
     rospy.loginfo(f"destination={destination}")
 
     # ---
-    # obstacleList for check_collision_mode='ray_casting'
+    # Prepare obstacleList for check_collision_mode='ray_casting'
     obstacleList = [[Conversor.geo_to_cart(p.geo, map.geo_home) for p in area.points] for area in map.nfz]
 
-    # Creates the ag_map in a structure the AG will understand
     rc_map = Mapa(
         origin,
         destination,
@@ -235,7 +456,6 @@ def pfp(from_wp, to_wp, map, save_filename=None):
         rospy.loginfo(f"route={route}")
 
         feasibility_res, distance_to_objective = feasibility(route, obstacleList, destination)
-        # Draw final route
         if save_filename:
             vis_mapa(rc_map, route=route, save=f"{save_filename}.png")
 
@@ -250,13 +470,44 @@ def pfp(from_wp, to_wp, map, save_filename=None):
 
 
 def rrt(from_wp, to_wp, map, save_filename=None):
+"""
+    Perform path planning using the Rapidly-exploring Random Tree (RRT) algorithm.
 
+    Args:
+        from_wp (Waypoint): Starting waypoint.
+        to_wp (Waypoint): Ending waypoint.
+        map (Map): Map containing no-fly zones.
+        save_filename (str): Optional filename to save the generated map image.
+
+    Returns:
+        tuple: A tuple containing waypoint list, path length, feasibility status, distance to objective, time taken, and path length.
+
+    This function performs path planning using the Rapidly-exploring Random Tree (RRT) algorithm to generate a safe path from a starting waypoint to an ending waypoint while avoiding obstacles.
+
+    Args:
+        - from_wp (Waypoint): Starting waypoint.
+        - to_wp (Waypoint): Ending waypoint.
+        - map (Map): Map containing no-fly zones.
+        - save_filename (str): Optional filename to save the generated map image.
+
+    Returns:
+        - tuple: A tuple containing the following elements:
+          - WaypointList: A list of waypoints representing the generated path.
+          - float: The length of the generated path.
+          - str: Feasibility status, which can be 'feasible', 'infeasible', or 'verify'.
+          - float: Distance to the objective (destination waypoint).
+          - float: Time taken to generate the path.
+          - int: Length of the generated path.
+
+    This function calculates a path using the Rapidly-exploring Random Tree (RRT) algorithm from the provided starting waypoint to the ending waypoint, considering the specified map with no-fly zones. The generated path is returned as a list of waypoints, along with information about its feasibility, length, and the time taken for the planning process. An optional map image can be saved to the provided file.
+    """
     origin = Conversor.geo_to_cart(from_wp.geo, map.geo_home)
     rospy.loginfo(f"origin={origin}")
 
     destination = Conversor.geo_to_cart(to_wp.geo, map.geo_home)
     rospy.loginfo(f"destination={destination}")
 
+    # Prepare obstacleList for collision checking using ray casting
     obstacleList = [[Conversor.geo_to_cart(p.geo, map.geo_home) for p in area.points] for area in map.nfz]
 
     rc_map = Mapa(
@@ -274,10 +525,11 @@ def rrt(from_wp, to_wp, map, save_filename=None):
 
     rospy.loginfo(f"rand_area={rand_area}")
 
+    # Calculate the distance to the goal based on the origin and destination
     dist_to_goal = euclidean_distance(origin, destination) * 1.2
     rospy.loginfo(f"dist_to_goal={dist_to_goal}")
 
-    # Set Initial parameters
+    # Set initial parameters for the RRT algorithm
     rrt = RRT(
         start=[origin.x, origin.y],
         goal=[destination.x, destination.y],
@@ -309,7 +561,7 @@ def rrt(from_wp, to_wp, map, save_filename=None):
             route, obstacleList, destination
         )
 
-        # Draw final route
+        # Draw the final route on the map and save it to a file if a filename is provided
         if save_filename:
             vis_mapa(rc_map, route=route, save=f"{save_filename}.png")
 
@@ -324,19 +576,44 @@ def rrt(from_wp, to_wp, map, save_filename=None):
 
 
 def ag(from_wp, to_wp, map, save_filename=None):
+"""
+    Perform path planning using the Genetic Algorithm (Algoritmo genetico, AG in pt-br).
 
+    Args:
+        from_wp (Waypoint): Starting waypoint.
+        to_wp (Waypoint): Ending waypoint.
+        map (Map): Map containing no-fly zones.
+        save_filename (str): Optional filename to save the generated map image.
+
+    Returns:
+        tuple: A tuple containing waypoint list, path length, feasibility status, distance to objective, time taken, and path length.
+
+    This function performs path planning using the Genetic Algorithm (AG) algorithm to generate a safe path from a starting waypoint to an ending waypoint while avoiding obstacles.
+
+    Args:
+        - from_wp (Waypoint): Starting waypoint.
+        - to_wp (Waypoint): Ending waypoint.
+        - map (Map): Map containing no-fly zones.
+        - save_filename (str): Optional filename to save the generated map image.
+
+    Returns:
+        - tuple: A tuple containing the following elements:
+          - WaypointList: A list of waypoints representing the generated path.
+          - float: The length of the generated path.
+          - str: Feasibility status, which can be 'feasible', 'infeasible', or 'verify'.
+          - float: Distance to the objective (destination waypoint).
+          - float: Time taken to generate the path.
+          - int: Length of the generated path.
+
+    This function calculates a path using the Genetic Algorithm (AG) algorithm from the provided starting waypoint to the ending waypoint, considering the specified map with no-fly zones. The generated path is returned as a list of waypoints, along with information about its feasibility, length, and the time taken for the planning process. An optional map image can be saved to the provided file.
+    """
     # Convert map to ag_map
-    # nfzs has this structure:
-    # nfzs = [
-    #     [CartesianPoint(), CartesianPoint(), CartesianPoint(), CartesianPoint()],
-    #     ...
-    # ]
     nfzs = [[point.cartesian for point in area.points] for area in map.nfz]
 
     origin = Conversor.geo_to_cart(from_wp.geo, map.geo_home)
     destination = Conversor.geo_to_cart(to_wp.geo, map.geo_home)
 
-    # Creates the ag_map in a structure the AG will understand
+    # Create an AG map structure
     ag_map = Mapa(
         origin,
         destination,
@@ -345,6 +622,7 @@ def ag(from_wp, to_wp, map, save_filename=None):
         inflation_rate=0.1,
     )
 
+    # Create an AG instance for path planning
     ag = Genetic(
         Subject,
         ag_map,
@@ -374,8 +652,8 @@ def ag(from_wp, to_wp, map, save_filename=None):
         gps_imprecision=1,
     )
 
+    # Run the AG algorithm and get the best route found
     best = ag.run(info=True)
-
     route = best.get_route()
 
     rospy.loginfo("Best route found:")
@@ -387,9 +665,10 @@ def ag(from_wp, to_wp, map, save_filename=None):
     distance_path = best.fitness_trace[5]  # (fit_dist)
     distance_to_objective = best.fitness_trace[0]  # (fit_d)
 
+    # Get the time when the first feasible route was found
     first_factible_route_found_time = get_first_factible_route(ag)
 
-    # Draw final route
+    # Draw the final route on the map and save it to a file if a filename is provided
     if save_filename:
         vis_mapa(ag_map, route=route, save=f"{save_filename}.png")
 
@@ -406,24 +685,50 @@ def ag(from_wp, to_wp, map, save_filename=None):
 # SERVER
 
 def select_planner(obstacles_qty, distance, battery):
-    """Selects a path planner based on the information received
+ """
+    Select a path planning algorithm based on input features.
 
     Args:
-        obstacles_qty (int): quantity of obstacles between the origin and the destination waypoint
-        distance (float): the distance in a straight line between the origin and the destination waypoint
+        obstacles_qty (int): The number of obstacles in the environment.
+        distance (float): The distance to the destination.
+        battery (float): The remaining battery percentage.
 
     Returns:
-        selected_planner (str): the name of the selected planner, according to the intelligence
-    """
+        str: The selected path planning algorithm ("rrt" or another planner).
 
+    This function takes input features, including the number of obstacles (`obstacles_qty`), the distance to the destination (`distance`), and the remaining battery percentage (`battery`). It uses a K-Nearest Neighbors (KNN) classifier to predict the best path planning algorithm based on these features.
+
+    Returns the selected path planning algorithm, which can be "rrt" or another planner based on the KNN prediction.
+    """
+    # Uncomment the next line to always return "rrt"
     # return "rrt"
 
     global KNN
 
-    # Predict the best planner
+    # Predict the best planner based on the input features
     return KNN.predict([[obstacles_qty, distance, battery]])
 
 def run_path_planning(from_wp, to_wp, map, obstacles_qty):
+    """
+    Run path planning based on specified waypoints, map, and obstacle quantity.
+
+    Args:
+        from_wp (Waypoint): The starting waypoint.
+        to_wp (Waypoint): The destination waypoint.
+        map (Map): The map containing obstacle information.
+        obstacles_qty (int): The quantity of obstacles in the environment.
+
+    Returns:
+        list of Waypoint or None: The generated path as a list of waypoints or None if no feasible path is found.
+
+    This function calculates the distance between the starting and destination waypoints, retrieves UAV battery information, and selects a path planning algorithm based on the obstacles quantity. It logs the selected planner and execution time.
+
+    If "ag," "rrt," or "pfp" is selected, the respective path planning algorithm is executed, and the results are logged. If the selected planner fails to find a feasible path, the function iteratively attempts alternative planners from a list (RRT, AG, PFP) and logs each attempt. The function continues until a feasible path is found.
+
+    The generated path (route) is returned as a list of waypoints if a feasible path is found. Otherwise, None is returned.
+
+    Note: The function rotates between planners to increase the likelihood of finding a feasible path when the initial selection fails.
+    """
     distance = euclidean_distance(from_wp.cartesian, to_wp.cartesian)/1000
 
     uav = Drone()
@@ -493,14 +798,28 @@ class PathPlanningOp():
 
 def path_planning(data):
     """
+    Perform path planning operations based on the specified data.
+
     Args:
-        origin_point (RegionPoint): data.req.from
-        destination_point (RegionPoint): data.req.to
+        data (PathPlanningData): The data object containing the operation and related information.
 
     Returns:
-        List[Waypoint]
-    """
+        PathPlanningResponse or None: A response object with the generated route or None if no feasible path is found.
 
+    This function performs various path planning operations based on the given `data` object. The operation is determined by the `op` field within the data object.
+
+    - If the operation is `PLAN_PATH`, path planning is executed using the `run_path_planning` function. The number of obstacles is estimated using the `count_obstacles` function. The generated route is returned as a `PathPlanningResponse` object.
+
+    - If the operation is `PULVERIZE`, the `pulverize` function is called to generate a route. The resulting route is returned as a `PathPlanningResponse` object.
+
+    - If the operation is `TAKE_PICTURE`, a route for capturing a picture is generated using the `picture` function. The resulting route is returned as a `PathPlanningResponse` object.
+
+    - If the operation is `PLAN_PATH_RRT`, path planning is executed using the `rrt` function, and the generated route is returned as a `PathPlanningResponse` object.
+
+    If a feasible route is found, it is returned as a `PathPlanningResponse` object. If no feasible path is found, None is returned.
+
+    Note: This function handles various path planning scenarios based on the specified operation in the `data` object.
+    """
     route = WaypointList()
 
     # Organize inputs
@@ -539,6 +858,14 @@ def path_planning(data):
         return PathPlanningResponse(route)
 
 def path_planning_server():
+    """
+    Initialize and run the path planning service.
+
+    This function initializes the ROS node for the path planning service and configures a global variable for the K-nearest neighbors (KNN) classifier. The KNN model is loaded from a pickle file, allowing it to be used across multiple service requests. The service listens for incoming path planning requests and delegates them to the `path_planning` function. Once the service is ready, it enters the ROS service loop.
+
+    Note: The service runs indefinitely to accept path planning requests.
+
+    """
     rospy.init_node("path_planning_server")
 
     harpia_root_dir = get_harpia_root_dir()

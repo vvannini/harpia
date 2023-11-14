@@ -27,53 +27,67 @@ import math
 import numpy
 import json
 
-# table = [
-#     {"Type": "Takeoff and landing", "Takeoff Alt": 5},
-#     {"Type": "Takeoff and landing", "Takeoff Alt": 15},
-#     {"Type": "Takeoff and landing", "Takeoff Alt": 30},
-#     {"Type": "Hovering", "Hovering Alt": 5},
-#     {"Type": "Hovering", "Hovering Alt": 15},
-#     {"Type": "Hovering", "Hovering Alt": 30},
-#     {"Type": "Line flight", "Direction": "F", "Distance": 10, "Start Alt": 15, "End Alt": 15},
-#     {"Type": "Line flight", "Direction": "F", "Distance": 10, "Start Alt": 15, "End Alt": 10},
-#     {"Type": "Line flight", "Direction": "F", "Distance": 15, "Start Alt": 50, "End Alt": 30},
-#     {"Type": "Line flight", "Direction": "F", "Distance": 5, "Start Alt": 7, "End Alt": 5},
-#     {"Type": "Line flight", "Direction": "B","Distance": 10, "Start Alt": 15, "End Alt": 10},
-#     {"Type": "Line flight", "Direction": "B","Distance": 15, "Start Alt": 50, "End Alt": 30},
-#     {"Type": "Line flight", "Direction": "B","Distance": 5, "Start Alt": 7, "End Alt": 5},
-#     {"Type": "Line flight", "Direction": "L", "Distance": 10, "Start Alt": 15, "End Alt": 10},
-#     {"Type": "Line flight", "Direction": "L", "Distance": 15, "Start Alt": 50, "End Alt": 30},
-#     {"Type": "Line flight", "Direction": "L", "Distance": 5, "Start Alt": 7, "End Alt": 5},
-#     {"Type": "Line flight", "Direction": "R", "Distance": 10, "Start Alt": 15, "End Alt": 10},
-#     {"Type": "Line flight", "Direction": "R", "Distance": 15, "Start Alt": 50, "End Alt": 30},
-#     {"Type": "Line flight", "Direction": "R", "Distance": 5, "Start Alt": 7, "End Alt": 5},
-#     {"Type": "Circular flight", "Radius": 5, "Wind speed": None},
-#     {"Type": "Circular flight", "Radius": 25, "Wind speed": None},
-#     {"Type": "Circular flight", "Radius": 50, "Wind speed": None},
-#     {"Type": "8", "Radius": 50, "Start Alt": 7, "End Alt": 5},
-#     {"Type": "alt", "delta_Alt": 5}
-
-# ]
-
-
 table = [
+    {"Type": "Takeoff and landing", "Takeoff Alt": 5},
+    {"Type": "Takeoff and landing", "Takeoff Alt": 15},
+    {"Type": "Takeoff and landing", "Takeoff Alt": 30},
+    {"Type": "Hovering", "Hovering Alt": 5},
+    {"Type": "Hovering", "Hovering Alt": 15},
+    {"Type": "Hovering", "Hovering Alt": 30},
+    {"Type": "Line flight", "Direction": "F", "Distance": 10, "Start Alt": 15, "End Alt": 15},
+    {"Type": "Line flight", "Direction": "F", "Distance": 10, "Start Alt": 15, "End Alt": 10},
+    {"Type": "Line flight", "Direction": "F", "Distance": 15, "Start Alt": 50, "End Alt": 30},
+    {"Type": "Line flight", "Direction": "F", "Distance": 5, "Start Alt": 7, "End Alt": 5},
+    {"Type": "Line flight", "Direction": "B","Distance": 10, "Start Alt": 15, "End Alt": 10},
+    {"Type": "Line flight", "Direction": "B","Distance": 15, "Start Alt": 50, "End Alt": 30},
+    {"Type": "Line flight", "Direction": "B","Distance": 5, "Start Alt": 7, "End Alt": 5},
+    {"Type": "Line flight", "Direction": "L", "Distance": 10, "Start Alt": 15, "End Alt": 10},
+    {"Type": "Line flight", "Direction": "L", "Distance": 15, "Start Alt": 50, "End Alt": 30},
+    {"Type": "Line flight", "Direction": "L", "Distance": 5, "Start Alt": 7, "End Alt": 5},
+    {"Type": "Line flight", "Direction": "R", "Distance": 10, "Start Alt": 15, "End Alt": 10},
+    {"Type": "Line flight", "Direction": "R", "Distance": 15, "Start Alt": 50, "End Alt": 30},
+    {"Type": "Line flight", "Direction": "R", "Distance": 5, "Start Alt": 7, "End Alt": 5},
+    {"Type": "Circular flight", "Radius": 5, "Wind speed": None},
+    {"Type": "Circular flight", "Radius": 25, "Wind speed": None},
+    {"Type": "Circular flight", "Radius": 50, "Wind speed": None},
+    {"Type": "8", "Radius": 50, "Start Alt": 7, "End Alt": 5},
     {"Type": "alt", "delta_Alt": 5}
 
 ]
 
-# table = [
-#     {"Type": "alt", "delta_Alt": 5},
-# ]
-
 
 def get_harpia_root_dir():
+    """
+    Get the root directory of the Harpia system.
+
+    This function retrieves the root directory of the Harpia system using the ROS parameter '/harpia_home'. 
+    If the parameter is not found, the default root directory is set to the user's home directory with the 'harpia' folder.
+
+    Returns:
+        str: The absolute path to the Harpia root directory.
+
+    Example:
+        root_dir = get_harpia_root_dir()
+        print(f"Harpia root directory: {root_dir}")
+    """
     return rospy.get_param("/harpia_home", default=os.path.expanduser("~/harpia"))
 
-'''
-    behaivors 
-'''
 
 def sequential_noise(data):
+      """
+    Generate sequential noisy data for various UAV parameters.
+
+    Parameters:
+        data (dict): A dictionary containing UAV parameters.
+
+    Returns:
+        dict: A dictionary with keys representing UAV parameters and values containing lists of sequential noisy data.
+
+    Example:
+        # Assuming 'uav_data' is a dictionary containing UAV parameters
+        noisy_sequence = sequential_noise(uav_data)
+        print(f"Noisy sequence for roll: {noisy_sequence['roll']}")
+    """
     sequential = {'roll':[],
                           'pitch':[],
                           'yaw':[],
@@ -92,7 +106,20 @@ def sequential_noise(data):
 
 def go_to_base(mission, uav):
     """
-    Go to nearest base immediately and land.
+    Go to the nearest base immediately and land.
+
+    Parameters:
+        mission (Mission): An object representing the mission with map, goals, and other details.
+        uav (UAV): An object representing the UAV with latitude, longitude, and other details.
+
+    Returns:
+        Base: An object representing the nearest base reached by the UAV.
+
+    Example:
+        # Assuming 'current_mission' is an instance of the Mission class
+        # and 'current_uav' is an instance of the UAV class
+        base_reached = go_to_base(current_mission, current_uav)
+        print(f"UAV reached the nearest base: {base_reached.name}")
     """
 
     rate = rospy.Rate(1)
@@ -130,6 +157,44 @@ def go_to_base(mission, uav):
     
 
 class UAV(object):
+    """
+    Class representing a UAV (Unmanned Aerial Vehicle) with ROS (Robot Operating System) integration.
+
+    Attributes:
+        sequential (dict): Dictionary containing sequential data such as roll, pitch, yaw, etc.
+        noise (dict): Dictionary containing noise data generated from the sequential data.
+        armed (bool): Indicates whether the UAV is armed.
+        land_ex (float): Extended state variable indicating the UAV's landing state.
+        alt (float): Altitude of the UAV.
+        lat (float): Latitude of the UAV.
+        lon (float): Longitude of the UAV.
+        mode (str): Current mode of the UAV.
+        guided (bool): Indicates whether the UAV is in guided mode.
+        manual_input (bool): Indicates whether manual input is being used.
+        system_status (int): Status of the UAV system.
+        vtol_state (int): VTOL (Vertical Take-Off and Landing) state of the UAV.
+        landed_state (int): Landed state of the UAV.
+        status (int): Status of the UAV.
+        last_commanded_altitude (float): Altitude of the last commanded position.
+        current (int): Current waypoint sequence.
+        self_check (int): Counter for self-checking purposes.
+        qtd_sub (int): Quantity of subscribers.
+        curr_vel (TwistStamped): Current velocity of the UAV.
+        des_pose (PoseStamped): Desired pose of the UAV.
+        cur_pose (PoseStamped): Current pose of the UAV.
+
+    Methods:
+        vel_cb(msg): Callback function for velocity subscriber.
+        pos_cb(msg): Callback function for position subscriber.
+        pose_callback(data): Callback function for pose subscriber.
+        state_callback(data): Callback function for state subscriber.
+        state_ex_callback(data): Callback function for extended state subscriber.
+        gps_callback(data): Callback function for GPS data subscriber.
+        isReadyToTargetFly(): Checks if the UAV is ready to fly in OFFBOARD mode.
+        reached_callback(data): Callback function for waypoint reached subscriber.
+        change_altitude(delta): Changes the altitude of the UAV by a given delta.
+        periodic_setpoint(event): Periodically sets the desired pose for the UAV.
+    """  
     def __init__(self):
         self.sequential = {'roll':-float("inf"),
                           'pitch':-float("inf"),
@@ -278,6 +343,24 @@ class UAV(object):
 # ------------   Callers for MAVRos Services
 
 def mavros_cmd(topic, msg_ty, error_msg="MAVROS command failed: ", **kwargs):
+     """
+    Send a command to MAVROS through a ROS service.
+
+    Parameters:
+        topic (str): The topic of the MAVROS command service.
+        msg_ty (ROS message type): The ROS message type for the service.
+        error_msg (str): Custom error message in case the service call fails.
+        **kwargs: Additional keyword arguments to be passed to the service.
+
+    Returns:
+        None
+
+    Raises:
+        rospy.ServiceException: If the service call fails.
+
+    Example:
+        mavros_cmd('/mavros/cmd/takeoff', CommandTOL, altitude=5)
+    """
     rospy.wait_for_service(topic)
     try:
         service_proxy = rospy.ServiceProxy(topic, msg_ty)
@@ -287,6 +370,17 @@ def mavros_cmd(topic, msg_ty, error_msg="MAVROS command failed: ", **kwargs):
         rospy.logerr(f"{error_msg} {e}")
 
 def land():
+     """
+    Initiate landing through MAVROS.
+
+    This function sends a landing command to MAVROS using the '/mavros/cmd/land' service.
+
+    Parameters:
+        None
+
+    Returns:
+        None
+    """
     mavros_cmd(
         '/mavros/cmd/land',
         CommandTOL,
@@ -295,6 +389,19 @@ def land():
     )
 
 def takeoff(alt, uav):
+     """
+    Initiate takeoff through MAVROS.
+
+    This function sends a takeoff command to MAVROS using the '/mavros/cmd/takeoff' service.
+
+    Parameters:
+        alt (float): The desired altitude for takeoff.
+        uav (UAV): An instance of the UAV class representing the drone.
+
+    Returns:
+        None
+
+    """
     mavros_cmd(
         '/mavros/cmd/takeoff',
         CommandTOL,
@@ -303,6 +410,17 @@ def takeoff(alt, uav):
     )
 
 def arm():
+    """
+    Arm the drone through MAVROS.
+
+    This function sends an arming command to MAVROS using the '/mavros/cmd/arming' service.
+
+    Parameters:
+        None
+
+    Returns:
+        None
+    """
     mavros_cmd(
         '/mavros/cmd/arming',
         CommandBool,
@@ -311,6 +429,20 @@ def arm():
     )
 
 def set_mode(mode):
+    """
+    Set the flight mode of the drone through MAVROS.
+
+    This function sends a command to set the flight mode using the '/mavros/set_mode' service.
+
+    Parameters:
+        mode (str): The desired flight mode.
+
+    Returns:
+        None
+
+    Example:
+        set_mode("GUIDED")
+    """
     mavros_cmd(
         '/mavros/set_mode',
         SetMode,
@@ -320,6 +452,17 @@ def set_mode(mode):
     )
 
 def clear_mission():
+     """
+    Clear the mission waypoints through MAVROS.
+
+    This function sends a command to clear the mission waypoints using the '/mavros/mission/clear' service.
+
+    Parameters:
+        None
+
+    Returns:
+        None
+    """
     mavros_cmd(
         '/mavros/mission/clear',
         WaypointClear,
@@ -327,6 +470,17 @@ def clear_mission():
     )
 
 def send_route(route):
+    """
+    Send a route to the drone's mission through MAVROS.
+
+    This function sends a route (list of waypoints) to the drone's mission using the '/mavros/mission/push' service.
+
+    Parameters:
+        route (Route): The route to be sent, containing waypoints.
+
+    Returns:
+        None
+    """
     mavros_cmd(
         '/mavros/mission/push',
         WaypointPush,
@@ -337,6 +491,19 @@ def send_route(route):
 
 
 def set_home_position(latitude, longitude, altitude):
+    """
+    Set the home position for the drone through MAVROS.
+
+    This function sets the home position for the drone using the '/mavros/cmd/set_home' service.
+
+    Parameters:
+        latitude (float): The latitude of the home position.
+        longitude (float): The longitude of the home position.
+        altitude (float): The altitude of the home position.
+
+    Returns:
+        None
+    """
     rospy.wait_for_service('/mavros/cmd/set_home')
     try:
         set_home_service = rospy.ServiceProxy('/mavros/cmd/set_home', CommandHome)
@@ -353,6 +520,24 @@ def set_home_position(latitude, longitude, altitude):
 
 
 def takeoff_land(kenny:UAV, alt:int, flight_time:int,flag_fault:bool) -> list:
+    """
+    Perform takeoff, flight, and landing for a specified duration.
+
+    This function controls the drone to perform takeoff, hover for a specified duration,
+    and then land. The flight data, including either sequential or noisy data, is recorded during the flight.
+
+    Parameters:
+        kenny (UAV): An instance of the UAV class representing the drone.
+        alt (int): The altitude to reach during takeoff.
+        flight_time (int): The duration of the flight in seconds.
+        flag_fault (bool): A flag indicating whether to use noisy data during the flight.
+
+    Returns:
+        list: A list containing the flight data recorded during the flight.
+
+    Example:
+        flight_data = takeoff_land(kenny, 10, 60, False)
+    """
     flight_list = []
     start = time.time()
 
@@ -383,6 +568,24 @@ def takeoff_land(kenny:UAV, alt:int, flight_time:int,flag_fault:bool) -> list:
     return flight_list
 
 def hovering(kenny:UAV, alt:int, flight_time:int,flag_fault:bool) -> list:
+     """
+    Perform hovering at a specific altitude for a specified duration.
+
+    This function controls the drone to perform takeoff, hover at a specified altitude, and record flight data.
+    The flight data, including either sequential or noisy data, is recorded during the hovering.
+
+    Parameters:
+        kenny (UAV): An instance of the UAV class representing the drone.
+        alt (int): The altitude to reach during takeoff.
+        flight_time (int): The duration of the hovering in seconds.
+        flag_fault (bool): A flag indicating whether to use noisy data during hovering.
+
+    Returns:
+        list: A list containing the flight data recorded during hovering.
+
+    Example:
+        hover_data = hovering(kenny, 10, 60, False)
+    """
     flight_list = []
 
     set_mode("AUTO.LOITER")
@@ -407,6 +610,25 @@ def hovering(kenny:UAV, alt:int, flight_time:int,flag_fault:bool) -> list:
     return flight_list
 
 def line(lat, lon, distance, alt, direction):
+    """
+    Generate waypoints for flying in a straight line in a specific direction.
+
+    This function generates waypoints for flying in a straight line from the given latitude and longitude,
+    covering a specified distance in a particular direction. The waypoints are added to a WaypointList.
+
+    Parameters:
+        lat (float): The initial latitude of the starting point.
+        lon (float): The initial longitude of the starting point.
+        distance (float): The distance to cover in the specified direction (in meters).
+        alt (float): The altitude at which the waypoints should be set.
+        direction (str): The direction of the line ('R' for right, 'L' for left, 'B' for back, 'F' for forward).
+
+    Returns:
+        WaypointList: A list of waypoints representing a straight line in the specified direction.
+
+    Example:
+        line_route = line(37.7749, -122.4194, 250, 10, 'F')
+    """
     longitude = lon
     latitude = lat
     alt = 10
@@ -453,7 +675,25 @@ def line(lat, lon, distance, alt, direction):
     return geo_route
 
 def line_flight(uav, min_alt, max_alt,distance, direction, flight_time, flag_fault):
+    """
+    Perform a flight in a straight line with a UAV.
 
+    This function performs a flight in a straight line with a UAV, covering a specified distance in a particular direction.
+    The UAV takes off to the specified minimum altitude, then flies along the generated line waypoints. The flight lasts for
+    a specified duration. Flight data is collected and added to the `flight_list`.
+
+    Parameters:
+        uav (UAV): An instance of the UAV class representing the UAV.
+        min_alt (float): The minimum altitude at which the UAV takes off.
+        max_alt (float): The maximum altitude at which the UAV flies during the line flight.
+        distance (float): The distance to cover in the specified direction (in meters).
+        direction (str): The direction of the line ('R' for right, 'L' for left, 'B' for back, 'F' for forward).
+        flight_time (int): The duration of the flight in seconds.
+        flag_fault (bool): A flag indicating whether to use noisy data (True) or sequential data (False).
+
+    Returns:
+        list: A list of flight data collected during the line flight.
+    """
     target = Pose()
     target.position.x = 0
     target.position.y = 0
@@ -506,6 +746,22 @@ def line_flight(uav, min_alt, max_alt,distance, direction, flight_time, flag_fau
     # return None
     
 def circle(lat, lon, raio, alt):
+    """
+    Generate waypoints for a circular flight path around a specified location.
+
+    This function generates waypoints for a circular flight path around a specified location using the given latitude,
+    longitude, radius, and altitude. The circular flight path is created as a polygon, and waypoints are defined based on
+    the perimeter of this polygon.
+
+    Parameters:
+        lat (float): The latitude of the center of the circle.
+        lon (float): The longitude of the center of the circle.
+        raio (float): The radius of the circular flight path (in meters).
+        alt (float): The altitude at which the circular flight path is performed.
+
+    Returns:
+        WaypointList: A list of waypoints defining the circular flight path.
+     """
     point = PointGeometry(lon, lat)
     local_azimuthal_projection = f"+proj=aeqd +R=6371000 +units=m +lat_0={point.y} +lon_0={point.x}"
 
@@ -561,6 +817,23 @@ def circle(lat, lon, raio, alt):
     return route
 
 def circular_flight(uav, raio, alt, flight_time, flag_fault):
+    """
+    Perform a circular flight around a specified location.
+
+    This function performs a circular flight around a specified location using the given UAV object, radius, altitude, flight
+    time, and flag indicating whether to simulate a fault. The UAV is assumed to be armed and take off before executing the
+    circular flight path. The flight path is defined by waypoints generated using the `circle` function.
+
+    Parameters:
+        uav (UAV): The UAV object representing the drone.
+        raio (float): The radius of the circular flight path (in meters).
+        alt (float): The altitude at which the circular flight path is performed.
+        flight_time (int): The duration of the circular flight in seconds.
+        flag_fault (bool): A flag indicating whether to simulate a fault during the flight.
+
+    Returns:
+        list: A list of flight data (either sequential or noisy) collected during the circular flight.
+    """
     flight_list = []
     set_mode("AUTO.LOITER")
 
@@ -600,6 +873,26 @@ def circular_flight(uav, raio, alt, flight_time, flag_fault):
     return flight_list
     
 def eight_waypoints(center_lat, center_lon, min_altitude, max_altitude, radius):
+    """
+    Generate waypoints for an eight-shaped flight pattern.
+
+    This function generates waypoints for an eight-shaped flight pattern based on the specified center coordinates, minimum and
+    maximum altitudes, and radius. The flight pattern consists of 32 points forming a figure-eight shape. The waypoints are
+    returned as a list of tuples containing latitude, longitude, and altitude values.
+
+    Parameters:
+        center_lat (float): The latitude of the center point for the flight pattern.
+        center_lon (float): The longitude of the center point for the flight pattern.
+        min_altitude (float): The minimum altitude for the flight pattern.
+        max_altitude (float): The maximum altitude for the flight pattern.
+        radius (float): The radius of the figure-eight flight pattern.
+
+    Returns:
+        WaypointList: A list of waypoints for the figure-eight flight pattern.
+
+    Example:
+        waypoints = eight_waypoints(37.7749, -122.4194, 10, 30, 50)
+    """
     waypoints = []
     # Calculate the coordinates for the eight-shaped flight pattern
     num_points = 32  # Number of points in the pattern
@@ -648,6 +941,24 @@ def eight_waypoints(center_lat, center_lon, min_altitude, max_altitude, radius):
     return route
 
 def eight_flight(uav, raio, min_alt, max_alt, flight_time, flag_fault):
+    """
+    Perform an eight-shaped flight pattern with the UAV.
+
+    This function commands the UAV to perform an eight-shaped flight pattern based on the specified radius, minimum altitude,
+    maximum altitude, flight time, and fault flag. The UAV follows the generated waypoints for the eight-shaped pattern.
+
+    Parameters:
+        uav (UAV): The UAV object representing the drone.
+        raio (float): The radius of the figure-eight flight pattern.
+        min_alt (float): The minimum altitude for the flight pattern.
+        max_alt (float): The maximum altitude for the flight pattern.
+        flight_time (int): The total flight time for the eight-shaped pattern.
+        flag_fault (bool): A flag indicating whether to use fault-injected data during the flight.
+
+    Returns:
+        list: A list of recorded data during the flight.
+
+    """
     flight_list = []
     set_mode("AUTO.LOITER")
 
@@ -687,6 +998,20 @@ def eight_flight(uav, raio, min_alt, max_alt, flight_time, flag_fault):
     return flight_list
  
 def vertical_line(lat, lon, alt_change):
+    """
+    Generate waypoints for a vertical line flight pattern.
+
+    This function generates waypoints for a vertical line flight pattern based on the specified latitude, longitude,
+    and altitude change. The waypoints form a straight vertical line, and the UAV follows this path during the flight.
+
+    Parameters:
+        lat (float): The latitude of the starting point for the vertical line.
+        lon (float): The longitude of the starting point for the vertical line.
+        alt_change (float): The change in altitude for the vertical line.
+
+    Returns:
+        WaypointList: A list of waypoints representing the vertical line.
+    """
     altitude = alt_change
 
     geo_route = WaypointList()
@@ -711,6 +1036,23 @@ def vertical_line(lat, lon, alt_change):
     return geo_route
 
 def altitude_flight(kenny:UAV, alt:int, flight_time:int,flag_fault:bool) -> list:
+    """
+    Perform a flight maneuver with changes in altitude using waypoints.
+
+    This function performs a flight maneuver with changes in altitude using waypoints. It includes takeoff, ascending
+    to a specified altitude, flying at that altitude for a specified time, descending to a lower altitude, and then
+    landing. The flight data, including noise if specified, is recorded during the maneuver.
+
+    Parameters:
+        kenny (UAV): An instance of the UAV class representing the unmanned aerial vehicle.
+        alt (int): The target altitude to reach during the flight.
+        flight_time (int): The total time duration for the flight maneuver.
+        flag_fault (bool): A flag indicating whether to use fault-injected data (True) or sequential data (False).
+
+    Returns:
+        list: A list of recorded flight data during the maneuver.
+
+    """
     flight_list = []
 
     set_mode("AUTO.LOITER")
@@ -782,7 +1124,19 @@ def altitude_flight(kenny:UAV, alt:int, flight_time:int,flag_fault:bool) -> list
 
 # ------------ MAIN
 def listener():
+    """
+    Main function to generate flight data for a drone.
 
+    This function initializes a ROS node, sets up a UAV instance, and generates flight data based on predefined maneuvers.
+    The flight data includes takeoff and landing, hovering, circular flight, line flight, eight-shaped flight, and altitude change.
+    The generated data is saved in a JSON file.
+
+    Parameters:
+    None
+
+    Returns:
+    None
+    """
     rospy.init_node('genarate_flight_data', anonymous=True)
     kenny = UAV()
     flight_list = []
